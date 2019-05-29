@@ -2,6 +2,7 @@ package edu.isi.oba;
 
 import static org.junit.Assert.*;
 
+import org.openapitools.codegen.CodegenModel;
 import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.Node;
@@ -18,8 +19,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
-
-
+import org.openapitools.codegen.CodegenProperty;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 /**
  * Hello world!
  */
@@ -35,17 +38,16 @@ public class App {
 
 
         Set<OWLClass> classes;
+        Set<CodegenModel> models = null;
 
         classes = ontology.getClassesInSignature();
 
         System.out.println("Classes");
         System.out.println("--------------------------------");
         for (OWLClass cls : classes) {
-            System.out.println("+: " + cls.getIRI().getShortForm());
-
-            printObjectProperties(ontology, cls);
-            printDataProperties(ontology, cls);
-
+            CodegenModel codegenModel = new CodegenModel();
+            List<CodegenProperty> properties = getDataProperties(ontology, cls, factory);
+            codegenModel.setAllVars(properties);
         }
     }
 
@@ -59,6 +61,22 @@ public class App {
                 System.out.println("\t\t +:" + dp.getProperty());
             }
         }
+    }
+
+    private static List<CodegenProperty> getDataProperties(OWLOntology ontology, OWLClass cls, OWLDataFactory factory) {
+        List<CodegenProperty> properties = null;
+        for (OWLDataPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN)) {
+            if (dp.getDomain().equals(cls)) {
+                CodegenProperty property = new CodegenProperty();
+                for (OWLDataProperty odp : dp.getDataPropertiesInSignature()) {
+                    OWLDataPropertyDomainAxiom domain = factory.getOWLDataPropertyDomainAxiom(odp, cls);
+                    Set <OWLDataPropertyRangeAxiom> sgdp = ontology.getDataPropertyRangeAxioms(odp);
+                    System.out.println(sgdp);
+                }
+                //todo: set the parameters of property using ontologyProperty the information
+            }
+        }
+        return properties;
     }
 
     private static void printObjectProperties(OWLOntology ontology, OWLClass cls) {

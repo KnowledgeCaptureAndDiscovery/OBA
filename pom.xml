@@ -45,6 +45,13 @@
       <artifactId>owlapi-api</artifactId>
       <version>5.1.10</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.openapitools/openapi-generator -->
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>openapi-generator</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
