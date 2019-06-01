@@ -3,21 +3,27 @@ package edu.isi.oba;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.PrefixDocumentFormat;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
+import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import java.util.*;
 
 public class Mapper {
     public HashMap<String, String> dataTypes;
     public OWLOntologyManager manager;
+    public  DefaultPrefixManager pm;
 
     public Mapper(String ont_url, String ont_prefix) throws OWLOntologyCreationException {
+        this.pm = new DefaultPrefixManager();
         this.manager = OWLManager.createOWLOntologyManager();
         this.dataTypes = new HashMap<>();
-        OWLOntology ontology = manager.loadOntology(IRI.create(ont_url));
-        OWLDataFactory factory = manager.getOWLDataFactory();
-        DefaultPrefixManager pm = new DefaultPrefixManager(null, null, ont_prefix);
+        OWLOntology ontology = this.manager.loadOntology(IRI.create(ont_url));
+        OWLDataFactory factory = this.manager.getOWLDataFactory();
+        OWLDocumentFormat format = ontology.getOWLOntologyManager().getOntologyFormat(ontology);
+
         this.setDataTypes();
         this.getClass(ontology, factory);
     }
@@ -70,6 +76,12 @@ public class Mapper {
         }
     }
 
+    public CodegenProperty createCodegenProperty (String name, String type){
+        CodegenProperty codegenProperty = new CodegenProperty();
+        codegenProperty.setName(name);
+        codegenProperty.setDatatype(type);
+        return codegenProperty;
+    }
     /**
      * Obtain a list of Codegenproperty using the Ontology DataProperties of a Class
      * @param ontology Ontology
@@ -79,26 +91,27 @@ public class Mapper {
      */
     public List<CodegenProperty> getDataProperties(OWLOntology ontology, OWLClass cls, OWLDataFactory factory) {
         HashMap<String, String> dataTypes = new HashMap<String, String>();
+        HashMap<String, String> propertyNameURI = new HashMap<>();
         List<CodegenProperty> properties = new ArrayList<>();
         for (OWLDataPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN)) {
             if (dp.getDomain().equals(cls)) {
-                CodegenProperty property = new CodegenProperty();
                 for (OWLDataProperty odp : dp.getDataPropertiesInSignature()) {
-                    OWLDataPropertyDomainAxiom domain = factory.getOWLDataPropertyDomainAxiom(odp, cls);
+                    //OWLDataPropertyDomainAxiom domain = factory.getOWLDataPropertyDomainAxiom(odp, cls);
                     Set <OWLDataPropertyRangeAxiom> ranges = ontology.getDataPropertyRangeAxioms(odp);
-                    CodegenProperty codegenProperty = new CodegenProperty();
-                    getCodeGenTypesByRange(ranges, odp);
-                    List<String> types = getCodeGenTypesByRange(ranges, odp);
-                    String type = types.get(0);
-                    //todo: obtain type using the range
+                    //todo: Verify the short format
+                    String propertyName = this.pm.getShortForm(odp.getIRI());
+                    String propertyURI = odp.getIRI().toString();
+                    propertyNameURI.put(propertyURI,propertyName);
 
-                    codegenProperty.setName(name);
-                    codegenProperty.setBaseName(type);
+                    //obtain type using the range
+                    //todo: Verify the short format
+                    List<String> propertyRanges = getCodeGenTypesByRange(ranges, odp);
+                    String propertyRange = propertyRanges.get(0);
+
+                    CodegenProperty codeProperty = createCodegenProperty(propertyName, propertyRange);
                 }
                 //todo: set the parameters of property using ontologyProperty the information
 
-
-                properties.add(property);
             }
         }
         return properties;
