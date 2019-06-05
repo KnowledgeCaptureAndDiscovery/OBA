@@ -81,7 +81,7 @@ public class Mapper {
      */
     private boolean checkDomainClass(OWLClass cls, OWLPropertyDomainAxiom dp, Set<OWLClass> superClasses) {
         IRI classIRI = cls.getIRI();
-        IRI iri = IRI.create("https://w3id.org/mint/modelCatalog#Model");
+        IRI iri = IRI.create("https://w3id.org/mint/modelCatalog#CAG");
         IRI iridp = IRI.create("https://w3id.org/mint/modelCatalog#hasPresentation");
         if (classIRI.equals(iri)){
             System.out.println("ok");
@@ -153,6 +153,11 @@ public class Mapper {
 
         for (OWLObjectPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
             if (checkDomainClass(cls, dp, superClasses)) {
+                IRI iri = IRI.create("https://w3id.org/mint/modelCatalog#CAG");
+                if (cls.equals(iri)){
+                    System.out.println("ok");
+                }
+
                 for (OWLObjectProperty odp : dp.getObjectPropertiesInSignature()) {
                     Boolean array = true;
                     Boolean nullable = true;

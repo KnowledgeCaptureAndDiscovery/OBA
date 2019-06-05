@@ -43,10 +43,15 @@ components:
     Process:
       properties:
         influences:
-          items:
-            $ref: '#/components/schemas/Process'
-          nullable: true
-          type: array
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Process'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/VariablePresentation'
+            nullable: true
+            type: array
       type: Object
     Unit:
       properties: {}
@@ -165,14 +170,14 @@ components:
             $ref: '#/components/schemas/TimeInterval'
           nullable: true
           type: array
-        hasOutput:
-          items:
-            $ref: '#/components/schemas/DatasetSpecification'
-          nullable: true
-          type: array
         hasModule:
           items:
             $ref: '#/components/schemas/Module'
+          nullable: true
+          type: array
+        hasOutput:
+          items:
+            $ref: '#/components/schemas/DatasetSpecification'
           nullable: true
           type: array
         hasInput:
@@ -213,10 +218,15 @@ components:
     CAG:
       properties:
         hasPart:
-          items:
-            $ref: '#/components/schemas/Process'
-          nullable: true
-          type: array
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Process'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/VariablePresentation'
+            nullable: true
+            type: array
       type: Object
     DatasetSpecification:
       properties:
@@ -378,15 +388,25 @@ components:
           nullable: true
           type: array
         influences:
-          items:
-            $ref: '#/components/schemas/Process'
-          nullable: true
-          type: array
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Process'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/VariablePresentation'
+            nullable: true
+            type: array
         hasDataset:
-          items:
-            $ref: '#/components/schemas/Dataset'
-          nullable: true
-          type: array
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Dataset'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/DatasetSpecification'
+            nullable: true
+            type: array
         hasConstraint:
           items:
             type: string

@@ -2,6 +2,7 @@ package edu.isi.oba;
 
 import io.swagger.v3.oas.models.media.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -91,7 +92,6 @@ public class MapperProperty {
     /**
      * Set the property type
      * It can has multiple types
-     * TODO: link the codeGenProperty hasMany
      * @param type
      */
     public void setType(List<String> type) {
@@ -124,33 +124,42 @@ public class MapperProperty {
         }
     }
 
-    public Schema getSchemaByObjectProperty() throws Exception{
-        //TODO: Assumption: only one type
-        String ref = this.ref.get(0);
-        try {
-            return getObjectPropertiesByRef(ref, array, nullable);
+    public Schema getSchemaByObjectProperty(){
+        if (this.ref.size() > 1){
+            return getComposedSchemaObject(this.ref, array, nullable);
         }
-        catch (Exception e) {
-            throw new NullPointerException("Null pointer");
+        else {
+            return getObjectPropertiesByRef(this.ref.get(0), array, nullable);
         }
     }
 
-    public Schema getObjectPropertiesByRef(String ref, boolean array , boolean nullable){
+    public Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable){
+        Schema object = new ObjectSchema();
+        object.set$ref(ref);
+
         if (array) {
             ArraySchema objects = new ArraySchema();
-            Schema base = new  ObjectSchema();
-            base.set$ref(ref);
-            objects.setItems(base);
             objects.setNullable(nullable);
+            objects.setItems(object);
             return objects;
         }
         else {
-            ObjectSchema object = new ObjectSchema();
-            object.set$ref(ref);
-            object.setNullable(nullable);
             return object;
         }
+
+
     }
+    private Schema getComposedSchemaObject(List<String> refs, boolean array, boolean nullable){
+        ComposedSchema composedSchema = new ComposedSchema();
+        List<Schema> items = new ArrayList<>();
+        for (String ref : refs){
+            Schema item = getObjectPropertiesByRef(ref, array, nullable);
+            items.add(item);
+        }
+        composedSchema.setAnyOf(items);
+        return composedSchema;
+    }
+
 
 
 
