@@ -1,0 +1,431 @@
+openapi: 3.0.1
+info:
+  description: Some description
+  title: Some title
+externalDocs:
+  description: a-description
+  url: http://abcdef.com
+servers:
+- description: first server
+  url: http://www.server1.com
+- description: second server
+  url: http://www.server2.com
+security:
+- some_auth:
+  - write
+  - read
+tags:
+- description: some 1 description
+  name: tag1
+- description: some 2 description
+  name: tag2
+- description: some 3 description
+  name: tag3
+paths:
+  /ping/pong:
+    get:
+      description: Some description
+      operationId: pingOp
+      responses:
+        200:
+          description: Ok
+components:
+  schemas:
+    Variable:
+      properties: {}
+      type: Object
+    Grid:
+      properties: {}
+      type: Object
+    GSNVariable:
+      properties: {}
+      type: Object
+    Process:
+      properties:
+        influences:
+          items:
+            $ref: '#/components/schemas/Process'
+          nullable: true
+          type: array
+      type: Object
+    Unit:
+      properties: {}
+      type: Object
+    Function:
+      properties:
+        hasComponentLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSupportScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasContainer:
+          items:
+            $ref: '#/components/schemas/Container'
+          nullable: true
+          type: array
+        hasImplementationScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    StandardVariable:
+      properties: {}
+      type: Object
+    Container:
+      properties:
+        hasIdentifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasExecutionCommand:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasInstallationInstructions:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    EmpiricalModel:
+      properties:
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasModelCategory:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    ModelConfiguration:
+      properties:
+        hasComponentLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasContainer:
+          items:
+            $ref: '#/components/schemas/Container'
+          nullable: true
+          type: array
+        hasProcess:
+          items:
+            $ref: '#/components/schemas/Process'
+          nullable: true
+          type: array
+        hasImplementationScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSupportScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasCAG:
+          items:
+            $ref: '#/components/schemas/CAG'
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasParameter:
+          items:
+            $ref: '#/components/schemas/Parameter'
+          nullable: true
+          type: array
+        hasTimeInterval:
+          items:
+            $ref: '#/components/schemas/TimeInterval'
+          nullable: true
+          type: array
+        hasOutput:
+          items:
+            $ref: '#/components/schemas/DatasetSpecification'
+          nullable: true
+          type: array
+        hasModule:
+          items:
+            $ref: '#/components/schemas/Module'
+          nullable: true
+          type: array
+        hasInput:
+          items:
+            $ref: '#/components/schemas/DatasetSpecification'
+          nullable: true
+          type: array
+      type: Object
+    Concept:
+      properties: {}
+      type: Object
+    TimeInterval:
+      properties:
+        usesUnit:
+          items:
+            $ref: '#/components/schemas/Unit'
+          nullable: true
+          type: array
+        hasValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+      type: Object
+    Dataset:
+      properties:
+        hadGrid:
+          items:
+            $ref: '#/components/schemas/Grid'
+          nullable: true
+          type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/VariablePresentation'
+          nullable: true
+          type: array
+      type: Object
+    CAG:
+      properties:
+        hasPart:
+          items:
+            $ref: '#/components/schemas/Process'
+          nullable: true
+          type: array
+      type: Object
+    DatasetSpecification:
+      properties:
+        hasDimensionality:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hadGrid:
+          items:
+            $ref: '#/components/schemas/Grid'
+          nullable: true
+          type: array
+        hasFormat:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/VariablePresentation'
+          nullable: true
+          type: array
+        hasFileStructure:
+          items:
+            $ref: '#/components/schemas/DataStructureDefinition'
+          nullable: true
+          type: array
+      type: Object
+    HybridModel:
+      properties:
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasModelCategory:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    TheoryBasedModel:
+      properties:
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasModelCategory:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    ICASAVariable:
+      properties: {}
+      type: Object
+    DataStructureDefinition:
+      properties: {}
+      type: Object
+    SoftwareVersion:
+      properties:
+        hasVersionId:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    Model:
+      properties:
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSoftwareVersion:
+          items:
+            $ref: '#/components/schemas/SoftwareVersion'
+          nullable: true
+          type: array
+        hasModelCategory:
+          items:
+            type: string
+          nullable: true
+          type: array
+      type: Object
+    Parameter:
+      properties:
+        hasDefaultValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasDataType:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasMaximumAcceptedValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+      type: Object
+    Software:
+      properties:
+        hasSoftwareVersion:
+          items:
+            $ref: '#/components/schemas/SoftwareVersion'
+          nullable: true
+          type: array
+      type: Object
+    VariablePresentation:
+      properties:
+        hasDefaultValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasShortName:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasStandardVariable:
+          items:
+            $ref: '#/components/schemas/StandardVariable'
+          nullable: true
+          type: array
+        hasMaximumAcceptedValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        influences:
+          items:
+            $ref: '#/components/schemas/Process'
+          nullable: true
+          type: array
+        hasDataset:
+          items:
+            $ref: '#/components/schemas/Dataset'
+          nullable: true
+          type: array
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        usesUnit:
+          items:
+            $ref: '#/components/schemas/Unit'
+          nullable: true
+          type: array
+        hasLongName:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasRelevanceLevel:
+          items:
+            type: object
+          nullable: true
+          type: array
+      type: Object
+    ModelVersion:
+      properties:
+        hasVersionId:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasConfiguration:
+          items:
+            $ref: '#/components/schemas/ModelConfiguration'
+          nullable: true
+          type: array
+      type: Object
+    Module:
+      properties: {}
+      type: Object
+    Place:
+      properties: {}
+      type: Object
+x-custom: value1
+x-other: value2
