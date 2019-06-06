@@ -19,6 +19,8 @@ public class Mapper {
     public PrefixManager pm;
     private IRIShortFormProvider sfp = new SimpleIRIShortFormProvider();
     public OWLReasoner reasoner;
+    public Map<IRI, String> schemaNames = new HashMap<>();
+
 
     public Mapper(String ont_url, String ont_prefix) throws OWLOntologyCreationException, IOException {
         this.manager = OWLManager.createOWLOntologyManager();
@@ -34,17 +36,56 @@ public class Mapper {
             this.pm = new DefaultPrefixManager();
 
         }
-        this.pm.setPrefix("qudt", "http://qudt.org/schema/qudt");
-        this.pm.setPrefix("onto", "http://ontosoft.org/software");
-        this.pm.setPrefix("geo", "http://www.geoscienceontology.org/geo-upper");
+        this.pm.setPrefix("qudt", "http://qudt.org/schema/qudt/");
+        this.pm.setPrefix("onto", "http://ontosoft.org/software#");
+        this.pm.setPrefix("geo", "http://www.geoscienceontology.org/geo-upper#");
+        this.pm.setPrefix("schema", "http://schema.org/");
+        this.pm.setPrefix("skos", "http://www.w3.org/2004/02/skos/core#");
+        this.pm.setPrefix("dcat", "http://www.w3.org/ns/dcat#");
+        this.pm.setPrefix("dataCatalog", "https://w3id.org/mint/dataCatalog#");
+        this.pm.setPrefix("mint", "https://w3id.org/mint/modelCatalog#");
+
         Map<String, String> a = this.pm.getPrefixName2PrefixMap();
 
         Map<String, Schema> schemas = new HashMap<>();
         OWLDataFactory factory = this.manager.getOWLDataFactory();
+        this.setSchemaNames(ontology, factory);
         schemas = this.getClasses(ontology, factory);
         Serializer serializer = new Serializer(schemas);
     }
 
+    private void setSchemaNames(OWLOntology ontology, OWLDataFactory factory){
+        Set<OWLClass> classes;
+        classes = ontology.getClassesInSignature();
+        List<String> classesName = new ArrayList<>();
+        List<String> dups = new ArrayList<>();
+        //Create auxiliar list to detect duplicate name
+        for (OWLClass cls : classes) {
+            classesName.add(this.sfp.getShortForm(cls.getIRI()));
+        }
+        Set<String> uniqueNames = new HashSet<String>(classesName);
+
+        for (String uniqueName : uniqueNames) {
+            if (Collections.frequency(classesName, uniqueName) > 1){
+                dups.add(uniqueName);
+            };
+        }
+
+        for (OWLClass cls : classes) {
+            String className = this.sfp.getShortForm(cls.getIRI());
+            String schemaName;
+            if (dups.contains(className)){
+                schemaName = this.pm.getPrefixIRI(cls.getIRI()).replace(":", "-");
+            } else {
+                schemaName = this.sfp.getShortForm(cls.getIRI());
+            }
+            schemaNames.put(cls.getIRI(), schemaName);
+        }
+    }
+
+    private String getSchemaName(OWLClass cls){
+        return schemaNames.get(cls.getIRI());
+    }
 
     /**
      * Obtain Schemas using the ontology classes
@@ -56,10 +97,10 @@ public class Mapper {
         Set<OWLClass> classes;
         classes = ontology.getClassesInSignature();
         Map<String, Schema> schemas = new HashMap<>();
+        Set<String> prefixs = this.pm.getPrefixNames();
 
         for (OWLClass cls : classes) {
             System.out.println(cls.getIRI());
-            String className = cls.getIRI().getShortForm();
 
             //todo: FIX THIS HACK. THE HACK FIXS THE DUPLICATE NAME
             Map<String, Schema> dataProperties = this.getDataProperties(ontology, cls, factory);
@@ -68,7 +109,7 @@ public class Mapper {
             properties.putAll(dataProperties);
             properties.putAll(objectProperties);
             MapperSchema mapperSchema = new MapperSchema();
-            schemas.put(className, mapperSchema.getSchema(className, "object", properties));
+            schemas.put(getSchemaName(cls), mapperSchema.getSchema(getSchemaName(cls), "object", properties));
         }
 
         return schemas;
@@ -206,9 +247,9 @@ public class Mapper {
         Iterator<OWLObjectPropertyRangeAxiom> itr = ranges.iterator();
         while (itr.hasNext()) {
             OWLObjectPropertyAxiom propertyRangeAxiom = itr.next();
-            for (OWLEntity rangeStr : propertyRangeAxiom.getSignature()) {
-                if (!rangeStr.containsEntityInSignature(odp)) {
-                    String dataProp = this.sfp.getShortForm(rangeStr.getIRI());
+            for (OWLEntity rangeClass : propertyRangeAxiom.getSignature()) {
+                if (!rangeClass.containsEntityInSignature(odp)) {
+                    String dataProp = getSchemaName(rangeClass.asOWLClass());
                     objectProperty.add(dataProp);
                 }
             }

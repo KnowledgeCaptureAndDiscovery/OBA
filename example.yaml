@@ -31,7 +31,7 @@ paths:
           description: Ok
 components:
   schemas:
-    Variable:
+    dcat-Dataset:
       properties: {}
       type: object
     Grid:
@@ -52,9 +52,6 @@ components:
               $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
-      type: object
-    Unit:
-      properties: {}
       type: object
     Function:
       properties:
@@ -99,6 +96,9 @@ components:
             type: string
           nullable: true
           type: array
+      type: object
+    schema-Dataset:
+      properties: {}
       type: object
     EmpiricalModel:
       properties:
@@ -193,25 +193,12 @@ components:
       properties:
         usesUnit:
           items:
-            $ref: '#/components/schemas/Unit'
+            $ref: '#/components/schemas/qudt-Unit'
           nullable: true
           type: array
         hasValue:
           items:
             type: object
-          nullable: true
-          type: array
-      type: object
-    Dataset:
-      properties:
-        hadGrid:
-          items:
-            $ref: '#/components/schemas/Grid'
-          nullable: true
-          type: array
-        hasPresentation:
-          items:
-            $ref: '#/components/schemas/VariablePresentation'
           nullable: true
           type: array
       type: object
@@ -292,7 +279,13 @@ components:
           nullable: true
           type: array
       type: object
+    geo-Variable:
+      properties: {}
+      type: object
     ICASAVariable:
+      properties: {}
+      type: object
+    mint-Unit:
       properties: {}
       type: object
     DataStructureDefinition:
@@ -387,16 +380,6 @@ components:
             type: object
           nullable: true
           type: array
-        hasDataset:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/Dataset'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/DatasetSpecification'
-            nullable: true
-            type: array
         influences:
           anyOf:
           - items:
@@ -407,6 +390,16 @@ components:
               $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
+        hasDataset:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/dataCatalog-Dataset'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/DatasetSpecification'
+            nullable: true
+            type: array
         hasConstraint:
           items:
             type: string
@@ -414,7 +407,7 @@ components:
           type: array
         usesUnit:
           items:
-            $ref: '#/components/schemas/Unit'
+            $ref: '#/components/schemas/qudt-Unit'
           nullable: true
           type: array
         hasLongName:
@@ -441,10 +434,29 @@ components:
           nullable: true
           type: array
       type: object
+    dataCatalog-Dataset:
+      properties:
+        hadGrid:
+          items:
+            $ref: '#/components/schemas/Grid'
+          nullable: true
+          type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/VariablePresentation'
+          nullable: true
+          type: array
+      type: object
     Module:
       properties: {}
       type: object
     Place:
+      properties: {}
+      type: object
+    mint-Variable:
+      properties: {}
+      type: object
+    qudt-Unit:
       properties: {}
       type: object
 x-custom: value1

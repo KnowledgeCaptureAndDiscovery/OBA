@@ -23,7 +23,7 @@ import java.util.*;
 public class Serializer {
     public static final String STRING_TYPE = "string";
     public static final String INTEGER_TYPE = "integer";
-
+    //TODO: validate the yaml
     public Serializer(Map<String, Schema> schemas) throws IOException {
         OpenAPI openAPI = new OpenAPI();
         openAPI.setInfo(new Info().title("Some title").description("Some description"));
