@@ -68,7 +68,7 @@ public class Mapper {
             properties.putAll(dataProperties);
             properties.putAll(objectProperties);
             MapperSchema mapperSchema = new MapperSchema();
-            schemas.put(className, mapperSchema.getSchema(className, "Object", properties));
+            schemas.put(className, mapperSchema.getSchema(className, "object", properties));
         }
 
         return schemas;

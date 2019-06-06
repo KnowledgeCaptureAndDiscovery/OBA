@@ -33,13 +33,13 @@ components:
   schemas:
     Variable:
       properties: {}
-      type: Object
+      type: object
     Grid:
       properties: {}
-      type: Object
+      type: object
     GSNVariable:
       properties: {}
-      type: Object
+      type: object
     Process:
       properties:
         influences:
@@ -52,10 +52,10 @@ components:
               $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
-      type: Object
+      type: object
     Unit:
       properties: {}
-      type: Object
+      type: object
     Function:
       properties:
         hasComponentLocation:
@@ -78,10 +78,10 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     StandardVariable:
       properties: {}
-      type: Object
+      type: object
     Container:
       properties:
         hasIdentifier:
@@ -99,7 +99,7 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     EmpiricalModel:
       properties:
         hasConstraint:
@@ -117,7 +117,7 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     ModelConfiguration:
       properties:
         hasComponentLocation:
@@ -185,10 +185,10 @@ components:
             $ref: '#/components/schemas/DatasetSpecification'
           nullable: true
           type: array
-      type: Object
+      type: object
     Concept:
       properties: {}
-      type: Object
+      type: object
     TimeInterval:
       properties:
         usesUnit:
@@ -201,7 +201,7 @@ components:
             type: object
           nullable: true
           type: array
-      type: Object
+      type: object
     Dataset:
       properties:
         hadGrid:
@@ -214,7 +214,7 @@ components:
             $ref: '#/components/schemas/VariablePresentation'
           nullable: true
           type: array
-      type: Object
+      type: object
     CAG:
       properties:
         hasPart:
@@ -227,7 +227,7 @@ components:
               $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
-      type: Object
+      type: object
     DatasetSpecification:
       properties:
         hasDimensionality:
@@ -255,7 +255,7 @@ components:
             $ref: '#/components/schemas/DataStructureDefinition'
           nullable: true
           type: array
-      type: Object
+      type: object
     HybridModel:
       properties:
         hasConstraint:
@@ -273,7 +273,7 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     TheoryBasedModel:
       properties:
         hasConstraint:
@@ -291,13 +291,13 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     ICASAVariable:
       properties: {}
-      type: Object
+      type: object
     DataStructureDefinition:
       properties: {}
-      type: Object
+      type: object
     SoftwareVersion:
       properties:
         hasVersionId:
@@ -305,7 +305,7 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     Model:
       properties:
         hasConstraint:
@@ -328,7 +328,7 @@ components:
             type: string
           nullable: true
           type: array
-      type: Object
+      type: object
     Parameter:
       properties:
         hasDefaultValue:
@@ -351,7 +351,7 @@ components:
             type: object
           nullable: true
           type: array
-      type: Object
+      type: object
     Software:
       properties:
         hasSoftwareVersion:
@@ -359,7 +359,7 @@ components:
             $ref: '#/components/schemas/SoftwareVersion'
           nullable: true
           type: array
-      type: Object
+      type: object
     VariablePresentation:
       properties:
         hasDefaultValue:
@@ -387,16 +387,6 @@ components:
             type: object
           nullable: true
           type: array
-        influences:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/Process'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/VariablePresentation'
-            nullable: true
-            type: array
         hasDataset:
           anyOf:
           - items:
@@ -405,6 +395,16 @@ components:
             type: array
           - items:
               $ref: '#/components/schemas/DatasetSpecification'
+            nullable: true
+            type: array
+        influences:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Process'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
         hasConstraint:
@@ -427,7 +427,7 @@ components:
             type: object
           nullable: true
           type: array
-      type: Object
+      type: object
     ModelVersion:
       properties:
         hasVersionId:
@@ -440,12 +440,12 @@ components:
             $ref: '#/components/schemas/ModelConfiguration'
           nullable: true
           type: array
-      type: Object
+      type: object
     Module:
       properties: {}
-      type: Object
+      type: object
     Place:
       properties: {}
-      type: Object
+      type: object
 x-custom: value1
 x-other: value2
