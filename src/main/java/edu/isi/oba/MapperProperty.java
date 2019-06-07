@@ -5,9 +5,12 @@ import io.swagger.v3.oas.models.media.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class MapperProperty {
     public HashMap<String, String> dataTypes;
+    private final static Logger logger = Logger.getLogger("oba.MapperProperty");
 
     public void setDataTypes() {
         this.dataTypes.put("xsd:anyType", "string");
@@ -65,7 +68,7 @@ public class MapperProperty {
     }
 
     public static final String STRING_TYPE = "string";
-    public static final String INTEGER_TYPE = "integer";
+    public static final String NUMBER_TYPE = "number";
     String name;
     public List<String> type;
     public List<String> ref;
@@ -106,22 +109,21 @@ public class MapperProperty {
         this.nullable = nullable;
     }
 
-    public Schema getSchemaByDataProperty() throws Exception{
+    public Schema getSchemaByDataProperty(){
         //TODO: Assumption: only one type
-        try {
-            String schemaType = getDataType(this.type.get(0));
-            switch (schemaType) {
-                case STRING_TYPE:
-                    return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
-                case INTEGER_TYPE:
-                    return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable);
-                default:
-                    return (array) ? arraySchema(new ObjectSchema(), nullable) : new ObjectSchema().nullable(nullable);
-            }
+        String schemaType = getDataType(this.type.get(0));
+        switch (schemaType) {
+            case STRING_TYPE:
+                return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
+            case NUMBER_TYPE:
+                return (array) ? arraySchema(new NumberSchema(), nullable) : new IntegerSchema().nullable(nullable);
+            default:
+                System.out.println("datatype mapping failed " + this.type.get(0));
+
+                return (array) ? arraySchema(new ObjectSchema(), nullable) : new ObjectSchema().nullable(nullable);
         }
-        catch (Exception e) {
-            throw new NullPointerException("Null pointer");
-        }
+
+
     }
 
     public Schema getSchemaByObjectProperty(){

@@ -32,16 +32,82 @@ paths:
 components:
   schemas:
     dcat-Dataset:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     Grid:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     GSNVariable:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     Process:
       properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         influences:
           anyOf:
           - items:
@@ -52,15 +118,12 @@ components:
               $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
+      required:
+      - type
       type: object
     Function:
       properties:
         hasComponentLocation:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasSupportScriptLocation:
           items:
             type: string
           nullable: true
@@ -75,13 +138,67 @@ components:
             type: string
           nullable: true
           type: array
+        hasSupportScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     StandardVariable:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     Container:
       properties:
         hasIdentifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
           items:
             type: string
           nullable: true
@@ -96,13 +213,47 @@ components:
             type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     schema-Dataset:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     EmpiricalModel:
       properties:
         hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
           items:
             type: string
           nullable: true
@@ -117,6 +268,8 @@ components:
             type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     ModelConfiguration:
       properties:
@@ -150,9 +303,19 @@ components:
             type: string
           nullable: true
           type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasCAG:
           items:
             $ref: '#/components/schemas/CAG'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
           nullable: true
           type: array
         hasAssumption:
@@ -180,30 +343,86 @@ components:
             $ref: '#/components/schemas/DatasetSpecification'
           nullable: true
           type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
         hasInput:
           items:
             $ref: '#/components/schemas/DatasetSpecification'
           nullable: true
           type: array
+      required:
+      - type
       type: object
     Concept:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     TimeInterval:
       properties:
+        hasValue:
+          items:
+            type: number
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         usesUnit:
           items:
             $ref: '#/components/schemas/qudt-Unit'
           nullable: true
           type: array
-        hasValue:
-          items:
-            type: object
-          nullable: true
-          type: array
+      required:
+      - type
       type: object
     CAG:
       properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasPart:
           anyOf:
           - items:
@@ -214,12 +433,14 @@ components:
               $ref: '#/components/schemas/VariablePresentation'
             nullable: true
             type: array
+      required:
+      - type
       type: object
     DatasetSpecification:
       properties:
         hasDimensionality:
           items:
-            type: object
+            type: number
           nullable: true
           type: array
         hadGrid:
@@ -232,16 +453,33 @@ components:
             type: string
           nullable: true
           type: array
-        hasPresentation:
-          items:
-            $ref: '#/components/schemas/VariablePresentation'
-          nullable: true
-          type: array
         hasFileStructure:
           items:
             $ref: '#/components/schemas/DataStructureDefinition'
           nullable: true
           type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/VariablePresentation'
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     HybridModel:
       properties:
@@ -250,6 +488,21 @@ components:
             type: string
           nullable: true
           type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasAssumption:
           items:
             type: string
@@ -260,6 +513,8 @@ components:
             type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     TheoryBasedModel:
       properties:
@@ -268,6 +523,21 @@ components:
             type: string
           nullable: true
           type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasAssumption:
           items:
             type: string
@@ -278,26 +548,113 @@ components:
             type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     geo-Variable:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     ICASAVariable:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     mint-Unit:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     DataStructureDefinition:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     SoftwareVersion:
       properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasVersionId:
           items:
             type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     Model:
       properties:
@@ -306,6 +663,21 @@ components:
             type: string
           nullable: true
           type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasAssumption:
           items:
             type: string
@@ -321,12 +693,24 @@ components:
             type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     Parameter:
       properties:
         hasDefaultValue:
           items:
-            type: object
+            type: number
+          nullable: true
+          type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasMaximumAcceptedValue:
+          items:
+            type: number
           nullable: true
           type: array
         hasDataType:
@@ -334,40 +718,54 @@ components:
             type: string
           nullable: true
           type: array
-        hasMinimumAcceptedValue:
+        id:
           items:
-            type: object
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
           nullable: true
           type: array
-        hasMaximumAcceptedValue:
+        type:
           items:
-            type: object
+            type: string
           nullable: true
           type: array
+      required:
+      - type
       type: object
     Software:
       properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasSoftwareVersion:
           items:
             $ref: '#/components/schemas/SoftwareVersion'
           nullable: true
           type: array
+      required:
+      - type
       type: object
     VariablePresentation:
       properties:
         hasDefaultValue:
           items:
-            type: object
-          nullable: true
-          type: array
-        hasShortName:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasMinimumAcceptedValue:
-          items:
-            type: object
+            type: number
           nullable: true
           type: array
         hasStandardVariable:
@@ -377,19 +775,44 @@ components:
           type: array
         hasMaximumAcceptedValue:
           items:
-            type: object
+            type: number
           nullable: true
           type: array
-        influences:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/Process'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/VariablePresentation'
-            nullable: true
-            type: array
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasLongName:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasRelevanceLevel:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasShortName:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: number
+          nullable: true
+          type: array
         hasDataset:
           anyOf:
           - items:
@@ -400,29 +823,46 @@ components:
               $ref: '#/components/schemas/DatasetSpecification'
             nullable: true
             type: array
-        hasConstraint:
+        influences:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Process'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/VariablePresentation'
+            nullable: true
+            type: array
+        id:
           items:
             type: string
-          nullable: true
+          nullable: false
           type: array
         usesUnit:
           items:
             $ref: '#/components/schemas/qudt-Unit'
           nullable: true
           type: array
-        hasLongName:
+      required:
+      - type
+      type: object
+    ModelVersion:
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
           items:
             type: string
           nullable: true
           type: array
-        hasRelevanceLevel:
+        type:
           items:
-            type: object
+            type: string
           nullable: true
           type: array
-      type: object
-    ModelVersion:
-      properties:
         hasVersionId:
           items:
             type: string
@@ -433,6 +873,8 @@ components:
             $ref: '#/components/schemas/ModelConfiguration'
           nullable: true
           type: array
+      required:
+      - type
       type: object
     dataCatalog-Dataset:
       properties:
@@ -446,18 +888,103 @@ components:
             $ref: '#/components/schemas/VariablePresentation'
           nullable: true
           type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     Module:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     Place:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     mint-Variable:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
     qudt-Unit:
-      properties: {}
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
       type: object
 x-custom: value1
 x-other: value2

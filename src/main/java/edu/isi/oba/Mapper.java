@@ -100,8 +100,6 @@ public class Mapper {
         Set<String> prefixs = this.pm.getPrefixNames();
 
         for (OWLClass cls : classes) {
-            System.out.println(cls.getIRI());
-
             //todo: FIX THIS HACK. THE HACK FIXS THE DUPLICATE NAME
             Map<String, Schema> dataProperties = this.getDataProperties(ontology, cls, factory);
             Map<String, Schema> objectProperties = this.getObjectProperties(ontology, cls, factory);
@@ -124,9 +122,6 @@ public class Mapper {
         IRI classIRI = cls.getIRI();
         IRI iri = IRI.create("https://w3id.org/mint/modelCatalog#CAG");
         IRI iridp = IRI.create("https://w3id.org/mint/modelCatalog#hasPresentation");
-        if (classIRI.equals(iri)){
-            System.out.println("ok");
-        }
 
         OWLPropertyDomainAxiom dataProperty = dp;
         Set<OWLClass> domainClasses = dataProperty.getDomain().getClassesInSignature();
@@ -177,12 +172,20 @@ public class Mapper {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    System.out.println(mapperProperty.name);
                 }
                 //todo: set the parameters of property using ontologyProperty the information
 
             }
         }
+        List<String> dataProperties = new ArrayList<>();
+        dataProperties.add("xsd:string");
+        MapperProperty idProperty = new MapperProperty("id", dataProperties, true, false, false);
+        MapperProperty labelProperty = new MapperProperty("label", dataProperties, true, true, false);
+        MapperProperty typeProperty = new MapperProperty("type", dataProperties, true, true, false);
+        properties.put(idProperty.name, idProperty.getSchemaByDataProperty());
+        properties.put(labelProperty.name, labelProperty.getSchemaByDataProperty());
+        properties.put(typeProperty.name, typeProperty.getSchemaByDataProperty());
+
         return properties;
     }
 
@@ -195,9 +198,6 @@ public class Mapper {
         for (OWLObjectPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
             if (checkDomainClass(cls, dp, superClasses)) {
                 IRI iri = IRI.create("https://w3id.org/mint/modelCatalog#CAG");
-                if (cls.equals(iri)){
-                    System.out.println("ok");
-                }
 
                 for (OWLObjectProperty odp : dp.getObjectPropertiesInSignature()) {
                     Boolean array = true;
@@ -216,13 +216,12 @@ public class Mapper {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    System.out.println(mapperProperty.name);
-
                 }
             }
         }
         return properties;
     }
+
 
     private List<String> getCodeGenTypesByRangeData(Set<OWLDataPropertyRangeAxiom> ranges, OWLDataProperty odp) {
         List<String> dataProperties = new ArrayList<>();
