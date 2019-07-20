@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MapperSchema {
+
     public Schema getSchema(String name, String type, Map<String, Schema> properties) {
         Schema schema = new Schema();
         schema.setName(name);
@@ -19,10 +20,9 @@ public class MapperSchema {
 
 
     private List<String> required() {
-        ArrayList<String> required = new ArrayList<String>() {{
+        return new ArrayList<String>() {{
             add("type");
         }};
-        return required;
     }
 
 

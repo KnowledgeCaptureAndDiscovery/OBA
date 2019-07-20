@@ -333,14 +333,14 @@ components:
             $ref: '#/components/schemas/TimeInterval'
           nullable: true
           type: array
-        hasModule:
-          items:
-            $ref: '#/components/schemas/Module'
-          nullable: true
-          type: array
         hasOutput:
           items:
             $ref: '#/components/schemas/DatasetSpecification'
+          nullable: true
+          type: array
+        hasModule:
+          items:
+            $ref: '#/components/schemas/Module'
           nullable: true
           type: array
         id:
@@ -813,16 +813,6 @@ components:
             type: number
           nullable: true
           type: array
-        hasDataset:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/dataCatalog-Dataset'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/DatasetSpecification'
-            nullable: true
-            type: array
         influences:
           anyOf:
           - items:
@@ -831,6 +821,16 @@ components:
             type: array
           - items:
               $ref: '#/components/schemas/VariablePresentation'
+            nullable: true
+            type: array
+        hasDataset:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/dataCatalog-Dataset'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/DatasetSpecification'
             nullable: true
             type: array
         id:
