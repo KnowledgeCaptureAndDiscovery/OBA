@@ -24,7 +24,7 @@ public class Serializer {
     public static final String STRING_TYPE = "string";
     public static final String INTEGER_TYPE = "integer";
     //TODO: validate the yaml
-    public Serializer(Map<String, Schema> schemas) throws IOException {
+    public Serializer(Map<String, Schema> schemas, Paths paths) throws IOException {
         OpenAPI openAPI = new OpenAPI();
         openAPI.setInfo(new Info().title("Some title").description("Some description"));
         openAPI.setExternalDocs(new ExternalDocumentation().url("http://abcdef.com").description("a-description"));
@@ -40,12 +40,7 @@ public class Serializer {
                 new Tag().name("tag2").description("some 2 description"),
                 new Tag().name("tag3").description("some 3 description")
         ));
-        openAPI.path("/ping/pong", new PathItem().get(new Operation()
-                .description("Some description")
-                .operationId("pingOp")
-                .responses(new ApiResponses().addApiResponse("200", new ApiResponse().description("Ok")))));
-
-
+        openAPI.setPaths(paths);
 
         openAPI.components(new Components().schemas(schemas));
         openAPI.setExtensions(new LinkedHashMap<String, Object>());

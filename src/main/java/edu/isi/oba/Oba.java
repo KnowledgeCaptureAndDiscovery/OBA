@@ -1,5 +1,6 @@
 package edu.isi.oba;
 
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
 import org.semanticweb.owlapi.model.IRI;
 
@@ -12,7 +13,8 @@ public class Oba {
             Mapper obaMapper = new Mapper(ont_url, ont_prefix);
 
             Map<String, Schema> schemas = obaMapper.schemas;
-            Serializer serializer = new Serializer(schemas);
+            Paths paths = obaMapper.paths;
+            Serializer serializer = new Serializer(schemas, paths);
         }
 }
 

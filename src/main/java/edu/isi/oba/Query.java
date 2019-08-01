@@ -1,6 +1,7 @@
 package edu.isi.oba;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -21,31 +22,38 @@ import java.io.IOException;
  * $NAME/delete/query-graph.sparql
  */
 class Query {
-  private static String get_all_query_file = "get/all/query.sparql";
-  private static String get_all_graph_query_file = "get/all/query-graph.sparql";
-  private static String get_one_query_file = "get/one/query.sparql";
-  private static String get_one_graph_query_file = "get/one/query-graph.sparql";
-  private static String get_related_query_file = "get/related/query.sparql";
-  private static String get_related_graph_query_file = "get/related/query-graph.sparql";
+  private static String get_all_query_file = "query.sparql";
+  private static String get_all_graph_query_file = "query-graph.sparql";
+  private static String get_one_query_file = "query.sparql";
+  private static String get_one_graph_query_file = "query-graph.sparql";
+  private static String get_related_query_file = "query.sparql";
+  private static String get_related_graph_query_file = "query-graph.sparql";
 
-  private static String post_query_file = "post/query.sparql";
-  private static String post_graph_query_file = "post/query-graph.sparql";
+  private static String post_query_file = "query.sparql";
+  private static String post_graph_query_file = "query-graph.sparql";
 
-  private static String delete_query_file = "delete/query.sparql";
-  private static String delete_graph_query_file = "delete/query-graph.sparql";
+  private static String delete_query_file = "query.sparql";
+  private static String delete_graph_query_file = "query-graph.sparql";
+
+  private static String get_all_dir = "get/all";
+  private static String get_one_dir = "get/one";
+  private static String get_related_dir = "get/related";
+
+  private static String post_dir = "post";
+
+  private static String delete_dir = "delete";
 
 
-  public Query(String schema_name) {
-    get_all(schema_name);
+  public Query() {
   }
 
-  private void get_all(String schema_name){
-    write_query(query_get_all_resources( true), get_all_graph_query_file, schema_name);
-    write_query(query_get_all_resources( false), get_all_query_file, schema_name);
-    write_query(query_resource( true), get_one_graph_query_file, schema_name);
-    write_query(query_resource(false), get_one_query_file, schema_name);
-    write_query(query_resource_related( true), get_related_graph_query_file, schema_name);
-    write_query(query_resource_related( false), get_related_query_file, schema_name);
+  public void get_all(String schema_name){
+    write_query(query_get_all_resources( true), get_all_dir, get_all_graph_query_file, schema_name);
+    write_query(query_get_all_resources( false), get_all_dir, get_all_query_file, schema_name);
+    write_query(query_resource( true), get_one_dir, get_one_graph_query_file, schema_name);
+    write_query(query_resource(false), get_one_dir, get_one_query_file, schema_name);
+    write_query(query_resource_related( true), get_related_dir, get_related_graph_query_file, schema_name);
+    write_query(query_resource_related( false), get_related_dir, get_related_query_file, schema_name);
   }
 
 
@@ -125,11 +133,18 @@ class Query {
 
 
 
-  private void write_query(String query, String file, String schema_name) {
-    String file_name = "queries/" + schema_name + "/" + file;
+  private void write_query(String query, String method_dir, String file, String schema_name) {
+    String dir_path = "queries" + File.separator + schema_name + File.separator + method_dir;
+    String file_path = dir_path + File.separator + file;
+    File directory = new File(dir_path);
+    if (! directory.exists()){
+      directory.mkdirs();
+    }
+
+
     BufferedWriter writer = null;
     try {
-      writer = new BufferedWriter(new FileWriter(file_name));
+      writer = new BufferedWriter(new FileWriter(file_path));
       writer.write(query);
       writer.close();
     } catch (IOException e) {
