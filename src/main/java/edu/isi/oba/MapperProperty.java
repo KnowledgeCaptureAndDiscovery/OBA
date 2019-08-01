@@ -111,6 +111,10 @@ public class MapperProperty {
 
     public Schema getSchemaByDataProperty(){
         //TODO: Assumption: only one type
+        if (this.type.size() == 0) {
+            return (array) ? arraySchema(new ObjectSchema(), nullable) : new ObjectSchema().nullable(nullable);
+        }
+
         String schemaType = getDataType(this.type.get(0));
         switch (schemaType) {
             case STRING_TYPE:
@@ -119,7 +123,6 @@ public class MapperProperty {
                 return (array) ? arraySchema(new NumberSchema(), nullable) : new IntegerSchema().nullable(nullable);
             default:
                 System.out.println("datatype mapping failed " + this.type.get(0));
-
                 return (array) ? arraySchema(new ObjectSchema(), nullable) : new ObjectSchema().nullable(nullable);
         }
 

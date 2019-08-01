@@ -31,7 +31,7 @@ paths:
           description: Ok
 components:
   schemas:
-    dcat-Dataset:
+    sd:SVOVariable:
       properties:
         id:
           items:
@@ -51,8 +51,13 @@ components:
       required:
       - type
       type: object
-    Grid:
+    sd:SampleResource:
       properties:
+        dataCatalogIdentifier:
+          items:
+            type: string
+          nullable: true
+          type: array
         id:
           items:
             type: string
@@ -71,69 +76,169 @@ components:
       required:
       - type
       type: object
-    GSNVariable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    Process:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        influences:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/Process'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/VariablePresentation'
-            nullable: true
-            type: array
-      required:
-      - type
-      type: object
-    Function:
+    sd:SoftwareConfiguration:
       properties:
         hasComponentLocation:
           items:
             type: string
           nullable: true
           type: array
-        hasContainer:
+        keywords:
           items:
-            $ref: '#/components/schemas/Container'
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
+          items:
+            type: string
           nullable: true
           type: array
         hasImplementationScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        softwareRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasVersion:
+          items:
+            $ref: '#/components/schemas/sd:SoftwareVersion'
+          nullable: true
+          type: array
+        hasTypicalDataSource:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDownloadURL:
+          items:
+            type: string
+          nullable: true
+          type: array
+        referencePublication:
+          items:
+            type: string
+          nullable: true
+          type: array
+        description:
+          items:
+            type: string
+          nullable: true
+          type: array
+        screenshot:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasInstallationInstructions:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSoftwareImage:
+          items:
+            $ref: '#/components/schemas/sd:SoftwareImage'
+          nullable: true
+          type: array
+        dateCreated:
+          items:
+            type: string
+          nullable: true
+          type: array
+        contributor:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        compatibleVisualizationSoftware:
+          items:
+            $ref: '#/components/schemas/sd:Software'
+          nullable: true
+          type: array
+        hasFAQ:
+          items:
+            type: string
+          nullable: true
+          type: array
+        logo:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasPurpose:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        hasSampleVisualization:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        memoryRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSampleExecution:
+          items:
+            $ref: '#/components/schemas/sd:SampleExecution'
+          nullable: true
+          type: array
+        hasSampleResult:
+          items:
+            $ref: '#/components/schemas/sd:SampleResource'
+          nullable: true
+          type: array
+        citation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        author:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/sd:Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/sd:Person'
+            nullable: true
+            type: array
+        processorRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasConstraint:
           items:
             type: string
           nullable: true
@@ -143,6 +248,101 @@ components:
             type: string
           nullable: true
           type: array
+        shortDescription:
+          items:
+            type: string
+          nullable: true
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasExecutionCommand:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasParameter:
+          items:
+            $ref: '#/components/schemas/sd:Parameter'
+          nullable: true
+          type: array
+        datePublished:
+          items:
+            type: string
+          nullable: true
+          type: array
+        operatingSystems:
+          items:
+            type: string
+          nullable: true
+          type: array
+        license:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSourceCode:
+          items:
+            $ref: '#/components/schemas/sd:SourceCode'
+          nullable: true
+          type: array
+        publisher:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/sd:Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/sd:Person'
+            nullable: true
+            type: array
+        hasOutput:
+          items:
+            $ref: '#/components/schemas/sd:DatasetSpecification'
+          nullable: true
+          type: array
+        hasInput:
+          items:
+            $ref: '#/components/schemas/sd:DatasetSpecification'
+          nullable: true
+          type: array
+        fundingSource:
+          items:
+            $ref: '#/components/schemas/sd:Organization'
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:DatasetSpecification:
+      properties:
+        hasDimensionality:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasFormat:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/sd:VariablePresentation'
+          nullable: true
+          type: array
+        hasFixedValue:
+          items:
+            $ref: '#/components/schemas/sd:SampleResource'
+          nullable: true
+          type: array
         id:
           items:
             type: string
@@ -161,7 +361,7 @@ components:
       required:
       - type
       type: object
-    StandardVariable:
+    sd:Unit:
       properties:
         id:
           items:
@@ -181,13 +381,688 @@ components:
       required:
       - type
       type: object
-    Container:
+    sd:VariablePresentation:
       properties:
-        hasIdentifier:
+        hasDefaultValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasShortName:
           items:
             type: string
           nullable: true
           type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasStandardVariable:
+          items:
+            $ref: '#/components/schemas/sd:StandardVariable'
+          nullable: true
+          type: array
+        hasMaximumAcceptedValue:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasConstraint:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        partOfDataset:
+          items:
+            $ref: '#/components/schemas/sd:DatasetSpecification'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        usesUnit:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasLongName:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:StandardVariable:
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:Variable:
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:SourceCode:
+      properties:
+        license:
+          items:
+            type: string
+          nullable: true
+          type: array
+        programmingLanguage:
+          items:
+            type: string
+          nullable: true
+          type: array
+        codeRepository:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:Organization:
+      properties:
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:Image:
+      properties:
+        hasDimensionality:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasFormat:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/sd:VariablePresentation'
+          nullable: true
+          type: array
+        hasFixedValue:
+          items:
+            $ref: '#/components/schemas/sd:SampleResource'
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:SoftwareImage:
+      properties:
+        keywords:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        softwareRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasVersion:
+          items:
+            $ref: '#/components/schemas/sd:SoftwareVersion'
+          nullable: true
+          type: array
+        hasTypicalDataSource:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDownloadURL:
+          items:
+            type: string
+          nullable: true
+          type: array
+        referencePublication:
+          items:
+            type: string
+          nullable: true
+          type: array
+        description:
+          items:
+            type: string
+          nullable: true
+          type: array
+        screenshot:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasInstallationInstructions:
+          items:
+            type: string
+          nullable: true
+          type: array
+        dateCreated:
+          items:
+            type: string
+          nullable: true
+          type: array
+        contributor:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasFAQ:
+          items:
+            type: string
+          nullable: true
+          type: array
+        logo:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasPurpose:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        hasSampleVisualization:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        memoryRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        citation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        author:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/sd:Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/sd:Person'
+            nullable: true
+            type: array
+        processorRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        shortDescription:
+          items:
+            type: string
+          nullable: true
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasExecutionCommand:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        datePublished:
+          items:
+            type: string
+          nullable: true
+          type: array
+        operatingSystems:
+          items:
+            type: string
+          nullable: true
+          type: array
+        license:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSourceCode:
+          items:
+            $ref: '#/components/schemas/sd:SourceCode'
+          nullable: true
+          type: array
+        publisher:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/sd:Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/sd:Person'
+            nullable: true
+            type: array
+        fundingSource:
+          items:
+            $ref: '#/components/schemas/sd:Organization'
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:Parameter:
+      properties:
+        hasDefaultValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasMaximumAcceptedValue:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasDataType:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/sd:VariablePresentation'
+          nullable: true
+          type: array
+        hasFixedValue:
+          items:
+            $ref: '#/components/schemas/sd:SampleResource'
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:SoftwareVersion:
+      properties:
+        keywords:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        softwareRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasVersion:
+          items:
+            $ref: '#/components/schemas/sd:SoftwareVersion'
+          nullable: true
+          type: array
+        hasTypicalDataSource:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDownloadURL:
+          items:
+            type: string
+          nullable: true
+          type: array
+        referencePublication:
+          items:
+            type: string
+          nullable: true
+          type: array
+        description:
+          items:
+            type: string
+          nullable: true
+          type: array
+        screenshot:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasInstallationInstructions:
+          items:
+            type: string
+          nullable: true
+          type: array
+        dateCreated:
+          items:
+            type: string
+          nullable: true
+          type: array
+        contributor:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasFAQ:
+          items:
+            type: string
+          nullable: true
+          type: array
+        logo:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasPurpose:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        hasSampleVisualization:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        memoryRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        citation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasConfiguration:
+          items:
+            $ref: '#/components/schemas/sd:SoftwareConfiguration'
+          nullable: true
+          type: array
+        author:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/sd:Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/sd:Person'
+            nullable: true
+            type: array
+        processorRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        shortDescription:
+          items:
+            type: string
+          nullable: true
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        datePublished:
+          items:
+            type: string
+          nullable: true
+          type: array
+        operatingSystems:
+          items:
+            type: string
+          nullable: true
+          type: array
+        license:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSourceCode:
+          items:
+            $ref: '#/components/schemas/sd:SourceCode'
+          nullable: true
+          type: array
+        publisher:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/sd:Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/sd:Person'
+            nullable: true
+            type: array
+        fundingSource:
+          items:
+            $ref: '#/components/schemas/sd:Organization'
+          nullable: true
+          type: array
+        hasVersionId:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:Person:
+      properties:
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        email:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - type
+      type: object
+    sd:SampleExecution:
+      properties:
         id:
           items:
             type: string
@@ -208,139 +1083,94 @@ components:
             type: string
           nullable: true
           type: array
+      required:
+      - type
+      type: object
+    sd:Software:
+      properties:
+        keywords:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        softwareRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasVersion:
+          items:
+            $ref: '#/components/schemas/sd:SoftwareVersion'
+          nullable: true
+          type: array
+        hasTypicalDataSource:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDownloadURL:
+          items:
+            type: string
+          nullable: true
+          type: array
+        referencePublication:
+          items:
+            type: string
+          nullable: true
+          type: array
+        description:
+          items:
+            type: string
+          nullable: true
+          type: array
+        screenshot:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
         hasInstallationInstructions:
           items:
             type: string
           nullable: true
           type: array
-      required:
-      - type
-      type: object
-    schema-Dataset:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
+        dateCreated:
           items:
             type: string
           nullable: true
           type: array
-        type:
+        contributor:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasFAQ:
           items:
             type: string
           nullable: true
           type: array
-      required:
-      - type
-      type: object
-    EmpiricalModel:
-      properties:
-        hasConstraint:
+        logo:
+          items:
+            $ref: '#/components/schemas/sd:Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/sd:Person'
+          nullable: true
+          type: array
+        hasPurpose:
           items:
             type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasAssumption:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasModelCategory:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    ModelConfiguration:
-      properties:
-        hasComponentLocation:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasContainer:
-          items:
-            $ref: '#/components/schemas/Container'
-          nullable: true
-          type: array
-        hasProcess:
-          items:
-            $ref: '#/components/schemas/Process'
-          nullable: true
-          type: array
-        hasImplementationScriptLocation:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasConstraint:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasSupportScriptLocation:
-          items:
-            type: string
-          nullable: true
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasCAG:
-          items:
-            $ref: '#/components/schemas/CAG'
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasAssumption:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasParameter:
-          items:
-            $ref: '#/components/schemas/Parameter'
-          nullable: true
-          type: array
-        hasTimeInterval:
-          items:
-            $ref: '#/components/schemas/TimeInterval'
-          nullable: true
-          type: array
-        hasOutput:
-          items:
-            $ref: '#/components/schemas/DatasetSpecification'
-          nullable: true
-          type: array
-        hasModule:
-          items:
-            $ref: '#/components/schemas/Module'
           nullable: true
           type: array
         id:
@@ -348,157 +1178,52 @@ components:
             type: string
           nullable: false
           type: array
-        hasInput:
+        hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/DatasetSpecification'
+            $ref: '#/components/schemas/sd:Image'
           nullable: true
           type: array
-      required:
-      - type
-      type: object
-    Concept:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
+        identifier:
           items:
             type: string
           nullable: true
           type: array
-        type:
+        memoryRequirements:
           items:
             type: string
           nullable: true
           type: array
-      required:
-      - type
-      type: object
-    TimeInterval:
-      properties:
-        hasValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
+        website:
           items:
             type: string
           nullable: true
           type: array
-        type:
+        citation:
           items:
             type: string
           nullable: true
           type: array
-        usesUnit:
-          items:
-            $ref: '#/components/schemas/qudt-Unit'
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    CAG:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasPart:
+        author:
           anyOf:
           - items:
-              $ref: '#/components/schemas/Process'
+              $ref: '#/components/schemas/sd:Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/VariablePresentation'
+              $ref: '#/components/schemas/sd:Person'
             nullable: true
             type: array
-      required:
-      - type
-      type: object
-    DatasetSpecification:
-      properties:
-        hasDimensionality:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hadGrid:
-          items:
-            $ref: '#/components/schemas/Grid'
-          nullable: true
-          type: array
-        hasFormat:
+        processorRequirements:
           items:
             type: string
           nullable: true
           type: array
-        hasFileStructure:
-          items:
-            $ref: '#/components/schemas/DataStructureDefinition'
-          nullable: true
-          type: array
-        hasPresentation:
-          items:
-            $ref: '#/components/schemas/VariablePresentation'
-          nullable: true
-          type: array
-        id:
+        shortDescription:
           items:
             type: string
-          nullable: false
+          nullable: true
           type: array
         label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    HybridModel:
-      properties:
-        hasConstraint:
-          items:
-            type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
           items:
             type: string
           nullable: true
@@ -508,465 +1233,45 @@ components:
             type: string
           nullable: true
           type: array
-        hasModelCategory:
+        datePublished:
           items:
             type: string
           nullable: true
           type: array
-      required:
-      - type
-      type: object
-    TheoryBasedModel:
-      properties:
-        hasConstraint:
+        operatingSystems:
           items:
             type: string
           nullable: true
           type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
+        license:
           items:
             type: string
           nullable: true
           type: array
-        type:
+        hasSourceCode:
           items:
-            type: string
+            $ref: '#/components/schemas/sd:SourceCode'
           nullable: true
           type: array
-        hasAssumption:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasModelCategory:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    geo-Variable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    ICASAVariable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    mint-Unit:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    DataStructureDefinition:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    SoftwareVersion:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasVersionId:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    Model:
-      properties:
-        hasConstraint:
-          items:
-            type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasAssumption:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasSoftwareVersion:
-          items:
-            $ref: '#/components/schemas/SoftwareVersion'
-          nullable: true
-          type: array
-        hasModelCategory:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    Parameter:
-      properties:
-        hasDefaultValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasMinimumAcceptedValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasMaximumAcceptedValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasDataType:
-          items:
-            type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    Software:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasSoftwareVersion:
-          items:
-            $ref: '#/components/schemas/SoftwareVersion'
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    VariablePresentation:
-      properties:
-        hasDefaultValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasStandardVariable:
-          items:
-            $ref: '#/components/schemas/StandardVariable'
-          nullable: true
-          type: array
-        hasMaximumAcceptedValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasConstraint:
-          items:
-            type: string
-          nullable: true
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasLongName:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasRelevanceLevel:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasShortName:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasMinimumAcceptedValue:
-          items:
-            type: number
-          nullable: true
-          type: array
-        influences:
+        publisher:
           anyOf:
           - items:
-              $ref: '#/components/schemas/Process'
+              $ref: '#/components/schemas/sd:Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/VariablePresentation'
+              $ref: '#/components/schemas/sd:Person'
             nullable: true
             type: array
-        hasDataset:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/dataCatalog-Dataset'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/DatasetSpecification'
-            nullable: true
-            type: array
-        id:
+        fundingSource:
           items:
-            type: string
-          nullable: false
-          type: array
-        usesUnit:
-          items:
-            $ref: '#/components/schemas/qudt-Unit'
+            $ref: '#/components/schemas/sd:Organization'
           nullable: true
           type: array
       required:
       - type
       type: object
-    ModelVersion:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasVersionId:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasConfiguration:
-          items:
-            $ref: '#/components/schemas/ModelConfiguration'
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    dataCatalog-Dataset:
-      properties:
-        hadGrid:
-          items:
-            $ref: '#/components/schemas/Grid'
-          nullable: true
-          type: array
-        hasPresentation:
-          items:
-            $ref: '#/components/schemas/VariablePresentation'
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    Module:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    Place:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    mint-Variable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - type
-      type: object
-    qudt-Unit:
+    sd:ICASAVariable:
       properties:
         id:
           items:

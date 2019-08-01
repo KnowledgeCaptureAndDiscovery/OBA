@@ -1,12 +1,18 @@
 package edu.isi.oba;
 
+import io.swagger.v3.oas.models.media.Schema;
+import org.semanticweb.owlapi.model.IRI;
+
+import java.util.Map;
+
 public class Oba {
         public static void main(String[] args) throws Exception {
-            String ont_url = "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/0.4.0/ontology.xml";
-            String ont_prefix = "https://w3id.org/mint/modelCatalog";
+            String ont_url = "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.1.0/ontology.xml";
+            String ont_prefix = "sd";
             Mapper obaMapper = new Mapper(ont_url, ont_prefix);
 
-            //Serializer serializer = new Serializer();
-    }
+            Map<String, Schema> schemas = obaMapper.schemas;
+            Serializer serializer = new Serializer(schemas);
+        }
 }
 

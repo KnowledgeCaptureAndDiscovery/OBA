@@ -1,46 +1,68 @@
 package edu.isi.oba;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+/**
+ * $NAME/get/all/query.sparql
+ * $NAME/get/all/query-graph.sparql
+ *
+ * $NAME/get/one/query.sparql
+ * $NAME/get/one/query-graph.sparql
+ *
+ * $NAME/get/related/query.sparql
+ * $NAME/get/related/query-graph.sparql
+
+ * $NAME/post/query.sparql
+ * $NAME/post/query-graph.sparql
+ *
+ * $NAME/delete/query.sparql
+ * $NAME/delete/query-graph.sparql
+ */
 class Query {
-  private final String prefix;
+  private static String get_all_query_file = "get/all/query.sparql";
+  private static String get_all_graph_query_file = "get/all/query-graph.sparql";
+  private static String get_one_query_file = "get/one/query.sparql";
+  private static String get_one_graph_query_file = "get/one/query-graph.sparql";
+  private static String get_related_query_file = "get/related/query.sparql";
+  private static String get_related_graph_query_file = "get/related/query-graph.sparql";
 
-  public Query(String prefix) {
-    this.prefix = prefix;
+  private static String post_query_file = "post/query.sparql";
+  private static String post_graph_query_file = "post/query-graph.sparql";
+
+  private static String delete_query_file = "delete/query.sparql";
+  private static String delete_graph_query_file = "delete/query-graph.sparql";
+
+
+  public Query(String schema_name) {
+    get_all(schema_name);
   }
 
-  /**
-   * Return the graph uri of the user
-   * @param username the username of a user
-   * @return
-   */
-
-  public String build_graph_uri(String username){
-    return String.format("%s/%s_", username);
+  private void get_all(String schema_name){
+    write_query(query_get_all_resources( true), get_all_graph_query_file, schema_name);
+    write_query(query_get_all_resources( false), get_all_query_file, schema_name);
+    write_query(query_resource( true), get_one_graph_query_file, schema_name);
+    write_query(query_resource(false), get_one_query_file, schema_name);
+    write_query(query_resource_related( true), get_related_graph_query_file, schema_name);
+    write_query(query_resource_related( false), get_related_query_file, schema_name);
   }
 
-  /**
-   * Return the resource uri of a resource
-   * @param resource_id
-   * @return
-   */
-  private String build_resource_uri(String resource_id){
-    return String.format("%s/%s",this.prefix, resource_id);
-  }
+
 
   /**
    * Returns the query to get all resources by the type
    * @param graph: boolean
-   * @param resource_type Model
    * @return
    */
-  public String query_get_all_resources(String resource_type, Boolean graph) {
-    String resource_type_uri = build_resource_uri(resource_type);
+  public String query_get_all_resources(Boolean graph) {
     String query = "CONSTRUCT {" +
             "?item ?predicate_item ?prop ." +
             "?prop a ?type" +
             "}" +
             "WHERE {";
-    query += graph ? "GRAPH _?graph_iri {" : "";
-    query += "?item a <{" + resource_type_uri + "}> . " +
+    query += graph ? "GRAPH ?_graph_iri {" : "";
+    query += "?item a  ?_resource_type_uri . " +
             "{" +
             "?item ?predicate_item ?prop" +
             "}" +
@@ -56,19 +78,17 @@ class Query {
 
   /**
    * Return the query to a resource by the resource_id
-   * @param resource_id:
    * @param graph
    * @return
    */
-  public String query_resource(String resource_id, Boolean graph) {
-    String resource_uri = build_resource_uri(resource_id);
+  public String query_resource(Boolean graph) {
     String query = "CONSTRUCT {" +
-            "<" + resource_uri + "> ?predicate_item ?prop ." +
-              "?prop a ?type" +
+            "?_resource_uri ?predicate_item ?prop " +
+            "?prop a ?type" +
             "}" +
             "WHERE {";
     query += graph ? "GRAPH _?graph_iri {" : "";
-    query += "<" + resource_uri + "> ?predicate_item ?prop " +
+    query += "?_resource_uri ?predicate_item ?prop " +
             "{" +
             "?item ?predicate_item ?prop" +
             "}" +
@@ -85,19 +105,16 @@ class Query {
 
   /**
    * Return the query the related resources to resource id by a predicate
-   * @param resource_id: the name of the subject
-   * @param predicate: the name of the resource
    * @param graph: enable user graph
    * @return
    */
-  public String query_resource_related(String resource_id, String predicate, Boolean graph) {
-    String resource_uri = build_resource_uri(resource_id);
+  public String query_resource_related(Boolean graph) {
     String query = "CONSTRUCT {" +
             "?s ?p ?o" +
             "}" +
             "WHERE {";
     query += graph ? "GRAPH _?graph_iri {" : "";
-    query += "<" + resource_uri + "> <" + predicate + "> ?s" +
+    query += "?_resource_uri  ?_predicate  ?s" +
             "{" +
             "?s ?o ?p" +
             "}" +
@@ -106,4 +123,17 @@ class Query {
     return query;
   }
 
+
+
+  private void write_query(String query, String file, String schema_name) {
+    String file_name = "queries/" + schema_name + "/" + file;
+    BufferedWriter writer = null;
+    try {
+      writer = new BufferedWriter(new FileWriter(file_name));
+      writer.write(query);
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
