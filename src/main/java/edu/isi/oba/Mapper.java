@@ -88,7 +88,7 @@ class Mapper {
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
 
-          this.paths.addPathItem(mapperSchema.name, pathGenerator.generate_plurar(mapperSchema));
+          this.paths.addPathItem(mapperSchema.name, pathGenerator.generate_plural(mapperSchema));
 
         }
       }

@@ -26,14 +26,11 @@ public class Path {
             .schema(new StringSchema());
   }
 
-  private Operation plurar_get(String schema_name){
+  private Operation plural_get(String schema_name){
     String summary = "List All " + schema_name;
     String description = "Gets a list of all " + schema_name + " entities.";
     String description_response = "Successful response - returns an array of " + schema_name + " entities.";
-    String ref_text = "#/components/schemas/" + schema_name;
-    Schema ref = new Schema().$ref(ref_text);
-    MediaType media_type = new MediaType().schema(ref);
-    Content content = new Content().addMediaType("application/json", media_type);
+    Content content = getContent(schema_name);
     ApiResponse apiResponse = new ApiResponse()
             .description(description_response)
             .content(content);
@@ -48,22 +45,19 @@ public class Path {
 
   }
 
-  private Operation plurar_post(String schema_name){
+  private Operation plural_post(String schema_name){
     String summary = "Create a " + schema_name;
     String description = "Create a new instance of a " + schema_name;
     String description_response = "Successful response - returns an array of " + schema_name + "  entities.";
     String description_request = "A new " + schema_name + "to be created";
 
-    String ref_text = "#/components/schemas/" + schema_name;
-    Schema ref = new Schema().$ref(ref_text);
-    MediaType media_type = new MediaType().schema(ref);
-    Content content = new Content().addMediaType("application/json", media_type);
+    Content content = getContent(schema_name);
     RequestBody requestBody = new RequestBody();
-    requestBody.setDescription(description_response);
+    requestBody.setDescription(description_request);
     requestBody.setContent(content);
 
     ApiResponse apiResponse = new ApiResponse()
-            .description("Successful response");
+            .description(description_response);
 
     return new Operation()
             .description(description)
@@ -74,12 +68,20 @@ public class Path {
             );
 
   }
-  public PathItem generate_plurar(MapperSchema mapperSchema){
+
+  private Content getContent(String schema_name) {
+    String ref_text = "#/components/schemas/" + schema_name;
+    Schema ref = new Schema().$ref(ref_text);
+    MediaType media_type = new MediaType().schema(ref);
+    return new Content().addMediaType("application/json", media_type);
+  }
+
+  public PathItem generate_plural(MapperSchema mapperSchema){
     String schema_name = mapperSchema.name;
 
 
-    Operation get_operation = plurar_get(schema_name);
-    Operation post_operation = plurar_post(schema_name);
+    Operation get_operation = plural_get(schema_name);
+    Operation post_operation = plural_post(schema_name);
 
 
     PathItem path = new PathItem()

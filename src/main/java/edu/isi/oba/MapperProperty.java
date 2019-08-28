@@ -89,9 +89,6 @@ public class MapperProperty {
         this.array = array;
         this.nullable = nullable;
     }
-
-
-
     /**
      * Set the property type
      * It can has multiple types

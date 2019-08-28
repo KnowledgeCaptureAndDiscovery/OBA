@@ -553,6 +553,36 @@ paths:
         201:
           description: Successful response
       summary: Create a sd:VariablePresentation
+  sd:Visualization:
+    get:
+      description: Gets a list of all sd:Visualization entities.
+      parameters:
+      - description: Username to query
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sd:Visualization'
+          description: Successful response - returns an array of sd:Visualization
+            entities.
+      summary: List All sd:Visualization
+    post:
+      description: Create a new instance of a sd:Visualization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sd:Visualization'
+        description: Successful response - returns an array of sd:Visualization  entities.
+      responses:
+        201:
+          description: Successful response
+      summary: Create a sd:Visualization
 components:
   schemas:
     sd:SVOVariable:
@@ -607,22 +637,22 @@ components:
             type: string
           nullable: true
           type: array
-        keywords:
-          items:
-            type: string
-          nullable: true
-          type: array
         hasDocumentation:
           items:
             type: string
           nullable: true
           type: array
-        softwareRequirements:
+        keywords:
           items:
             type: string
           nullable: true
           type: array
         hasImplementationScriptLocation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        softwareRequirements:
           items:
             type: string
           nullable: true
@@ -714,15 +744,15 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/sd:Visualization'
           nullable: true
           type: array
-        identifier:
+        memoryRequirements:
           items:
             type: string
           nullable: true
           type: array
-        memoryRequirements:
+        identifier:
           items:
             type: string
           nullable: true
@@ -802,12 +832,12 @@ components:
             type: string
           nullable: true
           type: array
-        operatingSystems:
+        license:
           items:
             type: string
           nullable: true
           type: array
-        license:
+        operatingSystems:
           items:
             type: string
           nullable: true
@@ -860,14 +890,14 @@ components:
         hasFileStructure:
           nullable: true
           type: object
-        hasFixedValue:
-          items:
-            $ref: '#/components/schemas/sd:SampleResource'
-          nullable: true
-          type: array
         hasPresentation:
           items:
             $ref: '#/components/schemas/sd:VariablePresentation'
+          nullable: true
+          type: array
+        position:
+          items:
+            type: number
           nullable: true
           type: array
         id:
@@ -883,6 +913,11 @@ components:
         type:
           items:
             type: string
+          nullable: true
+          type: array
+        hasFixedResource:
+          items:
+            $ref: '#/components/schemas/sd:SampleResource'
           nullable: true
           type: array
       required:
@@ -922,7 +957,7 @@ components:
           type: array
         hasMinimumAcceptedValue:
           items:
-            type: number
+            type: object
           nullable: true
           type: array
         hasStandardVariable:
@@ -932,7 +967,7 @@ components:
           type: array
         hasMaximumAcceptedValue:
           items:
-            type: number
+            type: object
           nullable: true
           type: array
         hasConstraint:
@@ -1093,14 +1128,14 @@ components:
         hasFileStructure:
           nullable: true
           type: object
-        hasFixedValue:
-          items:
-            $ref: '#/components/schemas/sd:SampleResource'
-          nullable: true
-          type: array
         hasPresentation:
           items:
             $ref: '#/components/schemas/sd:VariablePresentation'
+          nullable: true
+          type: array
+        position:
+          items:
+            type: number
           nullable: true
           type: array
         id:
@@ -1118,17 +1153,22 @@ components:
             type: string
           nullable: true
           type: array
+        hasFixedResource:
+          items:
+            $ref: '#/components/schemas/sd:SampleResource'
+          nullable: true
+          type: array
       required:
       - id
       type: object
     sd:SoftwareImage:
       properties:
-        keywords:
+        hasDocumentation:
           items:
             type: string
           nullable: true
           type: array
-        hasDocumentation:
+        keywords:
           items:
             type: string
           nullable: true
@@ -1215,15 +1255,15 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/sd:Visualization'
           nullable: true
           type: array
-        identifier:
+        memoryRequirements:
           items:
             type: string
           nullable: true
           type: array
-        memoryRequirements:
+        identifier:
           items:
             type: string
           nullable: true
@@ -1278,12 +1318,12 @@ components:
             type: string
           nullable: true
           type: array
-        operatingSystems:
+        license:
           items:
             type: string
           nullable: true
           type: array
-        license:
+        operatingSystems:
           items:
             type: string
           nullable: true
@@ -1320,12 +1360,17 @@ components:
           type: array
         hasMinimumAcceptedValue:
           items:
-            type: number
+            type: object
           nullable: true
           type: array
         hasMaximumAcceptedValue:
           items:
-            type: number
+            type: object
+          nullable: true
+          type: array
+        adjustsVariable:
+          items:
+            type: object
           nullable: true
           type: array
         hasDataType:
@@ -1335,12 +1380,17 @@ components:
           type: array
         hasFixedValue:
           items:
-            $ref: '#/components/schemas/sd:SampleResource'
+            type: object
           nullable: true
           type: array
         hasPresentation:
           items:
             $ref: '#/components/schemas/sd:VariablePresentation'
+          nullable: true
+          type: array
+        position:
+          items:
+            type: number
           nullable: true
           type: array
         id:
@@ -1363,12 +1413,12 @@ components:
       type: object
     sd:SoftwareVersion:
       properties:
-        keywords:
+        hasDocumentation:
           items:
             type: string
           nullable: true
           type: array
-        hasDocumentation:
+        keywords:
           items:
             type: string
           nullable: true
@@ -1455,15 +1505,15 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/sd:Visualization'
           nullable: true
           type: array
-        identifier:
+        memoryRequirements:
           items:
             type: string
           nullable: true
           type: array
-        memoryRequirements:
+        identifier:
           items:
             type: string
           nullable: true
@@ -1518,12 +1568,12 @@ components:
             type: string
           nullable: true
           type: array
-        operatingSystems:
+        license:
           items:
             type: string
           nullable: true
           type: array
-        license:
+        operatingSystems:
           items:
             type: string
           nullable: true
@@ -1551,6 +1601,36 @@ components:
         hasVersionId:
           items:
             type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    sd:Visualization:
+      properties:
+        hasFormat:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        wasDerivedFromSoftware:
+          items:
+            $ref: '#/components/schemas/sd:Software'
           nullable: true
           type: array
       required:
@@ -1618,12 +1698,12 @@ components:
       type: object
     sd:Software:
       properties:
-        keywords:
+        hasDocumentation:
           items:
             type: string
           nullable: true
           type: array
-        hasDocumentation:
+        keywords:
           items:
             type: string
           nullable: true
@@ -1710,15 +1790,15 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/sd:Visualization'
           nullable: true
           type: array
-        identifier:
+        memoryRequirements:
           items:
             type: string
           nullable: true
           type: array
-        memoryRequirements:
+        identifier:
           items:
             type: string
           nullable: true
@@ -1768,12 +1848,12 @@ components:
             type: string
           nullable: true
           type: array
-        operatingSystems:
+        license:
           items:
             type: string
           nullable: true
           type: array
-        license:
+        operatingSystems:
           items:
             type: string
           nullable: true
