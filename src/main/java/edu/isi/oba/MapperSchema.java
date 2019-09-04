@@ -106,6 +106,8 @@ public class MapperSchema {
                     Boolean nullable = true;
 
                     Set<OWLDataPropertyRangeAxiom> ranges = ontology.getDataPropertyRangeAxioms(odp);
+                    if (ranges.size() == 0)
+                        System.err.println(odp.getIRI() + " range 0");
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
@@ -162,7 +164,8 @@ public class MapperSchema {
 
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     Set<OWLObjectPropertyRangeAxiom> ranges = ontology.getObjectPropertyRangeAxioms(odp);
-
+                    if (ranges.size() == 0)
+                        System.err.println(odp.getIRI() + " range 0");
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
 
