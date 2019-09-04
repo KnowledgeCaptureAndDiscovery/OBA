@@ -3,8 +3,7 @@ package edu.isi.oba;
 import io.swagger.models.Method;
 import io.swagger.v3.oas.models.PathItem;
 
-public class Path {
-  String schemaName;
+class Path {
 
   public Path() {
   }

@@ -1,9 +1,7 @@
 package edu.isi.oba;
 
-import io.swagger.annotations.Api;
 import io.swagger.models.Method;
 import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -18,22 +16,21 @@ enum Cardinality {
   SINGULAR, PLURAL
 }
 
-public class MapperOperation {
-  String summary;
-  String description;
-  String schemaName;
-  List<Parameter> parameters = new ArrayList<>();
-  RequestBody requestBody = new RequestBody();
-  ApiResponses apiResponses = new ApiResponses();
-  Cardinality cardinality;
-  Schema schema;
-  String ref_text;
+class MapperOperation {
+  private String summary;
+  private String description;
+  private final String schemaName;
+  private final List<Parameter> parameters = new ArrayList<>();
+  private final RequestBody requestBody = new RequestBody();
+  private final ApiResponses apiResponses = new ApiResponses();
+  private final Cardinality cardinality;
+  private final Schema schema;
 
   public Operation getOperation() {
     return operation;
   }
 
-  Operation operation;
+  private final Operation operation;
 
 
   public MapperOperation(String schemaName, Method method, Cardinality cardinality) {
@@ -94,7 +91,6 @@ public class MapperOperation {
       case PLURAL:
         summary = "List all " + this.schemaName + " entities";
         description = "Gets a list of all " + this.schemaName + " entities";
-        ref_text = "#/components/schemas/" + this.schemaName;
         responseDescriptionOk = "Successful response - returns an array of " + schemaName + " entities.";
 
         //Set response
@@ -108,7 +104,6 @@ public class MapperOperation {
       case SINGULAR:
         summary = "Get a " + this.schemaName;
         description = "Gets the details of a single instance of a " + this.schemaName;
-        ref_text = "#/components/schemas/" + this.schemaName;
         responseDescriptionOk = "Gets the details of a single instance of  " + schemaName;
 
         //Set request

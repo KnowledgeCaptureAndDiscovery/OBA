@@ -10,24 +10,24 @@ import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
 import java.util.*;
 
-public class MapperSchema {
+class MapperSchema {
 
-    OWLReasoner reasoner;
+    private final OWLReasoner reasoner;
     private final IRIShortFormProvider sfp = new SimpleIRIShortFormProvider();
-    public Map<String, Schema> dataProperties;
-    public Map<String, Schema> objectProperties;
-    public Map<String, Schema> properties;
-    String name;
-    String type;
-    Map<IRI, String> schemaNames;
-    Schema schema;
+    private Map<String, Schema> dataProperties;
+    private Map<String, Schema> objectProperties;
+    private Map<String, Schema> properties;
+    final String name;
+    private final String type;
+    private final Map<IRI, String> schemaNames;
+    private final Schema schema;
 
 
     public Schema getSchema() {
         return schema;
     }
 
-    public MapperSchema(OWLOntology ontology, OWLClass cls, String type, PrefixManager pm, Map<IRI, String> schemaNames) {
+    public MapperSchema(OWLOntology ontology, OWLClass cls, String type, Map<IRI, String> schemaNames) {
         OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
         reasoner = reasonerFactory.createReasoner(ontology);
 
@@ -48,7 +48,7 @@ public class MapperSchema {
         return properties;
     }
 
-    public Schema setSchema() {
+    private Schema setSchema() {
         Schema schema = new Schema();
         schema.setName(this.name);
         schema.setType(this.type);
@@ -218,15 +218,7 @@ public class MapperSchema {
     }
 
 
-    public Map<String, Schema> getDataProperties() {
-        return dataProperties;
-    }
-
-    public Map<String, Schema> getObjectProperties() {
-        return objectProperties;
-    }
-
-    public Map<String, Schema> getProperties() {
+    private Map<String, Schema> getProperties() {
         return properties;
     }
 

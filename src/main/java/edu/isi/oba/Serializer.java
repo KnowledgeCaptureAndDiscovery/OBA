@@ -4,14 +4,10 @@ package edu.isi.oba;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.*;
-import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.tags.Tag;
 
 import org.openapitools.codegen.serializer.SerializerUtils;
 
@@ -23,10 +19,8 @@ import java.util.*;
 
 
 
-public class Serializer {
-    public static final String STRING_TYPE = "string";
-    public static final String INTEGER_TYPE = "integer";
-    //TODO: validate the yaml
+class Serializer {
+  //TODO: validate the yaml
     public Serializer(Map<String, Schema> schemas, Paths paths) throws IOException {
         String url = "https://w3id.org/mint/modelCatalog/";
         OpenAPI openAPI = new OpenAPI();

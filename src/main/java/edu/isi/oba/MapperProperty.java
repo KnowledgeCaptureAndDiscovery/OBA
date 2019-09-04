@@ -5,14 +5,11 @@ import io.swagger.v3.oas.models.media.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
-public class MapperProperty {
-    public HashMap<String, String> dataTypes;
-    private final static Logger logger = Logger.getLogger("oba.MapperProperty");
+class MapperProperty {
+    private final HashMap<String, String> dataTypes;
 
-    public void setDataTypes() {
+    private void setDataTypes() {
         this.dataTypes.put("anyType", "string");
         this.dataTypes.put("anySimpleType", "string");
         this.dataTypes.put("string", "string");
@@ -63,18 +60,18 @@ public class MapperProperty {
         this.dataTypes.put("positiveInteger", "number");
     }
 
-    public String getDataType(String key){
+    private String getDataType(String key){
         return this.dataTypes.get(key);
     }
 
-    public static final String STRING_TYPE = "string";
-    public static final String NUMBER_TYPE = "number";
-    String name;
-    public List<String> type;
-    public List<String> ref;
-    Boolean array;
-    Boolean nullable;
-    Boolean object;
+    private static final String STRING_TYPE = "string";
+    private static final String NUMBER_TYPE = "number";
+    final String name;
+    private List<String> type;
+    private List<String> ref;
+    private Boolean array;
+    private Boolean nullable;
+    private final Boolean object;
 
 
     public MapperProperty(String name, List<String> type, Boolean array, Boolean nullable, Boolean object) {
@@ -87,22 +84,6 @@ public class MapperProperty {
         else
             this.type = type;
         this.array = array;
-        this.nullable = nullable;
-    }
-    /**
-     * Set the property type
-     * It can has multiple types
-     * @param type
-     */
-    public void setType(List<String> type) {
-        this.type = type;
-    }
-
-    public void setArray(Boolean array) {
-        this.array = array;
-    }
-
-    public void setNullable(Boolean nullable) {
         this.nullable = nullable;
     }
 
@@ -139,7 +120,7 @@ public class MapperProperty {
         }
     }
 
-    public Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable){
+    private Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable){
         Schema object = new ObjectSchema();
         object.set$ref(ref);
 

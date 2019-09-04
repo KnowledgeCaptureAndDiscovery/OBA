@@ -22,26 +22,16 @@ import java.io.IOException;
  * $NAME/delete/query-graph.sparql
  */
 class Query {
-  private static String get_all_query_file = "query.sparql";
-  private static String get_all_graph_query_file = "query-graph.sparql";
-  private static String get_one_query_file = "query.sparql";
-  private static String get_one_graph_query_file = "query-graph.sparql";
-  private static String get_related_query_file = "query.sparql";
-  private static String get_related_graph_query_file = "query-graph.sparql";
+  private static final String get_all_query_file = "query.sparql";
+  private static final String get_all_graph_query_file = "query-graph.sparql";
+  private static final String get_one_query_file = "query.sparql";
+  private static final String get_one_graph_query_file = "query-graph.sparql";
+  private static final String get_related_query_file = "query.sparql";
+  private static final String get_related_graph_query_file = "query-graph.sparql";
 
-  private static String post_query_file = "query.sparql";
-  private static String post_graph_query_file = "query-graph.sparql";
-
-  private static String delete_query_file = "query.sparql";
-  private static String delete_graph_query_file = "query-graph.sparql";
-
-  private static String get_all_dir = "get/all";
-  private static String get_one_dir = "get/one";
-  private static String get_related_dir = "get/related";
-
-  private static String post_dir = "post";
-
-  private static String delete_dir = "delete";
+  private static final String get_all_dir = "get/all";
+  private static final String get_one_dir = "get/one";
+  private static final String get_related_dir = "get/related";
 
 
   public Query() {
@@ -63,7 +53,7 @@ class Query {
    * @param graph: boolean
    * @return
    */
-  public String query_get_all_resources(Boolean graph) {
+  private String query_get_all_resources(Boolean graph) {
     String query = "CONSTRUCT {" +
             "?item ?predicate_item ?prop ." +
             "?prop a ?type" +
@@ -89,7 +79,7 @@ class Query {
    * @param graph
    * @return
    */
-  public String query_resource(Boolean graph) {
+  private String query_resource(Boolean graph) {
     String query = "CONSTRUCT {" +
             "?_resource_uri ?predicate_item ?prop " +
             "?prop a ?type" +
@@ -116,7 +106,7 @@ class Query {
    * @param graph: enable user graph
    * @return
    */
-  public String query_resource_related(Boolean graph) {
+  private String query_resource_related(Boolean graph) {
     String query = "CONSTRUCT {" +
             "?s ?p ?o" +
             "}" +
