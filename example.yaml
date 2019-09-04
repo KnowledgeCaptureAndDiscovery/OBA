@@ -1,33 +1,24 @@
 openapi: 3.0.1
 info:
-  description: Some description
-  title: Some title
+  description: This is MINT Model Catalog You can find out more about Model Catalog
+    at [https://w3id.org/mint/modelCatalog/](https://w3id.org/mint/modelCatalog/)
+  title: Model Catalog
+  version: v1.0.0
 externalDocs:
-  description: a-description
-  url: http://abcdef.com
+  description: Model Catalog
+  url: https://w3id.org/mint/modelCatalog/
 servers:
-- description: first server
-  url: http://www.server1.com
-- description: second server
-  url: http://www.server2.com
-security:
-- some_auth:
-  - write
-  - read
-tags:
-- description: some 1 description
-  name: tag1
-- description: some 2 description
-  name: tag2
-- description: some 3 description
-  name: tag3
+- url: https://api.models.mint.isi.edu/v1.0.0
+- url: https://dev.api.models.mint.isi.edu/v1.0.0
+- url: http://localhost:8080/v1.0.0
 paths:
-  sd:DatasetSpecification:
+  /datasetspecifications:
     get:
-      description: Gets a list of all sd:DatasetSpecification entities.
+      description: Gets a list of all DatasetSpecification entities
       parameters:
       - description: Username to query
         in: query
+        name: username
         required: false
         schema:
           type: string
@@ -36,28 +27,102 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:DatasetSpecification'
-          description: Successful response - returns an array of sd:DatasetSpecification
+                items:
+                  $ref: '#/components/schemas/DatasetSpecification'
+                type: array
+          description: Successful response - returns an array of DatasetSpecification
             entities.
-      summary: List All sd:DatasetSpecification
+      summary: List all DatasetSpecification entities
+      tags:
+      - DatasetSpecification
     post:
-      description: Create a new instance of a sd:DatasetSpecification
+      description: Create a new instance of a DatasetSpecification
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:DatasetSpecification'
-        description: Successful response - returns an array of sd:DatasetSpecification  entities.
+              $ref: '#/components/schemas/DatasetSpecification'
+        description: A new DatasetSpecificationto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:DatasetSpecification
-  sd:ICASAVariable:
+          description: Created
+      summary: Create a DatasetSpecification
+      tags:
+      - DatasetSpecification
+  /datasetspecifications/{id}:
+    delete:
+      description: Delete an existing DatasetSpecification
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a DatasetSpecification
+      tags:
+      - DatasetSpecification
     get:
-      description: Gets a list of all sd:ICASAVariable entities.
+      description: Gets the details of a single instance of a DatasetSpecification
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetSpecification'
+          description: Gets the details of a single instance of  DatasetSpecification
+      summary: Get a DatasetSpecification
+      tags:
+      - DatasetSpecification
+    put:
+      description: Updates an existing DatasetSpecification
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasetSpecification'
+        description: An old DatasetSpecificationto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a DatasetSpecification
+      tags:
+      - DatasetSpecification
+  /icasavariables:
+    get:
+      description: Gets a list of all ICASAVariable entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -66,28 +131,1029 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:ICASAVariable'
-          description: Successful response - returns an array of sd:ICASAVariable
+                items:
+                  $ref: '#/components/schemas/ICASAVariable'
+                type: array
+          description: Successful response - returns an array of ICASAVariable entities.
+      summary: List all ICASAVariable entities
+      tags:
+      - ICASAVariable
+    post:
+      description: Create a new instance of a ICASAVariable
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ICASAVariable'
+        description: A new ICASAVariableto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a ICASAVariable
+      tags:
+      - ICASAVariable
+  /icasavariables/{id}:
+    delete:
+      description: Delete an existing ICASAVariable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a ICASAVariable
+      tags:
+      - ICASAVariable
+    get:
+      description: Gets the details of a single instance of a ICASAVariable
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ICASAVariable'
+          description: Gets the details of a single instance of  ICASAVariable
+      summary: Get a ICASAVariable
+      tags:
+      - ICASAVariable
+    put:
+      description: Updates an existing ICASAVariable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ICASAVariable'
+        description: An old ICASAVariableto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a ICASAVariable
+      tags:
+      - ICASAVariable
+  /images:
+    get:
+      description: Gets a list of all Image entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Image'
+                type: array
+          description: Successful response - returns an array of Image entities.
+      summary: List all Image entities
+      tags:
+      - Image
+    post:
+      description: Create a new instance of a Image
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+        description: A new Imageto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Image
+      tags:
+      - Image
+  /images/{id}:
+    delete:
+      description: Delete an existing Image
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Image
+      tags:
+      - Image
+    get:
+      description: Gets the details of a single instance of a Image
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+          description: Gets the details of a single instance of  Image
+      summary: Get a Image
+      tags:
+      - Image
+    put:
+      description: Updates an existing Image
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+        description: An old Imageto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Image
+      tags:
+      - Image
+  /organizations:
+    get:
+      description: Gets a list of all Organization entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Organization'
+                type: array
+          description: Successful response - returns an array of Organization entities.
+      summary: List all Organization entities
+      tags:
+      - Organization
+    post:
+      description: Create a new instance of a Organization
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        description: A new Organizationto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Organization
+      tags:
+      - Organization
+  /organizations/{id}:
+    delete:
+      description: Delete an existing Organization
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Organization
+      tags:
+      - Organization
+    get:
+      description: Gets the details of a single instance of a Organization
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: Gets the details of a single instance of  Organization
+      summary: Get a Organization
+      tags:
+      - Organization
+    put:
+      description: Updates an existing Organization
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        description: An old Organizationto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Organization
+      tags:
+      - Organization
+  /parameters:
+    get:
+      description: Gets a list of all Parameter entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Parameter'
+                type: array
+          description: Successful response - returns an array of Parameter entities.
+      summary: List all Parameter entities
+      tags:
+      - Parameter
+    post:
+      description: Create a new instance of a Parameter
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Parameter'
+        description: A new Parameterto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Parameter
+      tags:
+      - Parameter
+  /parameters/{id}:
+    delete:
+      description: Delete an existing Parameter
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Parameter
+      tags:
+      - Parameter
+    get:
+      description: Gets the details of a single instance of a Parameter
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parameter'
+          description: Gets the details of a single instance of  Parameter
+      summary: Get a Parameter
+      tags:
+      - Parameter
+    put:
+      description: Updates an existing Parameter
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Parameter'
+        description: An old Parameterto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Parameter
+      tags:
+      - Parameter
+  /persons:
+    get:
+      description: Gets a list of all Person entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Person'
+                type: array
+          description: Successful response - returns an array of Person entities.
+      summary: List all Person entities
+      tags:
+      - Person
+    post:
+      description: Create a new instance of a Person
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+        description: A new Personto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Person
+      tags:
+      - Person
+  /persons/{id}:
+    delete:
+      description: Delete an existing Person
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Person
+      tags:
+      - Person
+    get:
+      description: Gets the details of a single instance of a Person
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: Gets the details of a single instance of  Person
+      summary: Get a Person
+      tags:
+      - Person
+    put:
+      description: Updates an existing Person
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+        description: An old Personto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Person
+      tags:
+      - Person
+  /svovariables:
+    get:
+      description: Gets a list of all SVOVariable entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SVOVariable'
+                type: array
+          description: Successful response - returns an array of SVOVariable entities.
+      summary: List all SVOVariable entities
+      tags:
+      - SVOVariable
+    post:
+      description: Create a new instance of a SVOVariable
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SVOVariable'
+        description: A new SVOVariableto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a SVOVariable
+      tags:
+      - SVOVariable
+  /svovariables/{id}:
+    delete:
+      description: Delete an existing SVOVariable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SVOVariable
+      tags:
+      - SVOVariable
+    get:
+      description: Gets the details of a single instance of a SVOVariable
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SVOVariable'
+          description: Gets the details of a single instance of  SVOVariable
+      summary: Get a SVOVariable
+      tags:
+      - SVOVariable
+    put:
+      description: Updates an existing SVOVariable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SVOVariable'
+        description: An old SVOVariableto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SVOVariable
+      tags:
+      - SVOVariable
+  /sampleexecutions:
+    get:
+      description: Gets a list of all SampleExecution entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SampleExecution'
+                type: array
+          description: Successful response - returns an array of SampleExecution entities.
+      summary: List all SampleExecution entities
+      tags:
+      - SampleExecution
+    post:
+      description: Create a new instance of a SampleExecution
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleExecution'
+        description: A new SampleExecutionto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a SampleExecution
+      tags:
+      - SampleExecution
+  /sampleexecutions/{id}:
+    delete:
+      description: Delete an existing SampleExecution
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SampleExecution
+      tags:
+      - SampleExecution
+    get:
+      description: Gets the details of a single instance of a SampleExecution
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleExecution'
+          description: Gets the details of a single instance of  SampleExecution
+      summary: Get a SampleExecution
+      tags:
+      - SampleExecution
+    put:
+      description: Updates an existing SampleExecution
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleExecution'
+        description: An old SampleExecutionto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SampleExecution
+      tags:
+      - SampleExecution
+  /sampleresources:
+    get:
+      description: Gets a list of all SampleResource entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SampleResource'
+                type: array
+          description: Successful response - returns an array of SampleResource entities.
+      summary: List all SampleResource entities
+      tags:
+      - SampleResource
+    post:
+      description: Create a new instance of a SampleResource
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleResource'
+        description: A new SampleResourceto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a SampleResource
+      tags:
+      - SampleResource
+  /sampleresources/{id}:
+    delete:
+      description: Delete an existing SampleResource
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SampleResource
+      tags:
+      - SampleResource
+    get:
+      description: Gets the details of a single instance of a SampleResource
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleResource'
+          description: Gets the details of a single instance of  SampleResource
+      summary: Get a SampleResource
+      tags:
+      - SampleResource
+    put:
+      description: Updates an existing SampleResource
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleResource'
+        description: An old SampleResourceto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SampleResource
+      tags:
+      - SampleResource
+  /softwares:
+    get:
+      description: Gets a list of all Software entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Software'
+                type: array
+          description: Successful response - returns an array of Software entities.
+      summary: List all Software entities
+      tags:
+      - Software
+    post:
+      description: Create a new instance of a Software
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Software'
+        description: A new Softwareto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Software
+      tags:
+      - Software
+  /softwares/{id}:
+    delete:
+      description: Delete an existing Software
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Software
+      tags:
+      - Software
+    get:
+      description: Gets the details of a single instance of a Software
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Software'
+          description: Gets the details of a single instance of  Software
+      summary: Get a Software
+      tags:
+      - Software
+    put:
+      description: Updates an existing Software
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Software'
+        description: An old Softwareto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Software
+      tags:
+      - Software
+  /softwareconfigurations:
+    get:
+      description: Gets a list of all SoftwareConfiguration entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SoftwareConfiguration'
+                type: array
+          description: Successful response - returns an array of SoftwareConfiguration
             entities.
-      summary: List All sd:ICASAVariable
+      summary: List all SoftwareConfiguration entities
+      tags:
+      - SoftwareConfiguration
     post:
-      description: Create a new instance of a sd:ICASAVariable
+      description: Create a new instance of a SoftwareConfiguration
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:ICASAVariable'
-        description: Successful response - returns an array of sd:ICASAVariable  entities.
+              $ref: '#/components/schemas/SoftwareConfiguration'
+        description: A new SoftwareConfigurationto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:ICASAVariable
-  sd:Image:
+          description: Created
+      summary: Create a SoftwareConfiguration
+      tags:
+      - SoftwareConfiguration
+  /softwareconfigurations/{id}:
+    delete:
+      description: Delete an existing SoftwareConfiguration
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SoftwareConfiguration
+      tags:
+      - SoftwareConfiguration
     get:
-      description: Gets a list of all sd:Image entities.
+      description: Gets the details of a single instance of a SoftwareConfiguration
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SoftwareConfiguration'
+          description: Gets the details of a single instance of  SoftwareConfiguration
+      summary: Get a SoftwareConfiguration
+      tags:
+      - SoftwareConfiguration
+    put:
+      description: Updates an existing SoftwareConfiguration
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SoftwareConfiguration'
+        description: An old SoftwareConfigurationto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SoftwareConfiguration
+      tags:
+      - SoftwareConfiguration
+  /softwareimages:
+    get:
+      description: Gets a list of all SoftwareImage entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -96,27 +1162,101 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:Image'
-          description: Successful response - returns an array of sd:Image entities.
-      summary: List All sd:Image
+                items:
+                  $ref: '#/components/schemas/SoftwareImage'
+                type: array
+          description: Successful response - returns an array of SoftwareImage entities.
+      summary: List all SoftwareImage entities
+      tags:
+      - SoftwareImage
     post:
-      description: Create a new instance of a sd:Image
+      description: Create a new instance of a SoftwareImage
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:Image'
-        description: Successful response - returns an array of sd:Image  entities.
+              $ref: '#/components/schemas/SoftwareImage'
+        description: A new SoftwareImageto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:Image
-  sd:Organization:
+          description: Created
+      summary: Create a SoftwareImage
+      tags:
+      - SoftwareImage
+  /softwareimages/{id}:
+    delete:
+      description: Delete an existing SoftwareImage
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SoftwareImage
+      tags:
+      - SoftwareImage
     get:
-      description: Gets a list of all sd:Organization entities.
+      description: Gets the details of a single instance of a SoftwareImage
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SoftwareImage'
+          description: Gets the details of a single instance of  SoftwareImage
+      summary: Get a SoftwareImage
+      tags:
+      - SoftwareImage
+    put:
+      description: Updates an existing SoftwareImage
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SoftwareImage'
+        description: An old SoftwareImageto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SoftwareImage
+      tags:
+      - SoftwareImage
+  /softwareversions:
+    get:
+      description: Gets a list of all SoftwareVersion entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -125,27 +1265,101 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:Organization'
-          description: Successful response - returns an array of sd:Organization entities.
-      summary: List All sd:Organization
+                items:
+                  $ref: '#/components/schemas/SoftwareVersion'
+                type: array
+          description: Successful response - returns an array of SoftwareVersion entities.
+      summary: List all SoftwareVersion entities
+      tags:
+      - SoftwareVersion
     post:
-      description: Create a new instance of a sd:Organization
+      description: Create a new instance of a SoftwareVersion
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:Organization'
-        description: Successful response - returns an array of sd:Organization  entities.
+              $ref: '#/components/schemas/SoftwareVersion'
+        description: A new SoftwareVersionto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:Organization
-  sd:Parameter:
+          description: Created
+      summary: Create a SoftwareVersion
+      tags:
+      - SoftwareVersion
+  /softwareversions/{id}:
+    delete:
+      description: Delete an existing SoftwareVersion
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SoftwareVersion
+      tags:
+      - SoftwareVersion
     get:
-      description: Gets a list of all sd:Parameter entities.
+      description: Gets the details of a single instance of a SoftwareVersion
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SoftwareVersion'
+          description: Gets the details of a single instance of  SoftwareVersion
+      summary: Get a SoftwareVersion
+      tags:
+      - SoftwareVersion
+    put:
+      description: Updates an existing SoftwareVersion
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SoftwareVersion'
+        description: An old SoftwareVersionto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SoftwareVersion
+      tags:
+      - SoftwareVersion
+  /sourcecodes:
+    get:
+      description: Gets a list of all SourceCode entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -154,27 +1368,101 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:Parameter'
-          description: Successful response - returns an array of sd:Parameter entities.
-      summary: List All sd:Parameter
+                items:
+                  $ref: '#/components/schemas/SourceCode'
+                type: array
+          description: Successful response - returns an array of SourceCode entities.
+      summary: List all SourceCode entities
+      tags:
+      - SourceCode
     post:
-      description: Create a new instance of a sd:Parameter
+      description: Create a new instance of a SourceCode
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:Parameter'
-        description: Successful response - returns an array of sd:Parameter  entities.
+              $ref: '#/components/schemas/SourceCode'
+        description: A new SourceCodeto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:Parameter
-  sd:Person:
+          description: Created
+      summary: Create a SourceCode
+      tags:
+      - SourceCode
+  /sourcecodes/{id}:
+    delete:
+      description: Delete an existing SourceCode
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a SourceCode
+      tags:
+      - SourceCode
     get:
-      description: Gets a list of all sd:Person entities.
+      description: Gets the details of a single instance of a SourceCode
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceCode'
+          description: Gets the details of a single instance of  SourceCode
+      summary: Get a SourceCode
+      tags:
+      - SourceCode
+    put:
+      description: Updates an existing SourceCode
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SourceCode'
+        description: An old SourceCodeto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a SourceCode
+      tags:
+      - SourceCode
+  /standardvariables:
+    get:
+      description: Gets a list of all StandardVariable entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -183,86 +1471,102 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:Person'
-          description: Successful response - returns an array of sd:Person entities.
-      summary: List All sd:Person
-    post:
-      description: Create a new instance of a sd:Person
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:Person'
-        description: Successful response - returns an array of sd:Person  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:Person
-  sd:SVOVariable:
-    get:
-      description: Gets a list of all sd:SVOVariable entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:SVOVariable'
-          description: Successful response - returns an array of sd:SVOVariable entities.
-      summary: List All sd:SVOVariable
-    post:
-      description: Create a new instance of a sd:SVOVariable
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:SVOVariable'
-        description: Successful response - returns an array of sd:SVOVariable  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:SVOVariable
-  sd:SampleExecution:
-    get:
-      description: Gets a list of all sd:SampleExecution entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:SampleExecution'
-          description: Successful response - returns an array of sd:SampleExecution
+                items:
+                  $ref: '#/components/schemas/StandardVariable'
+                type: array
+          description: Successful response - returns an array of StandardVariable
             entities.
-      summary: List All sd:SampleExecution
+      summary: List all StandardVariable entities
+      tags:
+      - StandardVariable
     post:
-      description: Create a new instance of a sd:SampleExecution
+      description: Create a new instance of a StandardVariable
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:SampleExecution'
-        description: Successful response - returns an array of sd:SampleExecution  entities.
+              $ref: '#/components/schemas/StandardVariable'
+        description: A new StandardVariableto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:SampleExecution
-  sd:SampleResource:
+          description: Created
+      summary: Create a StandardVariable
+      tags:
+      - StandardVariable
+  /standardvariables/{id}:
+    delete:
+      description: Delete an existing StandardVariable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a StandardVariable
+      tags:
+      - StandardVariable
     get:
-      description: Gets a list of all sd:SampleResource entities.
+      description: Gets the details of a single instance of a StandardVariable
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardVariable'
+          description: Gets the details of a single instance of  StandardVariable
+      summary: Get a StandardVariable
+      tags:
+      - StandardVariable
+    put:
+      description: Updates an existing StandardVariable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StandardVariable'
+        description: An old StandardVariableto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a StandardVariable
+      tags:
+      - StandardVariable
+  /units:
+    get:
+      description: Gets a list of all Unit entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -271,28 +1575,308 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:SampleResource'
-          description: Successful response - returns an array of sd:SampleResource
+                items:
+                  $ref: '#/components/schemas/Unit'
+                type: array
+          description: Successful response - returns an array of Unit entities.
+      summary: List all Unit entities
+      tags:
+      - Unit
+    post:
+      description: Create a new instance of a Unit
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Unit'
+        description: A new Unitto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Unit
+      tags:
+      - Unit
+  /units/{id}:
+    delete:
+      description: Delete an existing Unit
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Unit
+      tags:
+      - Unit
+    get:
+      description: Gets the details of a single instance of a Unit
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: Gets the details of a single instance of  Unit
+      summary: Get a Unit
+      tags:
+      - Unit
+    put:
+      description: Updates an existing Unit
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Unit'
+        description: An old Unitto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Unit
+      tags:
+      - Unit
+  /variables:
+    get:
+      description: Gets a list of all Variable entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Variable'
+                type: array
+          description: Successful response - returns an array of Variable entities.
+      summary: List all Variable entities
+      tags:
+      - Variable
+    post:
+      description: Create a new instance of a Variable
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Variable'
+        description: A new Variableto be created
+      responses:
+        201:
+          description: Created
+      summary: Create a Variable
+      tags:
+      - Variable
+  /variables/{id}:
+    delete:
+      description: Delete an existing Variable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Variable
+      tags:
+      - Variable
+    get:
+      description: Gets the details of a single instance of a Variable
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variable'
+          description: Gets the details of a single instance of  Variable
+      summary: Get a Variable
+      tags:
+      - Variable
+    put:
+      description: Updates an existing Variable
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Variable'
+        description: An old Variableto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Variable
+      tags:
+      - Variable
+  /variablepresentations:
+    get:
+      description: Gets a list of all VariablePresentation entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VariablePresentation'
+                type: array
+          description: Successful response - returns an array of VariablePresentation
             entities.
-      summary: List All sd:SampleResource
+      summary: List all VariablePresentation entities
+      tags:
+      - VariablePresentation
     post:
-      description: Create a new instance of a sd:SampleResource
+      description: Create a new instance of a VariablePresentation
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:SampleResource'
-        description: Successful response - returns an array of sd:SampleResource  entities.
+              $ref: '#/components/schemas/VariablePresentation'
+        description: A new VariablePresentationto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:SampleResource
-  sd:Software:
+          description: Created
+      summary: Create a VariablePresentation
+      tags:
+      - VariablePresentation
+  /variablepresentations/{id}:
+    delete:
+      description: Delete an existing VariablePresentation
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a VariablePresentation
+      tags:
+      - VariablePresentation
     get:
-      description: Gets a list of all sd:Software entities.
+      description: Gets the details of a single instance of a VariablePresentation
       parameters:
       - description: Username to query
         in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariablePresentation'
+          description: Gets the details of a single instance of  VariablePresentation
+      summary: Get a VariablePresentation
+      tags:
+      - VariablePresentation
+    put:
+      description: Updates an existing VariablePresentation
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariablePresentation'
+        description: An old VariablePresentationto be updated
+      responses:
+        200:
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a VariablePresentation
+      tags:
+      - VariablePresentation
+  /visualizations:
+    get:
+      description: Gets a list of all Visualization entities
+      parameters:
+      - description: Username to query
+        in: query
+        name: username
         required: false
         schema:
           type: string
@@ -301,28 +1885,59 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:Software'
-          description: Successful response - returns an array of sd:Software entities.
-      summary: List All sd:Software
+                items:
+                  $ref: '#/components/schemas/Visualization'
+                type: array
+          description: Successful response - returns an array of Visualization entities.
+      summary: List all Visualization entities
+      tags:
+      - Visualization
     post:
-      description: Create a new instance of a sd:Software
+      description: Create a new instance of a Visualization
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:Software'
-        description: Successful response - returns an array of sd:Software  entities.
+              $ref: '#/components/schemas/Visualization'
+        description: A new Visualizationto be created
       responses:
         201:
-          description: Successful response
-      summary: Create a sd:Software
-  sd:SoftwareConfiguration:
+          description: Created
+      summary: Create a Visualization
+      tags:
+      - Visualization
+  /visualizations/{id}:
+    delete:
+      description: Delete an existing Visualization
+      parameters:
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: Deleted
+        404:
+          description: Not Found
+      summary: Delete a Visualization
+      tags:
+      - Visualization
     get:
-      description: Gets a list of all sd:SoftwareConfiguration entities.
+      description: Gets the details of a single instance of a Visualization
       parameters:
       - description: Username to query
         in: query
+        name: username
         required: false
+        schema:
+          type: string
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
         schema:
           type: string
       responses:
@@ -330,262 +1945,157 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sd:SoftwareConfiguration'
-          description: Successful response - returns an array of sd:SoftwareConfiguration
-            entities.
-      summary: List All sd:SoftwareConfiguration
-    post:
-      description: Create a new instance of a sd:SoftwareConfiguration
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:SoftwareConfiguration'
-        description: Successful response - returns an array of sd:SoftwareConfiguration  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:SoftwareConfiguration
-  sd:SoftwareImage:
-    get:
-      description: Gets a list of all sd:SoftwareImage entities.
+                $ref: '#/components/schemas/Visualization'
+          description: Gets the details of a single instance of  Visualization
+      summary: Get a Visualization
+      tags:
+      - Visualization
+    put:
+      description: Updates an existing Visualization
       parameters:
-      - description: Username to query
-        in: query
-        required: false
+      - description: The ID of the resource
+        in: path
+        name: id
+        required: true
         schema:
           type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:SoftwareImage'
-          description: Successful response - returns an array of sd:SoftwareImage
-            entities.
-      summary: List All sd:SoftwareImage
-    post:
-      description: Create a new instance of a sd:SoftwareImage
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/sd:SoftwareImage'
-        description: Successful response - returns an array of sd:SoftwareImage  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:SoftwareImage
-  sd:SoftwareVersion:
-    get:
-      description: Gets a list of all sd:SoftwareVersion entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
+              $ref: '#/components/schemas/Visualization'
+        description: An old Visualizationto be updated
       responses:
         200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:SoftwareVersion'
-          description: Successful response - returns an array of sd:SoftwareVersion
-            entities.
-      summary: List All sd:SoftwareVersion
-    post:
-      description: Create a new instance of a sd:SoftwareVersion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:SoftwareVersion'
-        description: Successful response - returns an array of sd:SoftwareVersion  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:SoftwareVersion
-  sd:SourceCode:
-    get:
-      description: Gets a list of all sd:SourceCode entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:SourceCode'
-          description: Successful response - returns an array of sd:SourceCode entities.
-      summary: List All sd:SourceCode
-    post:
-      description: Create a new instance of a sd:SourceCode
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:SourceCode'
-        description: Successful response - returns an array of sd:SourceCode  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:SourceCode
-  sd:StandardVariable:
-    get:
-      description: Gets a list of all sd:StandardVariable entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:StandardVariable'
-          description: Successful response - returns an array of sd:StandardVariable
-            entities.
-      summary: List All sd:StandardVariable
-    post:
-      description: Create a new instance of a sd:StandardVariable
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:StandardVariable'
-        description: Successful response - returns an array of sd:StandardVariable  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:StandardVariable
-  sd:Unit:
-    get:
-      description: Gets a list of all sd:Unit entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:Unit'
-          description: Successful response - returns an array of sd:Unit entities.
-      summary: List All sd:Unit
-    post:
-      description: Create a new instance of a sd:Unit
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:Unit'
-        description: Successful response - returns an array of sd:Unit  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:Unit
-  sd:Variable:
-    get:
-      description: Gets a list of all sd:Variable entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:Variable'
-          description: Successful response - returns an array of sd:Variable entities.
-      summary: List All sd:Variable
-    post:
-      description: Create a new instance of a sd:Variable
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:Variable'
-        description: Successful response - returns an array of sd:Variable  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:Variable
-  sd:VariablePresentation:
-    get:
-      description: Gets a list of all sd:VariablePresentation entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:VariablePresentation'
-          description: Successful response - returns an array of sd:VariablePresentation
-            entities.
-      summary: List All sd:VariablePresentation
-    post:
-      description: Create a new instance of a sd:VariablePresentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:VariablePresentation'
-        description: Successful response - returns an array of sd:VariablePresentation  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:VariablePresentation
-  sd:Visualization:
-    get:
-      description: Gets a list of all sd:Visualization entities.
-      parameters:
-      - description: Username to query
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/sd:Visualization'
-          description: Successful response - returns an array of sd:Visualization
-            entities.
-      summary: List All sd:Visualization
-    post:
-      description: Create a new instance of a sd:Visualization
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/sd:Visualization'
-        description: Successful response - returns an array of sd:Visualization  entities.
-      responses:
-        201:
-          description: Successful response
-      summary: Create a sd:Visualization
+          description: Updated
+        404:
+          description: Not Found
+      summary: Update a Visualization
+      tags:
+      - Visualization
 components:
   schemas:
-    sd:SVOVariable:
+    SampleExecution:
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasExecutionCommand:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    Visualization:
+      properties:
+        hasFormat:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        wasDerivedFromSoftware:
+          items:
+            $ref: '#/components/schemas/Software'
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    SourceCode:
+      properties:
+        license:
+          items:
+            type: string
+          nullable: true
+          type: array
+        programmingLanguage:
+          items:
+            type: string
+          nullable: true
+          type: array
+        codeRepository:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    Organization:
+      properties:
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    Variable:
       properties:
         id:
           items:
@@ -605,13 +2115,8 @@ components:
       required:
       - id
       type: object
-    sd:SampleResource:
+    SVOVariable:
       properties:
-        dataCatalogIdentifier:
-          items:
-            type: string
-          nullable: true
-          type: array
         id:
           items:
             type: string
@@ -630,19 +2135,87 @@ components:
       required:
       - id
       type: object
-    sd:SoftwareConfiguration:
+    DatasetSpecification:
+      properties:
+        hasDimensionality:
+          items:
+            type: number
+          nullable: true
+          type: array
+        hasFormat:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasFileStructure:
+          nullable: true
+          type: object
+        hasPresentation:
+          items:
+            $ref: '#/components/schemas/VariablePresentation'
+          nullable: true
+          type: array
+        position:
+          items:
+            type: number
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasFixedResource:
+          items:
+            $ref: '#/components/schemas/SampleResource'
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    ICASAVariable:
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    SoftwareConfiguration:
       properties:
         hasComponentLocation:
           items:
             type: string
           nullable: true
           type: array
-        hasDocumentation:
+        keywords:
           items:
             type: string
           nullable: true
           type: array
-        keywords:
+        hasDocumentation:
           items:
             type: string
           nullable: true
@@ -659,7 +2232,7 @@ components:
           type: array
         hasVersion:
           items:
-            $ref: '#/components/schemas/sd:SoftwareVersion'
+            $ref: '#/components/schemas/SoftwareVersion'
           nullable: true
           type: array
         hasTypicalDataSource:
@@ -684,7 +2257,7 @@ components:
           type: array
         screenshot:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/Image'
           nullable: true
           type: array
         type:
@@ -699,7 +2272,7 @@ components:
           type: array
         hasSoftwareImage:
           items:
-            $ref: '#/components/schemas/sd:SoftwareImage'
+            $ref: '#/components/schemas/SoftwareImage'
           nullable: true
           type: array
         dateCreated:
@@ -707,14 +2280,14 @@ components:
             type: string
           nullable: true
           type: array
-        compatibleVisualizationSoftware:
-          items:
-            $ref: '#/components/schemas/sd:Software'
-          nullable: true
-          type: array
         contributor:
           items:
-            $ref: '#/components/schemas/sd:Person'
+            $ref: '#/components/schemas/Person'
+          nullable: true
+          type: array
+        compatibleVisualizationSoftware:
+          items:
+            $ref: '#/components/schemas/Software'
           nullable: true
           type: array
         hasFAQ:
@@ -722,14 +2295,14 @@ components:
             type: string
           nullable: true
           type: array
-        hasContactPerson:
-          items:
-            $ref: '#/components/schemas/sd:Person'
-          nullable: true
-          type: array
         logo:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/Person'
           nullable: true
           type: array
         hasPurpose:
@@ -744,7 +2317,7 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Visualization'
+            $ref: '#/components/schemas/Visualization'
           nullable: true
           type: array
         memoryRequirements:
@@ -764,12 +2337,12 @@ components:
           type: array
         hasSampleExecution:
           items:
-            $ref: '#/components/schemas/sd:SampleExecution'
+            $ref: '#/components/schemas/SampleExecution'
           nullable: true
           type: array
         hasSampleResult:
           items:
-            $ref: '#/components/schemas/sd:SampleResource'
+            $ref: '#/components/schemas/SampleResource'
           nullable: true
           type: array
         citation:
@@ -780,11 +2353,11 @@ components:
         author:
           anyOf:
           - items:
-              $ref: '#/components/schemas/sd:Organization'
+              $ref: '#/components/schemas/Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/sd:Person'
+              $ref: '#/components/schemas/Person'
             nullable: true
             type: array
         processorRequirements:
@@ -824,15 +2397,10 @@ components:
           type: array
         hasParameter:
           items:
-            $ref: '#/components/schemas/sd:Parameter'
+            $ref: '#/components/schemas/Parameter'
           nullable: true
           type: array
         datePublished:
-          items:
-            type: string
-          nullable: true
-          type: array
-        license:
           items:
             type: string
           nullable: true
@@ -842,278 +2410,45 @@ components:
             type: string
           nullable: true
           type: array
-        hasSourceCode:
-          items:
-            $ref: '#/components/schemas/sd:SourceCode'
-          nullable: true
-          type: array
-        publisher:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/sd:Organization'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/sd:Person'
-            nullable: true
-            type: array
-        hasOutput:
-          items:
-            $ref: '#/components/schemas/sd:DatasetSpecification'
-          nullable: true
-          type: array
-        fundingSource:
-          items:
-            $ref: '#/components/schemas/sd:Organization'
-          nullable: true
-          type: array
-        hasInput:
-          items:
-            $ref: '#/components/schemas/sd:DatasetSpecification'
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:DatasetSpecification:
-      properties:
-        hasDimensionality:
-          items:
-            type: number
-          nullable: true
-          type: array
-        hasFormat:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasFileStructure:
-          nullable: true
-          type: object
-        hasPresentation:
-          items:
-            $ref: '#/components/schemas/sd:VariablePresentation'
-          nullable: true
-          type: array
-        position:
-          items:
-            type: number
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasFixedResource:
-          items:
-            $ref: '#/components/schemas/sd:SampleResource'
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:Unit:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:VariablePresentation:
-      properties:
-        hasDefaultValue:
-          items:
-            type: object
-          nullable: true
-          type: array
-        hasShortName:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasMinimumAcceptedValue:
-          items:
-            type: object
-          nullable: true
-          type: array
-        hasStandardVariable:
-          items:
-            $ref: '#/components/schemas/sd:StandardVariable'
-          nullable: true
-          type: array
-        hasMaximumAcceptedValue:
-          items:
-            type: object
-          nullable: true
-          type: array
-        hasConstraint:
-          items:
-            type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        partOfDataset:
-          items:
-            $ref: '#/components/schemas/sd:DatasetSpecification'
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        usesUnit:
-          items:
-            type: object
-          nullable: true
-          type: array
-        hasLongName:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:StandardVariable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:Variable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:SourceCode:
-      properties:
         license:
           items:
             type: string
           nullable: true
           type: array
-        programmingLanguage:
+        hasSourceCode:
           items:
-            type: string
+            $ref: '#/components/schemas/SourceCode'
           nullable: true
           type: array
-        codeRepository:
+        publisher:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/Person'
+            nullable: true
+            type: array
+        hasOutput:
           items:
-            type: string
+            $ref: '#/components/schemas/DatasetSpecification'
           nullable: true
           type: array
-        id:
+        hasInput:
           items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
+            $ref: '#/components/schemas/DatasetSpecification'
           nullable: true
           type: array
-        type:
+        fundingSource:
           items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:Organization:
-      properties:
-        identifier:
-          items:
-            type: string
-          nullable: true
-          type: array
-        website:
-          items:
-            type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
+            $ref: '#/components/schemas/Organization'
           nullable: true
           type: array
       required:
       - id
       type: object
-    sd:Image:
+    Image:
       properties:
         hasDimensionality:
           items:
@@ -1130,7 +2465,7 @@ components:
           type: object
         hasPresentation:
           items:
-            $ref: '#/components/schemas/sd:VariablePresentation'
+            $ref: '#/components/schemas/VariablePresentation'
           nullable: true
           type: array
         position:
@@ -1155,20 +2490,60 @@ components:
           type: array
         hasFixedResource:
           items:
-            $ref: '#/components/schemas/sd:SampleResource'
+            $ref: '#/components/schemas/SampleResource'
           nullable: true
           type: array
       required:
       - id
       type: object
-    sd:SoftwareImage:
+    Unit:
       properties:
-        hasDocumentation:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
           items:
             type: string
           nullable: true
           type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    StandardVariable:
+      properties:
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    SoftwareVersion:
+      properties:
         keywords:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
           items:
             type: string
           nullable: true
@@ -1180,7 +2555,7 @@ components:
           type: array
         hasVersion:
           items:
-            $ref: '#/components/schemas/sd:SoftwareVersion'
+            $ref: '#/components/schemas/SoftwareVersion'
           nullable: true
           type: array
         hasTypicalDataSource:
@@ -1205,7 +2580,7 @@ components:
           type: array
         screenshot:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/Image'
           nullable: true
           type: array
         type:
@@ -1225,7 +2600,7 @@ components:
           type: array
         contributor:
           items:
-            $ref: '#/components/schemas/sd:Person'
+            $ref: '#/components/schemas/Person'
           nullable: true
           type: array
         hasFAQ:
@@ -1233,14 +2608,14 @@ components:
             type: string
           nullable: true
           type: array
-        hasContactPerson:
-          items:
-            $ref: '#/components/schemas/sd:Person'
-          nullable: true
-          type: array
         logo:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/Person'
           nullable: true
           type: array
         hasPurpose:
@@ -1255,7 +2630,202 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Visualization'
+            $ref: '#/components/schemas/Visualization'
+          nullable: true
+          type: array
+        memoryRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        identifier:
+          items:
+            type: string
+          nullable: true
+          type: array
+        website:
+          items:
+            type: string
+          nullable: true
+          type: array
+        citation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasConfiguration:
+          items:
+            $ref: '#/components/schemas/SoftwareConfiguration'
+          nullable: true
+          type: array
+        author:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/Person'
+            nullable: true
+            type: array
+        processorRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        shortDescription:
+          items:
+            type: string
+          nullable: true
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasAssumption:
+          items:
+            type: string
+          nullable: true
+          type: array
+        datePublished:
+          items:
+            type: string
+          nullable: true
+          type: array
+        operatingSystems:
+          items:
+            type: string
+          nullable: true
+          type: array
+        license:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasSourceCode:
+          items:
+            $ref: '#/components/schemas/SourceCode'
+          nullable: true
+          type: array
+        publisher:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Organization'
+            nullable: true
+            type: array
+          - items:
+              $ref: '#/components/schemas/Person'
+            nullable: true
+            type: array
+        fundingSource:
+          items:
+            $ref: '#/components/schemas/Organization'
+          nullable: true
+          type: array
+        hasVersionId:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    SoftwareImage:
+      properties:
+        keywords:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
+          items:
+            type: string
+          nullable: true
+          type: array
+        softwareRequirements:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasVersion:
+          items:
+            $ref: '#/components/schemas/SoftwareVersion'
+          nullable: true
+          type: array
+        hasTypicalDataSource:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDownloadURL:
+          items:
+            type: string
+          nullable: true
+          type: array
+        referencePublication:
+          items:
+            type: string
+          nullable: true
+          type: array
+        description:
+          items:
+            type: string
+          nullable: true
+          type: array
+        screenshot:
+          items:
+            $ref: '#/components/schemas/Image'
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasInstallationInstructions:
+          items:
+            type: string
+          nullable: true
+          type: array
+        dateCreated:
+          items:
+            type: string
+          nullable: true
+          type: array
+        contributor:
+          items:
+            $ref: '#/components/schemas/Person'
+          nullable: true
+          type: array
+        hasFAQ:
+          items:
+            type: string
+          nullable: true
+          type: array
+        logo:
+          items:
+            $ref: '#/components/schemas/Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/Person'
+          nullable: true
+          type: array
+        hasPurpose:
+          items:
+            type: string
+          nullable: true
+          type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        hasSampleVisualization:
+          items:
+            $ref: '#/components/schemas/Visualization'
           nullable: true
           type: array
         memoryRequirements:
@@ -1281,11 +2851,11 @@ components:
         author:
           anyOf:
           - items:
-              $ref: '#/components/schemas/sd:Organization'
+              $ref: '#/components/schemas/Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/sd:Person'
+              $ref: '#/components/schemas/Person'
             nullable: true
             type: array
         processorRequirements:
@@ -1318,40 +2888,40 @@ components:
             type: string
           nullable: true
           type: array
-        license:
+        operatingSystems:
           items:
             type: string
           nullable: true
           type: array
-        operatingSystems:
+        license:
           items:
             type: string
           nullable: true
           type: array
         hasSourceCode:
           items:
-            $ref: '#/components/schemas/sd:SourceCode'
+            $ref: '#/components/schemas/SourceCode'
           nullable: true
           type: array
         publisher:
           anyOf:
           - items:
-              $ref: '#/components/schemas/sd:Organization'
+              $ref: '#/components/schemas/Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/sd:Person'
+              $ref: '#/components/schemas/Person'
             nullable: true
             type: array
         fundingSource:
           items:
-            $ref: '#/components/schemas/sd:Organization'
+            $ref: '#/components/schemas/Organization'
           nullable: true
           type: array
       required:
       - id
       type: object
-    sd:Parameter:
+    Parameter:
       properties:
         hasDefaultValue:
           items:
@@ -1385,7 +2955,7 @@ components:
           type: array
         hasPresentation:
           items:
-            $ref: '#/components/schemas/sd:VariablePresentation'
+            $ref: '#/components/schemas/VariablePresentation'
           nullable: true
           type: array
         position:
@@ -1411,14 +2981,39 @@ components:
       required:
       - id
       type: object
-    sd:SoftwareVersion:
+    SampleResource:
       properties:
-        hasDocumentation:
+        dataCatalogIdentifier:
           items:
             type: string
           nullable: true
           type: array
+        id:
+          items:
+            type: string
+          nullable: false
+          type: array
+        label:
+          items:
+            type: string
+          nullable: true
+          type: array
+        type:
+          items:
+            type: string
+          nullable: true
+          type: array
+      required:
+      - id
+      type: object
+    Software:
+      properties:
         keywords:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasDocumentation:
           items:
             type: string
           nullable: true
@@ -1430,7 +3025,7 @@ components:
           type: array
         hasVersion:
           items:
-            $ref: '#/components/schemas/sd:SoftwareVersion'
+            $ref: '#/components/schemas/SoftwareVersion'
           nullable: true
           type: array
         hasTypicalDataSource:
@@ -1455,7 +3050,7 @@ components:
           type: array
         screenshot:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/Image'
           nullable: true
           type: array
         type:
@@ -1475,7 +3070,7 @@ components:
           type: array
         contributor:
           items:
-            $ref: '#/components/schemas/sd:Person'
+            $ref: '#/components/schemas/Person'
           nullable: true
           type: array
         hasFAQ:
@@ -1483,14 +3078,14 @@ components:
             type: string
           nullable: true
           type: array
-        hasContactPerson:
-          items:
-            $ref: '#/components/schemas/sd:Person'
-          nullable: true
-          type: array
         logo:
           items:
-            $ref: '#/components/schemas/sd:Image'
+            $ref: '#/components/schemas/Image'
+          nullable: true
+          type: array
+        hasContactPerson:
+          items:
+            $ref: '#/components/schemas/Person'
           nullable: true
           type: array
         hasPurpose:
@@ -1505,7 +3100,7 @@ components:
           type: array
         hasSampleVisualization:
           items:
-            $ref: '#/components/schemas/sd:Visualization'
+            $ref: '#/components/schemas/Visualization'
           nullable: true
           type: array
         memoryRequirements:
@@ -1528,19 +3123,14 @@ components:
             type: string
           nullable: true
           type: array
-        hasConfiguration:
-          items:
-            $ref: '#/components/schemas/sd:SoftwareConfiguration'
-          nullable: true
-          type: array
         author:
           anyOf:
           - items:
-              $ref: '#/components/schemas/sd:Organization'
+              $ref: '#/components/schemas/Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/sd:Person'
+              $ref: '#/components/schemas/Person'
             nullable: true
             type: array
         processorRequirements:
@@ -1568,47 +3158,67 @@ components:
             type: string
           nullable: true
           type: array
-        license:
+        operatingSystems:
           items:
             type: string
           nullable: true
           type: array
-        operatingSystems:
+        license:
           items:
             type: string
           nullable: true
           type: array
         hasSourceCode:
           items:
-            $ref: '#/components/schemas/sd:SourceCode'
+            $ref: '#/components/schemas/SourceCode'
           nullable: true
           type: array
         publisher:
           anyOf:
           - items:
-              $ref: '#/components/schemas/sd:Organization'
+              $ref: '#/components/schemas/Organization'
             nullable: true
             type: array
           - items:
-              $ref: '#/components/schemas/sd:Person'
+              $ref: '#/components/schemas/Person'
             nullable: true
             type: array
         fundingSource:
           items:
-            $ref: '#/components/schemas/sd:Organization'
-          nullable: true
-          type: array
-        hasVersionId:
-          items:
-            type: string
+            $ref: '#/components/schemas/Organization'
           nullable: true
           type: array
       required:
       - id
       type: object
-    sd:Visualization:
+    VariablePresentation:
       properties:
-        hasFormat:
+        hasDefaultValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasShortName:
+          items:
+            type: string
+          nullable: true
+          type: array
+        hasMinimumAcceptedValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasStandardVariable:
+          items:
+            $ref: '#/components/schemas/StandardVariable'
+          nullable: true
+          type: array
+        hasMaximumAcceptedValue:
+          items:
+            type: object
+          nullable: true
+          type: array
+        hasConstraint:
           items:
             type: string
           nullable: true
@@ -1623,20 +3233,30 @@ components:
             type: string
           nullable: true
           type: array
+        partOfDataset:
+          items:
+            $ref: '#/components/schemas/DatasetSpecification'
+          nullable: true
+          type: array
         type:
           items:
             type: string
           nullable: true
           type: array
-        wasDerivedFromSoftware:
+        usesUnit:
           items:
-            $ref: '#/components/schemas/sd:Software'
+            type: object
+          nullable: true
+          type: array
+        hasLongName:
+          items:
+            type: string
           nullable: true
           type: array
       required:
       - id
       type: object
-    sd:Person:
+    Person:
       properties:
         identifier:
           items:
@@ -1671,235 +3291,3 @@ components:
       required:
       - id
       type: object
-    sd:SampleExecution:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasExecutionCommand:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:Software:
-      properties:
-        hasDocumentation:
-          items:
-            type: string
-          nullable: true
-          type: array
-        keywords:
-          items:
-            type: string
-          nullable: true
-          type: array
-        softwareRequirements:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasVersion:
-          items:
-            $ref: '#/components/schemas/sd:SoftwareVersion'
-          nullable: true
-          type: array
-        hasTypicalDataSource:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasDownloadURL:
-          items:
-            type: string
-          nullable: true
-          type: array
-        referencePublication:
-          items:
-            type: string
-          nullable: true
-          type: array
-        description:
-          items:
-            type: string
-          nullable: true
-          type: array
-        screenshot:
-          items:
-            $ref: '#/components/schemas/sd:Image'
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasInstallationInstructions:
-          items:
-            type: string
-          nullable: true
-          type: array
-        dateCreated:
-          items:
-            type: string
-          nullable: true
-          type: array
-        contributor:
-          items:
-            $ref: '#/components/schemas/sd:Person'
-          nullable: true
-          type: array
-        hasFAQ:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasContactPerson:
-          items:
-            $ref: '#/components/schemas/sd:Person'
-          nullable: true
-          type: array
-        logo:
-          items:
-            $ref: '#/components/schemas/sd:Image'
-          nullable: true
-          type: array
-        hasPurpose:
-          items:
-            type: string
-          nullable: true
-          type: array
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        hasSampleVisualization:
-          items:
-            $ref: '#/components/schemas/sd:Visualization'
-          nullable: true
-          type: array
-        memoryRequirements:
-          items:
-            type: string
-          nullable: true
-          type: array
-        identifier:
-          items:
-            type: string
-          nullable: true
-          type: array
-        website:
-          items:
-            type: string
-          nullable: true
-          type: array
-        citation:
-          items:
-            type: string
-          nullable: true
-          type: array
-        author:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/sd:Organization'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/sd:Person'
-            nullable: true
-            type: array
-        processorRequirements:
-          items:
-            type: string
-          nullable: true
-          type: array
-        shortDescription:
-          items:
-            type: string
-          nullable: true
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasAssumption:
-          items:
-            type: string
-          nullable: true
-          type: array
-        datePublished:
-          items:
-            type: string
-          nullable: true
-          type: array
-        license:
-          items:
-            type: string
-          nullable: true
-          type: array
-        operatingSystems:
-          items:
-            type: string
-          nullable: true
-          type: array
-        hasSourceCode:
-          items:
-            $ref: '#/components/schemas/sd:SourceCode'
-          nullable: true
-          type: array
-        publisher:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/sd:Organization'
-            nullable: true
-            type: array
-          - items:
-              $ref: '#/components/schemas/sd:Person'
-            nullable: true
-            type: array
-        fundingSource:
-          items:
-            $ref: '#/components/schemas/sd:Organization'
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-    sd:ICASAVariable:
-      properties:
-        id:
-          items:
-            type: string
-          nullable: false
-          type: array
-        label:
-          items:
-            type: string
-          nullable: true
-          type: array
-        type:
-          items:
-            type: string
-          nullable: true
-          type: array
-      required:
-      - id
-      type: object
-x-custom: value1
-x-other: value2

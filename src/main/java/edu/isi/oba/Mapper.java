@@ -72,8 +72,9 @@ class Mapper {
       String prefixIRI = this.pm.getPrefixIRI(cls.getIRI());
       if (prefixIRI != null) {
         String prefix = prefixIRI.split(":")[0];
+        String name =  prefixIRI.split(":")[1];
         if (prefix.equals(this.ont_prefix)) {
-          schemaNames.put(cls.getIRI(), prefixIRI);
+          schemaNames.put(cls.getIRI(), name);
         }
       }
     }
@@ -88,7 +89,14 @@ class Mapper {
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
 
-          this.paths.addPathItem(mapperSchema.name, pathGenerator.generate_plural(mapperSchema));
+          String singular_name = "/" + mapperSchema.name.toLowerCase() + "s/{id}";
+          //TODO: find better way to obtain the plural name
+          String plural_name = "/" + mapperSchema.name.toLowerCase() + "s";
+
+          //Create the plural paths: for example: /models/
+          this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name));
+          //Create the plural paths: for example: /models/id
+          this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name));
 
         }
       }
