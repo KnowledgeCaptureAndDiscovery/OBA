@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
+import java.io.IOException;
 import java.util.*;
 
 class Mapper {
@@ -20,7 +21,8 @@ class Mapper {
 
   private String ont_prefix;
 
-  public Mapper(String ont_url, String ont_prefix) throws OWLOntologyCreationException {
+
+  public Mapper(String ont_url, String ont_prefix, Map<String, String> prefixes) throws OWLOntologyCreationException, IOException {
     OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
     OWLOntology ontology = manager.loadOntology(IRI.create(ont_url));
     OWLDocumentFormat format = manager.getOntologyFormat(ontology);
@@ -28,7 +30,7 @@ class Mapper {
     this.ont_prefix = ont_prefix;
     OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
 
-    setPrefixes(format);
+    setPrefixes(format, prefixes);
     schemas = this.createSchemas(ontology);
   }
 
@@ -36,14 +38,16 @@ class Mapper {
    * Manually set the prefixes
    * @param format: Represents the concrete representation format of an ontology
    */
-  private void setPrefixes(OWLDocumentFormat format) {
+  private void setPrefixes(OWLDocumentFormat format, Map<String, String> prefixes) {
     if (format.isPrefixOWLDocumentFormat()) {
       this.pm = format.asPrefixOWLDocumentFormat();
     } else {
       this.pm = new DefaultPrefixManager();
 
     }
-    this.pm.setPrefix("sd", "https://w3id.org/okn/o/sd#");
+    for (Map.Entry prefix : prefixes.entrySet()) {
+      this.pm.setPrefix(prefix.getKey().toString(), prefix.getValue().toString());
+    }
   }
 
 
