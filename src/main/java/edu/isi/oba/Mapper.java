@@ -72,6 +72,9 @@ class Mapper {
       if (prefixIRI != null) {
         String prefix = prefixIRI.split(":")[0];
         String name =  prefixIRI.split(":")[1];
+        System.out.println(name.toUpperCase() + "_TYPE_URI = \"" + cls.getIRI() + "\"");
+        System.out.println(name.toUpperCase() + "_TYPE_NAME = \"" + name  + "\"");
+
         if (prefix.equals(this.ont_prefix)) {
           schemaNames.put(cls.getIRI(), name);
         }
@@ -79,6 +82,7 @@ class Mapper {
     }
 
     for (OWLClass cls : classes) {
+
       String prefixIRI = this.pm.getPrefixIRI(cls.getIRI());
       if (prefixIRI != null) {
         String prefix = prefixIRI.split(":")[0];

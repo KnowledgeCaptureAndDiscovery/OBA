@@ -139,7 +139,7 @@ class MapperSchema {
                 add("string");
             }
         };
-        MapperProperty idProperty = new MapperProperty("id", defaultProperties, true, false, false);
+        MapperProperty idProperty = new MapperProperty("identifier", defaultProperties, false, false, false);
         MapperProperty labelProperty = new MapperProperty("label", defaultProperties, true, true, false);
         MapperProperty typeProperty = new MapperProperty("type", defaultProperties, true, true, false);
         properties.put(idProperty.name, idProperty.getSchemaByDataProperty());
