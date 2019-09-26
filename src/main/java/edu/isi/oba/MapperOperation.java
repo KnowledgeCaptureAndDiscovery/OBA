@@ -9,6 +9,8 @@ import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import java.util.*;
 
@@ -63,16 +65,29 @@ class MapperOperation {
               .schema(new StringSchema()));
     }
 
+    if (method == Method.PUT || method == Method.POST  || method == Method.DELETE ) {
+      parameters.add(new PathParameter()
+              .description("Username")
+              .name("user")
+              .schema(new StringSchema()));
+    }
     operation = new Operation()
-            .description(description)
-            .summary(summary)
-            .addTagsItem(schemaName)
-            .parameters(parameters)
-            .responses(apiResponses);
+          .description(description)
+          .summary(summary)
+          .addTagsItem(schemaName)
+          .parameters(parameters)
+          .responses(apiResponses);
 
 
     if (method == Method.PUT || method == Method.POST ){
       operation.setRequestBody(requestBody);
+    }
+
+
+    if (method == Method.PUT || method == Method.POST  || method == Method.DELETE ){
+      SecurityRequirement securityRequirement = new SecurityRequirement();
+      securityRequirement.addList("BearerAuth");
+      operation.addSecurityItem(securityRequirement);
     }
 
   }
@@ -129,7 +144,6 @@ class MapperOperation {
     Content content = new Content().addMediaType("application/json", mediaType);
     requestBody.setContent(content);
     requestBody.setDescription(requestDescription);
-
 
     //Set the response
     apiResponses.addApiResponse("201", new ApiResponse()

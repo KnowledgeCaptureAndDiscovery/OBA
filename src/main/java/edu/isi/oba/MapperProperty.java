@@ -137,7 +137,20 @@ class MapperProperty {
 
     }
     private Schema getComposedSchemaObject(List<String> refs, boolean array, boolean nullable){
-        ComposedSchema composedSchema = new ComposedSchema();
+        Schema object = new ObjectSchema();
+        object.setType("object");
+
+        if (array) {
+          ArraySchema objects = new ArraySchema();
+          objects.setNullable(nullable);
+          objects.setItems(object);
+          return objects;
+        }
+        else {
+          return object;
+        }
+
+        /*ComposedSchema composedSchema = new ComposedSchema();
         List<Schema> items = new ArrayList<>();
         for (String ref : refs){
             Schema item = getObjectPropertiesByRef(ref, array, nullable);
@@ -145,6 +158,8 @@ class MapperProperty {
         }
         composedSchema.setAnyOf(items);
         return composedSchema;
+        */
+
     }
 
 
