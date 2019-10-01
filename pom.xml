@@ -5,12 +5,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.isi.oba</groupId>
-  <artifactId>core</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>oba</artifactId>
+  <version>1.0</version>
 
   <name>core</name>
   <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>https://github.com/KnowledgeCaptureAndDiscovery/OBA</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,18 +31,8 @@
       <version>5.1.10</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-    </dependency>
-    <dependency>
       <groupId>net.sourceforge.owlapi</groupId>
       <artifactId>owlapi-apibinding</artifactId>
-      <version>5.1.10</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.owlapi</groupId>
-      <artifactId>owlapi-api</artifactId>
       <version>5.1.10</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.openapitools/openapi-generator -->
@@ -51,12 +41,17 @@
       <artifactId>openapi-generator</artifactId>
       <version>4.0.0</version>
     </dependency>
-      <dependency>
-          <groupId>net.sourceforge.owlapi</groupId>
-          <artifactId>owlapi-compatibility</artifactId>
-          <version>5.1.10</version>
-      </dependency>
-
+    <dependency>
+        <groupId>net.sourceforge.owlapi</groupId>
+        <artifactId>owlapi-compatibility</artifactId>
+        <version>5.1.10</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.25</version>
+    </dependency>
   </dependencies>
 
   <build>
