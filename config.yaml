@@ -1,7 +1,9 @@
 ontologies:
-  - xml_url: "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.0.0/ontology.xml"
-    prefix: "sdm"
-    prefix_uri: "https://w3id.org/okn/o/sdm#"
-  - xml_url: "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.1.0/ontology.xml"
-    prefix: "sd"
-    prefix_uri: "https://w3id.org/okn/o/sd#"
+  modelCatalog:
+    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.0.0/ontology.xml
+    prefix: sdm
+    prefixUri: https://w3id.org/okn/o/sdm#
+  softwareDescription:
+    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.1.0/ontology.xml
+    prefix: sd
+    prefixUri: https://w3id.org/okn/o/sd#
