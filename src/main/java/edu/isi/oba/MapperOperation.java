@@ -69,6 +69,7 @@ class MapperOperation {
       parameters.add(new PathParameter()
               .description("Username")
               .name("user")
+              .required(false)
               .schema(new StringSchema()));
     }
     operation = new Operation()

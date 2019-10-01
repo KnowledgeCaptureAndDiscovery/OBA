@@ -53,13 +53,12 @@ class MapperSchema {
         schema.setName(this.name);
         schema.setType(this.type);
         schema.setProperties(this.getProperties());
-        schema.setRequired(required());
         return schema;
     }
 
     private List<String> required() {
         return new ArrayList<String>() {{
-            add("id");
+            //add("id");
         }};
     }
 

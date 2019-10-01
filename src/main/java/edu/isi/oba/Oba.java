@@ -1,81 +1,40 @@
 package edu.isi.oba;
 
-import io.swagger.v3.oas.models.Paths;
-import io.swagger.v3.oas.models.media.Schema;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Config {
-  public Config(List<Ontology> ontologies) {
-    this.ontologies = ontologies;
-  }
-
-  public List<Ontology> getOntologies() {
-    return ontologies;
-  }
-
-  public void setOntologies(List<Ontology> ontologies) {
-    this.ontologies = ontologies;
-  }
-
-  private List<Ontology> ontologies;
-}
-
-
-class Ontology {
-  private String xml_url;
-
-  public void setXml_url(String xml_url) {
-    this.xml_url = xml_url;
-  }
-
-  public void setPrefix(String prefix) {
-    this.prefix = prefix;
-  }
-
-  public void setPrefix_uri(String prefix_uri) {
-    this.prefix_uri = prefix_uri;
-  }
-
-  public Ontology(String xml_url) {
-    this.xml_url = xml_url;
-  }
-
-  private String prefix;
-  private String prefix_uri;
-
-}
 
 class Oba {
-        public static void main(String[] args) throws Exception {
-//          Yaml yaml = new Yaml(new Constructor(Config.class));
-//          InputStream inputStream = new FileInputStream("config.yaml");
-//          Config obj = yaml.load(inputStream);
-//          System.out.println(obj);
 
-          Mapper sdm = extract_info(
-                  "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.0.0/ontology.xml",
-                  "sdm",
-                  "https://w3id.org/okn/o/sdm#");
-          Mapper sd = extract_info(
-                  "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.1.0/ontology.xml",
-                  "sd",
-                  "https://w3id.org/okn/o/sd#");
+  public static final String CONFIG_YAML = "config.yaml";
 
+  public static void main(String[] args) throws Exception {
+          Constructor constructor = new Constructor(YamlConfig.class);
+          Yaml yaml = new Yaml( constructor );
+
+          InputStream input = null;
+          try {
+            input = new FileInputStream(new File(CONFIG_YAML));
+          } catch (FileNotFoundException e) {
+            System.err.println("Configuration file not found: " + CONFIG_YAML);
+          }
+          YamlConfig data = yaml.loadAs( input, YamlConfig.class );
+
+          Map<String, OntologyConfig> ontologies = data.getOntologies();
           List<Mapper> mappers = new ArrayList<>();
-          mappers.add(sdm);
-          mappers.add(sd);
 
+          for (Map.Entry<String, OntologyConfig> entry : ontologies.entrySet()) {
+            OntologyConfig ontology = entry.getValue();
+            Mapper mapper = extract_info(ontology.getXmlUrl(), ontology.getPrefix(), ontology.getPrefixUri());
+            mappers.add(mapper);
+          }
           Serializer serializer = new Serializer(mappers);
         }
 
