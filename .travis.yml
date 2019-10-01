@@ -1,7 +1,8 @@
 language: java
 
-before_script:
-  - mvn --settings pom.xml org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion=${TRAVIS_TAG:-dev} 1>/dev/null 2>/dev/null 
+before_deploy:
+  - mvn --settings pom.xml org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion=${TRAVIS_TAG:TRAVIS_COMMIT} 1>/dev/null 2>/dev/null 
+  - mvn package
   
 deploy:
   - provider: releases
