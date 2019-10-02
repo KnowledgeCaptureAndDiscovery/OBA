@@ -1,11 +1,21 @@
 package edu.isi.oba;
 
 
+import java.util.List;
 import java.util.Map;
 
 class YamlConfig {
   public Map<String, OntologyConfig> ontologies;
 
+  public List<String> getPaths() {
+    return paths;
+  }
+
+  public void setPaths(List<String> paths) {
+    this.paths = paths;
+  }
+
+  public List<String> paths;
   public Map<String, OntologyConfig> getOntologies() {
     return ontologies;
   }

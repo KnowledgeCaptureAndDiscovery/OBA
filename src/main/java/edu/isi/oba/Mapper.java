@@ -21,12 +21,13 @@ class Mapper {
   public Map<String, Schema> schemas;
   final Paths paths = new Paths();
   public String ont_prefix;
+  List<String> selected_paths;
 
-
-  public Mapper(String ont_url, String ont_prefix, Map<String, String> prefixes) throws OWLOntologyCreationException, IOException {
+  public Mapper(String ont_url, String ont_prefix, Map<String, String> prefixes, List<String> paths) throws OWLOntologyCreationException, IOException {
     OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
     OWLOntology ontology = manager.loadOntology(IRI.create(ont_url));
     OWLDocumentFormat format = manager.getOntologyFormat(ontology);
+    this.selected_paths = paths;
     this.ont_prefix = ont_prefix;
     setPrefixes(format, prefixes);
     schemas = this.createSchemas(ontology);
@@ -87,36 +88,46 @@ class Mapper {
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
 
-          //User schema
-          Map<String, Schema> userProperties = new HashMap<>();
-          StringSchema username = new StringSchema();
-          StringSchema password = new StringSchema();
-          userProperties.put("username", username);
-          userProperties.put("password", password);
-
-          Schema userSchema = new Schema();
-          userSchema.setName("User");
-          userSchema.setType("object");
-          userSchema.setProperties(userProperties);
-          userSchema.setXml(new XML().name("User"));
-
-          schemas.put("User", userSchema);
-
-          String singular_name = "/" + mapperSchema.name.toLowerCase() + "s/{id}";
-          //TODO: find better way to obtain the plural name
-          String plural_name = "/" + mapperSchema.name.toLowerCase() + "s";
-
-          //Create the plural paths: for example: /models/
-          this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name));
-          //Create the plural paths: for example: /models/id
-          this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name));
-          this.paths.addPathItem("/user/login", pathGenerator.user_login());
-
+          if (this.selected_paths == null){
+            add_path(pathGenerator, mapperSchema);
+          } else {
+            for (String str : this.selected_paths) {
+              String search = str.trim().toLowerCase();
+              String schemaName = mapperSchema.name.toLowerCase();
+              if (search.trim().toLowerCase().equals(schemaName)) {
+                add_path(pathGenerator, mapperSchema);
+              }
+            }
+          }
         }
       }
+      //User schema
+      Map<String, Schema> userProperties = new HashMap<>();
+      StringSchema username = new StringSchema();
+      StringSchema password = new StringSchema();
+      userProperties.put("username", username);
+      userProperties.put("password", password);
+
+      Schema userSchema = new Schema();
+      userSchema.setName("User");
+      userSchema.setType("object");
+      userSchema.setProperties(userProperties);
+      userSchema.setXml(new XML().name("User"));
+      schemas.put("User", userSchema);
+
+      this.paths.addPathItem("/user/login", pathGenerator.user_login());
     }
 
     return schemas;
+  }
+
+  private void add_path(Path pathGenerator, MapperSchema mapperSchema) {
+    String singular_name = "/" + mapperSchema.name.toLowerCase() + "s/{id}";
+    String plural_name = "/" + mapperSchema.name.toLowerCase() + "s";
+    //Create the plural paths: for example: /models/
+    this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name));
+    //Create the plural paths: for example: /models/id
+    this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name));
   }
 
 }
