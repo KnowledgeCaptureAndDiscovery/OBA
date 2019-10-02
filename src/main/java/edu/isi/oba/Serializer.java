@@ -19,7 +19,7 @@ import java.util.*;
 
 class Serializer {
   //TODO: validate the yaml
-  public Serializer(List<Mapper> mappers) throws IOException {
+  public Serializer(List<Mapper> mappers, String filename) throws IOException {
     String url = "https://w3id.org/mint/modelCatalog/";
     OpenAPI openAPI = new OpenAPI();
     final String title = "Model Catalog";
@@ -92,7 +92,6 @@ class Serializer {
     openAPI.components(components);
 
     //write the filename
-    String filename = "example.yaml";
     String content = SerializerUtils.toYamlString(openAPI);
     File file = new File(filename);
     BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));

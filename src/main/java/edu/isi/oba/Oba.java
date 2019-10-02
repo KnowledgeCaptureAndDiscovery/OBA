@@ -29,13 +29,14 @@ class Oba {
           Map<String, OntologyConfig> ontologies = data.getOntologies();
           List<Mapper> mappers = new ArrayList<>();
           List<String> paths = data.getPaths();
+          String filename = data.getFilename();
 
           for (Map.Entry<String, OntologyConfig> entry : ontologies.entrySet()) {
             OntologyConfig ontology = entry.getValue();
             Mapper mapper = extract_info(ontology.getXmlUrl(), ontology.getPrefix(), ontology.getPrefixUri(), paths);
             mappers.add(mapper);
           }
-          Serializer serializer = new Serializer(mappers);
+          Serializer serializer = new Serializer(mappers, filename);
         }
 
 

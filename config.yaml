@@ -7,3 +7,7 @@ ontologies:
     xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.1.0/ontology.xml
     prefix: sd
     prefixUri: https://w3id.org/okn/o/sd#
+filename: modelcatalog.yaml
+paths:
+  - model
+

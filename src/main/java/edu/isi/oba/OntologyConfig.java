@@ -1,5 +1,7 @@
 package edu.isi.oba;
 
+import java.util.List;
+
 public class OntologyConfig {
   private String xmlUrl;
   private String prefix;
