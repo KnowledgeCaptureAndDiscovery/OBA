@@ -5,26 +5,44 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.cli.*;
 
 class Oba {
 
-  public static final String CONFIG_YAML = "config.yaml";
-
   public static void main(String[] args) throws Exception {
+          Options options = new Options();
+          Option input = new Option("c", "config", true, "configuration file path");
+          input.setRequired(true);
+          options.addOption(input);
+
+          CommandLineParser parser = new DefaultParser();
+          HelpFormatter formatter = new HelpFormatter();
+          CommandLine cmd;
+          String config_yaml = null;
+
+          try {
+            cmd = parser.parse(options, args);
+            config_yaml = cmd.getOptionValue("config");
+          } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utility-name", options);
+            System.exit(1);
+          }
           Constructor constructor = new Constructor(YamlConfig.class);
           Yaml yaml = new Yaml( constructor );
 
-          InputStream input = null;
+          InputStream config_input = null;
           try {
-            input = new FileInputStream(new File(CONFIG_YAML));
+            config_input = new FileInputStream(new File(config_yaml));
           } catch (FileNotFoundException e) {
-            System.err.println("Configuration file not found: " + CONFIG_YAML);
+            System.err.println("Configuration file not found: " + config_yaml);
           }
-          YamlConfig data = yaml.loadAs( input, YamlConfig.class );
+          YamlConfig data = yaml.loadAs( config_input, YamlConfig.class );
 
           Map<String, OntologyConfig> ontologies = data.getOntologies();
           List<Mapper> mappers = new ArrayList<>();
