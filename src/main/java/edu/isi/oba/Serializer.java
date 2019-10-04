@@ -13,13 +13,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 
 
 class Serializer {
   //TODO: validate the yaml
-  public Serializer(List<Mapper> mappers, String filename) throws IOException {
+  public  Serializer(List<Mapper> mappers, java.nio.file.Path dir) throws IOException {
     String url = "https://w3id.org/mint/modelCatalog/";
     OpenAPI openAPI = new OpenAPI();
     final String title = "Model Catalog";
@@ -53,11 +54,8 @@ class Serializer {
 
     Mapper mapper = null;
     Components components = new Components();
-    Paths paths = new Paths();
-    String varFileName = "vars.py";
-
-    FileWriter myWriter = new FileWriter(varFileName);
-
+    Paths oepnapiPaths = new Paths();
+    FileWriter myWriter = new FileWriter(dir + File.separator + ".openapi-generator/template/static_files/utils/vars.py");
     Iterator i = mappers.iterator();
     while (i.hasNext()) {
 
@@ -82,18 +80,18 @@ class Serializer {
       }
 
       System.out.println("inserting schemas and paths of " + mapper.ont_prefix);
-      mapper.paths.forEach((k, v) -> paths.addPathItem(k, v));
+      mapper.paths.forEach((k, v) -> oepnapiPaths.addPathItem(k, v));
       mapper.schemas.forEach((k, v) -> components.addSchemas(k, v));
       components.securitySchemes(securitySchemes);
     }
     myWriter.close();
 
-    openAPI.setPaths(paths);
+    openAPI.setPaths(oepnapiPaths);
     openAPI.components(components);
 
     //write the filename
     String content = SerializerUtils.toYamlString(openAPI);
-    File file = new File(filename);
+    File file = new File(dir + File.separator + "openapi.yaml");
     BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
     writer.write(content);
     writer.close();

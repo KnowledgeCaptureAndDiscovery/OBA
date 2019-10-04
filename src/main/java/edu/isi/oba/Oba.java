@@ -1,11 +1,16 @@
 package edu.isi.oba;
 
+import org.apache.commons.io.FileUtils;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,15 +52,32 @@ class Oba {
           Map<String, OntologyConfig> ontologies = data.getOntologies();
           List<Mapper> mappers = new ArrayList<>();
           List<String> paths = data.getPaths();
-          String filename = data.getFilename();
+          String dir = data.getName();
 
           for (Map.Entry<String, OntologyConfig> entry : ontologies.entrySet()) {
             OntologyConfig ontology = entry.getValue();
             Mapper mapper = extract_info(ontology.getXmlUrl(), ontology.getPrefix(), ontology.getPrefixUri(), paths);
             mappers.add(mapper);
           }
-          Serializer serializer = new Serializer(mappers, filename);
-        }
+          String fileName = dir;
+          Path destinationProject = Paths.get(fileName);
+          Path baseProject = Paths.get("./tools/base_project/");
+          if (Files.exists(destinationProject)){
+            System.err.println("The destination project exists");
+          }
+          FileUtils.copyDirectory(baseProject.toFile(), destinationProject.toFile());
+          Serializer serializer = new Serializer(mappers, destinationProject);
+
+          Path destinationQueries = Paths.get(destinationProject + "/.openapi-generator/template/static_files/queries/");
+          Path sourceQueries = Paths.get("queries");
+          FileUtils.copyDirectory(sourceQueries.toFile(), destinationQueries.toFile());
+
+          File source = new File("owl2jsonld-0.2.1-standalone.jar");
+          File dest = new File(destinationProject + "/owl2jsonld-0.2.1-standalone.jar");
+
+          FileUtils.copyFile(source, dest);
+
+  }
 
 
         public static Mapper extract_info(String ont_serialization_url, String ont_prefix, String ont_uri, List<String> paths) throws OWLOntologyCreationException, IOException {
