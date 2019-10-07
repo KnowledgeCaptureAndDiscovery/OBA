@@ -70,7 +70,7 @@ class MapperSchema {
      * @return true or false
      */
     private boolean checkDomainClass(OWLClass cls, OWLPropertyDomainAxiom dp) {
-        Set<OWLClass> superDomainClasses = reasoner.getSuperClasses(cls, true).getFlattened();
+        Set<OWLClass> superDomainClasses = reasoner.getSuperClasses(cls, false).getFlattened();
         Set<OWLClass> domainClasses = dp.getDomain().getClassesInSignature();
         for (OWLClass domainClass : domainClasses) {
             if (domainClass.equals(cls))
@@ -97,8 +97,8 @@ class MapperSchema {
     private Map<String, Schema> getDataProperties(OWLOntology ontology, OWLClass cls) {
         HashMap<String, String> propertyNameURI = new HashMap<>();
         Map<String, Schema> properties = new HashMap<>();
-
-        for (OWLDataPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN)) {
+        Set<OWLDataPropertyDomainAxiom> properties_class = ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN);
+        for (OWLDataPropertyDomainAxiom dp : properties_class) {
             if (checkDomainClass(cls, dp)) {
                 for (OWLDataProperty odp : dp.getDataPropertiesInSignature()) {
                     Boolean array = true;
