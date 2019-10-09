@@ -8,4 +8,5 @@ ontologies:
     prefix: sd
     prefixUri: https://w3id.org/okn/o/sd#
 name: outputs/modelcatalog
-
+paths:
+  - model

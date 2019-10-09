@@ -1,0 +1,7 @@
+ontologies:
+  preo:
+    xmlUrl: https://knowledgecaptureanddiscovery.github.io/WorkflowProvenanceRepository/preo/release/0.0.1/ontology.xml
+    prefix: preo
+    prefixUri: https://w3id.org/okn/o/preo#
+name: outputs/preo
+

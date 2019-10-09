@@ -1,0 +1,21 @@
+#+ summary: Given a rdf type, returns all the resources related to the type
+
+prefix sd: <https://w3id.org/okn/o/sd#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+CONSTRUCT {
+?item ?predicate ?prop .
+?prop a ?type
+}
+WHERE {
+GRAPH ?_g_iri {
+?item a  ?_type_iri .
+?item ?predicate ?prop
+VALUES ?predicate { sd:description rdfs:label }
+?w ?property ?desc.
+OPTIONAL {
+?prop a ?type
+}
+filter regex(str(?desc),?_text,"i")
+
+}}
