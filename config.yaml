@@ -1,13 +1,10 @@
 ontologies:
   modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.0.0/ontology.xml
+    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.1.0/ontology.xml
     prefix: sdm
     prefixUri: https://w3id.org/okn/o/sdm#
   softwareDescription:
-    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.1.0/ontology.xml
+    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.2.0/ontology.xml
     prefix: sd
     prefixUri: https://w3id.org/okn/o/sd#
-filename: modelcatalog.yaml
-paths:
-  - model
-
+name: outputs/modelcatalog

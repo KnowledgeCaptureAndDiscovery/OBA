@@ -117,8 +117,8 @@ class MapperOperation {
                 .content(new Content().addMediaType("application/json", new MediaType().schema(schema)));
         apiResponses.addApiResponse("200", responseOk);
         parameters.add(new QueryParameter()
-                .name("query_text")
-                .description("A value of type string that will substitute ?_text in the original query")
+                .name("label")
+                .description("Filter by label")
                 .required(false)
                 .schema(new StringSchema()));
         break;

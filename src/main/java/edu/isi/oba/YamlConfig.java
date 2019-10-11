@@ -7,14 +7,14 @@ import java.util.Map;
 class YamlConfig {
   public Map<String, OntologyConfig> ontologies;
   public List<String> paths;
-  public String filename = "openapi.yaml";
+  public String name = "server";
 
-  public String getFilename() {
-    return filename;
+  public String getName() {
+    return name;
   }
 
-  public void setFilename(String filename) {
-    this.filename = filename;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public List<String> getPaths() {

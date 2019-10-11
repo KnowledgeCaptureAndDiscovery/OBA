@@ -28,6 +28,7 @@ class Query {
   private static final String get_one_graph_query_file = "get_one_user.rq";
   private static final String get_related_query_file = "get_all_related.rq";
   private static final String get_related_graph_query_file = "get_all_related_user.rq";
+  private static final String get_all_search_graph_query_file = "get_all_search_user.rq";
 
 
   public Query() {
@@ -40,9 +41,36 @@ class Query {
     write_query(query_resource(false), get_one_query_file, schema_name);
     write_query(query_resource_related( true), get_related_graph_query_file, schema_name);
     write_query(query_resource_related( false), get_related_query_file, schema_name);
+    write_query(query_get_all_resources_search( true), get_all_search_graph_query_file, schema_name);
+
   }
 
-
+  /**
+   * Returns the query to get all resources by the type
+   * @param graph: boolean
+   * @return
+   */
+  private String query_get_all_resources_search(Boolean graph) {
+    String query = "#+ summary: Given a rdf type and label, returns all the resources related to the type and the label\n" +
+            "CONSTRUCT {\n" +
+            "?item ?predicate ?prop .\n" +
+            "?prop a ?type\n" +
+            "}\n" +
+            "WHERE {\n";
+    query += graph ? "GRAPH ?_g_iri {\n" : "\n";
+    query += "?item a  ?_type_iri . \n" +
+            "{\n" +
+            "?item ?predicate ?prop\n" +
+            "VALUES ?predicate { sd:description rdfs:label }\n" +
+            "?w ?property ?desc.\n" +
+            "OPTIONAL {\n" +
+            "?prop a ?type\n" +
+            "}\n" +
+            "filter regex(str(?desc),?_text,\"i\")\n" +
+            "}";
+    query += graph ? "}" : "";
+    return query;
+  }
 
   /**
    * Returns the query to get all resources by the type
