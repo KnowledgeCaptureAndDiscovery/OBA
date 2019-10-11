@@ -1,8 +1,0 @@
-#+ summary: Return the query the related resources to resource_iri by a predicate_ir
-CONSTRUCT {
-?s ?p ?o
-}
-WHERE {
-?_resource_iri  ?_predicate_iri  ?s .
-?s ?o ?p
-}
