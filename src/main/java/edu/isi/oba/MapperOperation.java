@@ -153,7 +153,9 @@ class MapperOperation {
 
     //Set the response
     apiResponses.addApiResponse("201", new ApiResponse()
-            .description("Created"));
+            .content(content)
+            .description("Created")
+    );
   }
 
 
@@ -172,7 +174,9 @@ class MapperOperation {
     //Set the response
     apiResponses
             .addApiResponse("200", new ApiResponse()
-                    .description("Updated"))
+                    .content(content)
+                    .description("Updated")
+            )
             .addApiResponse("404", new ApiResponse()
                     .description("Not Found"));
 

@@ -90,7 +90,7 @@ class MapperProperty {
     public Schema getSchemaByDataProperty(){
         //TODO: Assumption: only one type
         if (this.type.size() == 0) {
-            return (array) ? arraySchema(new ObjectSchema(), nullable) : new ObjectSchema().nullable(nullable);
+            return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
         }
 
         String schemaType = getDataType(this.type.get(0));
