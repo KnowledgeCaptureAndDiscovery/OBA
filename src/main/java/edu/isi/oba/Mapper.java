@@ -85,6 +85,8 @@ class Mapper {
         if (prefix.equals(this.ont_prefix)) {
           MapperSchema mapperSchema = new MapperSchema(ontology, cls, "object", schemaNames);
           query.get_all(mapperSchema.name);
+          query.write_readme(mapperSchema.name);
+
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
 

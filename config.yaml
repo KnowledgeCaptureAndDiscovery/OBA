@@ -1,6 +1,6 @@
 ontologies:
   modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.1.0/ontology.xml
+    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
     prefix: sdm
     prefixUri: https://w3id.org/okn/o/sdm#
   softwareDescription:

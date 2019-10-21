@@ -144,6 +144,25 @@ class Query {
   }
 
 
+  public void write_readme(String schema_name) {
+    String dir_path = "queries" + File.separator + schema_name + File.separator;
+    String file_path = dir_path + File.separator + "README";
+    File directory = new File(dir_path);
+    if (! directory.exists()){
+      directory.mkdirs();
+    }
+
+
+    BufferedWriter writer = null;
+    try {
+      writer = new BufferedWriter(new FileWriter(file_path));
+      writer.write("To modify the query from this class, edit this file");
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   private void write_query(String query, String file, String schema_name) {
     String dir_path = "queries" + File.separator + schema_name + File.separator;
     String file_path = dir_path + File.separator + file;
