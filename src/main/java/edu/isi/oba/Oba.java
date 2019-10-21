@@ -1,5 +1,7 @@
 package edu.isi.oba;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import org.apache.commons.io.FileUtils;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.yaml.snakeyaml.Yaml;
@@ -25,10 +27,12 @@ class Oba {
           input.setRequired(true);
           options.addOption(input);
 
+
           CommandLineParser parser = new DefaultParser();
           HelpFormatter formatter = new HelpFormatter();
           CommandLine cmd;
           String config_yaml = null;
+
 
           try {
             cmd = parser.parse(options, args);
@@ -49,10 +53,13 @@ class Oba {
           }
           YamlConfig data = yaml.loadAs( config_input, YamlConfig.class );
 
+          OpenAPI openapi_base = new OpenAPIV3Parser().read(data.getOpenapi_base());
+
+
           Map<String, OntologyConfig> ontologies = data.getOntologies();
           List<Mapper> mappers = new ArrayList<>();
           List<String> paths = data.getPaths();
-          String dir = data.getName();
+          String dir = data.getOutput_dir() + File.separator + data.getName() ;
 
           for (Map.Entry<String, OntologyConfig> entry : ontologies.entrySet()) {
             OntologyConfig ontology = entry.getValue();
@@ -66,7 +73,7 @@ class Oba {
             System.err.println("The destination project exists");
           }
           FileUtils.copyDirectory(baseProject.toFile(), destinationProject.toFile());
-          Serializer serializer = new Serializer(mappers, destinationProject);
+          Serializer serializer = new Serializer(mappers, destinationProject, openapi_base);
 
           Path destinationQueries = Paths.get(destinationProject + "/.openapi-generator/template/static_files/queries/");
           Path sourceQueries = Paths.get("queries");

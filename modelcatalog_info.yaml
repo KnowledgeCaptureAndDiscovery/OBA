@@ -1,0 +1,13 @@
+openapi: 3.0.1
+info:
+  description: This is the API of the  Software Description Ontology
+    at [https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/index-en.html](https://w3id.org/okn/o/sdm)
+  title: Model Catalog
+  version: v1.2.0
+externalDocs:
+  description: Model Catalog
+  url: https://w3id.org/okn/o/sdm
+servers:
+  - url: https://api.models.mint.isi.edu/v1.2.0
+  - url: https://dev.api.models.mint.isi.edu/v1.2.0
+  - url: http://localhost:8080/v1.2.0
