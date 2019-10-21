@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.*;
 
 class Mapper {
+  public static final String DEFAULT_DIR_QUERY = "_default_";
   private PrefixManager pm;
 
   public final Map<IRI, String> schemaNames = new HashMap<>();
@@ -64,6 +65,7 @@ class Mapper {
 
     Query query = new Query();
     Path pathGenerator = new Path();
+    query.get_all(DEFAULT_DIR_QUERY);
 
 
     for (OWLClass cls : classes) {
@@ -84,7 +86,7 @@ class Mapper {
         String prefix = prefixIRI.split(":")[0];
         if (prefix.equals(this.ont_prefix)) {
           MapperSchema mapperSchema = new MapperSchema(ontology, cls, "object", schemaNames);
-          query.get_all(mapperSchema.name);
+
           query.write_readme(mapperSchema.name);
 
           Schema schema = mapperSchema.getSchema();
