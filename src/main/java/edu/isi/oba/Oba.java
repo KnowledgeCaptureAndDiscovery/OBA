@@ -79,11 +79,6 @@ class Oba {
           Path sourceQueries = Paths.get("queries");
           FileUtils.copyDirectory(sourceQueries.toFile(), destinationQueries.toFile());
 
-          File source = new File("owl2jsonld-0.2.1-standalone.jar");
-          File dest = new File(destinationProject + "/owl2jsonld-0.2.1-standalone.jar");
-
-          FileUtils.copyFile(source, dest);
-
   }
 
 
