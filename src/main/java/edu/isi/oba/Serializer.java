@@ -50,9 +50,9 @@ class Serializer {
         clsIRI = (IRI) pair.getKey();
         name = (String) pair.getValue();
         try {
-
-          myWriter.write(name.toUpperCase() + "_TYPE_URI = \"" +  clsIRI.toString().replace("-", "") + "\"\n");
-          myWriter.write(name.toUpperCase() + "_TYPE_NAME = \"" +  name + "\"\n");
+          String variable_name = name.toUpperCase().replace("-", "") ;
+          myWriter.write(variable_name + "_TYPE_URI = \"" +  clsIRI + "\"\n");
+          myWriter.write(variable_name + "_TYPE_NAME = \"" +  name + "\"\n");
         } catch (IOException e) {
           System.out.println("An error occurred.");
           e.printStackTrace();

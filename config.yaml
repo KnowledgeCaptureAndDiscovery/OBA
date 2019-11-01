@@ -4,7 +4,7 @@ ontologies:
     prefix: sdm
     prefixUri: https://w3id.org/okn/o/sdm#
   softwareDescription:
-    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.2.0/ontology.xml
+    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.3.0/ontology.xml
     prefix: sd
     prefixUri: https://w3id.org/okn/o/sd#
 name: modelcatalog
