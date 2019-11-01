@@ -52,6 +52,8 @@ class Query {
    */
   private String query_get_all_resources_search(Boolean graph) {
     String query = "#+ summary: Given a rdf type and label, returns all the resources related to the type and the label\n" +
+            "PREFIX sd: <https://w3id.org/okn/o/sd#> \n" + 
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
             "CONSTRUCT {\n" +
             "?item ?predicate ?prop .\n" +
             "?prop a ?type\n" +
@@ -106,6 +108,8 @@ class Query {
    */
   private String query_resource(Boolean graph) {
     String query = "#+ summary: Return the query to a resource by the resource_iri\n" +
+            "PREFIX sd: <https://w3id.org/okn/o/sd#> \n" + 
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
             "CONSTRUCT {\n" +
             "?_resource_iri ?predicate ?prop .\n" +
             "?prop a ?type .\n" +
