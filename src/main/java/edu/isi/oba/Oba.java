@@ -1,5 +1,8 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.OntologyConfig;
+import edu.isi.oba.config.RelationConfig;
+import edu.isi.oba.config.YamlConfig;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 import org.apache.commons.io.FileUtils;

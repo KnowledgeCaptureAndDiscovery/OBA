@@ -1,4 +1,4 @@
-package edu.isi.oba;
+package edu.isi.oba.config;
 
 public class RelationConfig {
   public String getSubject() {

@@ -1,4 +1,4 @@
-package edu.isi.oba;
+package edu.isi.oba.config;
 
 import java.util.List;
 

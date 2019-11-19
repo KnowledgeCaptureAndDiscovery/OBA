@@ -1,14 +1,12 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.RelationConfig;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.XML;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.io.IOException;
@@ -99,10 +97,10 @@ class Mapper {
 
 
           //obtain the relations
-          List<RelationConfig> model_relations = relations.get(mapperSchema.name);
-          for (RelationConfig model_relation : model_relations){
-              add_path_relation(pathGenerator, model_relation.getSubject(), model_relation.getPredicate(), model_relation.getPath());
-          }
+//          List<RelationConfig> model_relations = relations.get(mapperSchema.name);
+//          for (RelationConfig model_relation : model_relations){
+//              add_path_relation(pathGenerator, model_relation.getSubject(), model_relation.getPredicate(), model_relation.getPath());
+//          }
 
 
           if (this.selected_paths == null){
