@@ -10,3 +10,12 @@ ontologies:
 name: modelcatalog
 output_dir: outputs
 openapi_base: modelcatalog_info.yaml
+relations:
+    - modelconfigurations:
+        subject: ModelConfiguration
+        predicate: hasInput
+        path: inputs
+    - setups:
+        subject: Setup
+        predicate: hasInput
+        path: inputs
