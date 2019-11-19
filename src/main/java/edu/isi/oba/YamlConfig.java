@@ -6,8 +6,11 @@ import java.util.Map;
 
 class YamlConfig {
   public Map<String, OntologyConfig> ontologies;
-  public List<String> paths;
+  public Map<String, List<RelationConfig>> relations;
+  public String output_dir = "outputs";
+  public String openapi_base;
   public String name = "server";
+  public List<String> paths;
 
   public String getOutput_dir() {
     return output_dir;
@@ -17,12 +20,6 @@ class YamlConfig {
     this.output_dir = output_dir;
   }
 
-  public String output_dir = "outputs";
-
-
-
-
-  public String openapi_base;
 
   public String getOpenapi_base() {
     return openapi_base;
@@ -62,5 +59,14 @@ class YamlConfig {
             "ontologies=" + ontologies +
             '}';
   }
+
+  public Map<String, List<RelationConfig>> getRelations() {
+    return relations;
+  }
+
+  public void setRelations(Map<String, List<RelationConfig>> relations) {
+    this.relations = relations;
+  }
+
 }
 

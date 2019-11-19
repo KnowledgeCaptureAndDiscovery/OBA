@@ -8,11 +8,9 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,17 +33,16 @@ class Oba {
     String dir = data.getOutput_dir() + File.separator + data.getName();
     //write the openapi specification
     generate_openapi_spec(openapi_base, mappers, dir);
-
   }
 
   private static List<Mapper> get_mappers(YamlConfig data) throws OWLOntologyCreationException, IOException {
     Map<String, OntologyConfig> ontologies = data.getOntologies();
     List<Mapper> mappers = new ArrayList<>();
     List<String> paths = data.getPaths();
-
+    Map<String, List<RelationConfig>> relations = data.getRelations();
     for (Map.Entry<String, OntologyConfig> entry : ontologies.entrySet()) {
       OntologyConfig ontology = entry.getValue();
-      Mapper mapper = extract_info(ontology.getXmlUrl(), ontology.getPrefix(), ontology.getPrefixUri(), paths);
+      Mapper mapper = extract_info(ontology.getXmlUrl(), ontology.getPrefix(), ontology.getPrefixUri(), paths, relations);
       mappers.add(mapper);
     }
     return mappers;
@@ -104,9 +101,9 @@ class Oba {
   }
 
 
-  public static Mapper extract_info(String ont_serialization_url, String ont_prefix, String ont_uri, List<String> paths) throws OWLOntologyCreationException, IOException {
+  public static Mapper extract_info(String ont_serialization_url, String ont_prefix, String ont_uri, List<String> paths, Map<String, List<RelationConfig>> relations) throws OWLOntologyCreationException, IOException {
     Map<String, String> prefixes = new HashMap<>();
     prefixes.put(ont_prefix, ont_uri);
-    return new Mapper(ont_serialization_url, ont_prefix, prefixes, paths);
+    return new Mapper(ont_serialization_url, ont_prefix, prefixes, paths, relations);
   }
 }
