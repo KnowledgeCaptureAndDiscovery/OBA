@@ -1,14 +1,12 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.RelationConfig;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.XML;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.io.IOException;
@@ -24,14 +22,18 @@ class Mapper {
   public String ont_prefix;
   List<String> selected_paths;
 
-  public Mapper(String ont_url, String ont_prefix, Map<String, String> prefixes, List<String> paths) throws OWLOntologyCreationException, IOException {
+  public Mapper(String ont_url, String ont_prefix, Map<String, String> prefixes,
+                List<String> paths, Map<String, List<RelationConfig>> relations)
+          throws OWLOntologyCreationException, IOException {
     OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
     OWLOntology ontology = manager.loadOntology(IRI.create(ont_url));
     OWLDocumentFormat format = manager.getOntologyFormat(ontology);
     this.selected_paths = paths;
     this.ont_prefix = ont_prefix;
     setPrefixes(format, prefixes);
-    schemas = this.createSchemas(ontology);
+    schemas = this.createSchemas(ontology, relations);
+
+
   }
 
   /**
@@ -56,9 +58,10 @@ class Mapper {
    * The schemas includes the properties
    *
    * @param ontology  Represents an OWL 2 ontology
+   * @param relations
    * @return schemas
    */
-  private Map<String, Schema> createSchemas(OWLOntology ontology) {
+  private Map<String, Schema> createSchemas(OWLOntology ontology, Map<String, List<RelationConfig>> relations) {
     Set<OWLClass> classes;
     classes = ontology.   getClassesInSignature();
     Map<String, Schema> schemas = new HashMap<>();
@@ -91,6 +94,14 @@ class Mapper {
 
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
+
+
+          //obtain the relations
+//          List<RelationConfig> model_relations = relations.get(mapperSchema.name);
+//          for (RelationConfig model_relation : model_relations){
+//              add_path_relation(pathGenerator, model_relation.getSubject(), model_relation.getPredicate(), model_relation.getPath());
+//          }
+
 
           if (this.selected_paths == null){
             add_path(pathGenerator, mapperSchema);
@@ -132,6 +143,12 @@ class Mapper {
     this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name));
     //Create the plural paths: for example: /models/id
     this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name));
+  }
+
+  private void add_path_relation(Path pathGenerator, String schema_name, String predicate, String path) {
+    String relation = "/" + schema_name.toLowerCase() + "s/{id}/" + path;
+    this.paths.addPathItem(relation, pathGenerator.generate_plural(schema_name));
+
   }
 
 }

@@ -1,6 +1,7 @@
-package edu.isi.oba;
+package edu.isi.oba.config;
 
 import java.util.List;
+
 
 public class OntologyConfig {
   private String xmlUrl;
@@ -31,4 +32,5 @@ public class OntologyConfig {
     this.prefixUri = prefixUri;
   }
 }
+
 
