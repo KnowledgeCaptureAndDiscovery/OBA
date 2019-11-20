@@ -113,7 +113,7 @@ class MapperSchema {
 
                     //obtain type using the range
                     List<String> propertyRanges = getCodeGenTypesByRangeData(ranges, odp);
-                    MapperProperty mapperProperty = new MapperProperty(propertyName, propertyRanges, array, nullable, false);
+                    MapperDataProperty mapperProperty = new MapperDataProperty(propertyName, propertyRanges, array, nullable);
                     try {
                         properties.put(mapperProperty.name, mapperProperty.getSchemaByDataProperty());
                     } catch (Exception e) {
@@ -138,10 +138,10 @@ class MapperSchema {
                 add("string");
             }
         };
-        MapperProperty idProperty = new MapperProperty("id", defaultProperties, false, false, false);
-        MapperProperty labelProperty = new MapperProperty("label", defaultProperties, true, true, false);
-        MapperProperty typeProperty = new MapperProperty("type", defaultProperties, true, true, false);
-        MapperProperty descriptionProperty = new MapperProperty("description", defaultProperties, true, true, false);
+        MapperDataProperty idProperty = new MapperDataProperty("id", defaultProperties, false, false);
+        MapperDataProperty labelProperty = new MapperDataProperty("label", defaultProperties, true, true);
+        MapperDataProperty typeProperty = new MapperDataProperty("type", defaultProperties, true, true);
+        MapperDataProperty descriptionProperty = new MapperDataProperty("description", defaultProperties, true, true);
 
         properties.put(idProperty.name, idProperty.getSchemaByDataProperty());
         properties.put(labelProperty.name, labelProperty.getSchemaByDataProperty());
@@ -162,9 +162,6 @@ class MapperSchema {
         for (OWLObjectPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
             if (checkDomainClass(cls, dp)) {
                 for (OWLObjectProperty odp : dp.getObjectPropertiesInSignature()) {
-                    Boolean array = true;
-                    Boolean nullable = true;
-
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     Set<OWLObjectPropertyRangeAxiom> ranges = ontology.getObjectPropertyRangeAxioms(odp);
                     if (ranges.size() == 0)
@@ -173,9 +170,9 @@ class MapperSchema {
                     propertyNameURI.put(propertyURI, propertyName);
 
                     List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp);
-                    MapperProperty mapperProperty = new MapperProperty(propertyName, propertyRanges, array, nullable, true);
+                    MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyRanges);
                     try {
-                        properties.put(mapperProperty.name, mapperProperty.getSchemaByObjectProperty());
+                        properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
