@@ -95,7 +95,7 @@ class MapperDataProperty {
         return (array) ? arraySchema(new NumberSchema(), nullable) : new IntegerSchema().nullable(nullable);
       default:
         System.out.println("datatype mapping failed " + this.type.get(0));
-        return (array) ? arraySchema(new ObjectSchema(), nullable) : new ObjectSchema().nullable(nullable);
+        return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable);
     }
   }
 
