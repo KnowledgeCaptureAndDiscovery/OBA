@@ -22,6 +22,7 @@ import java.io.IOException;
  * $NAME/delete/query-graph.sparql
  */
 class Query {
+  private String query_directory = "outputs/modelcatalog/.openapi-generator/template/static_files/queries/";
   //private static final String get_all_query_file = "get_all.rq";
   private static final String get_all_graph_query_file = "get_all_user.rq";
   //private static final String get_one_query_file = "get_one.rq";
@@ -150,7 +151,7 @@ class Query {
 
 
   public void write_readme(String schema_name) {
-    String dir_path = "queries" + File.separator + schema_name + File.separator;
+    String dir_path = query_directory + File.separator + schema_name + File.separator;
     String file_path = dir_path + File.separator + "README";
     File directory = new File(dir_path);
     if (! directory.exists()){
@@ -169,7 +170,7 @@ class Query {
   }
 
   private void write_query(String query, String file, String schema_name) {
-    String dir_path = "queries" + File.separator + schema_name + File.separator;
+    String dir_path = query_directory + File.separator + schema_name + File.separator;
     String file_path = dir_path + File.separator + file;
     File directory = new File(dir_path);
     if (! directory.exists()){

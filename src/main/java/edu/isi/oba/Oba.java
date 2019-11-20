@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,25 +23,36 @@ import org.apache.commons.cli.*;
 class Oba {
 
   public static void main(String[] args) throws Exception {
+    final String base_project_dir = "./tools/base_project/";
+
     //parse command line
     String config_yaml = get_config_yaml(args);
     //read the config yaml from command line
-    YamlConfig data = get_yaml_data(config_yaml);
+    YamlConfig config_data = get_yaml_data(config_yaml);
+    //copy base project
+    String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
+    python_copy_base_project(base_project_dir, destination_dir);
     //read ontologies and get schema and paths
-    List<Mapper> mappers = get_mappers(data);
+    List<Mapper> mappers = get_mappers(config_data);
     //get base of openapi
-    OpenAPI openapi_base = new OpenAPIV3Parser().read(data.getOpenapi_base());
+    OpenAPI openapi_base = new OpenAPIV3Parser().read(config_data.getOpenapi_base());
     //obtain the output directory to write the openapi specification
-    String dir = data.getOutput_dir() + File.separator + data.getName();
     //write the openapi specification
-    generate_openapi_spec(openapi_base, mappers, dir);
+    generate_openapi_spec(openapi_base, mappers, destination_dir);
   }
 
-  private static List<Mapper> get_mappers(YamlConfig data) throws OWLOntologyCreationException, IOException {
-    Map<String, OntologyConfig> ontologies = data.getOntologies();
+  /**
+   * Create the mapper between OWL and OpenAPI for each ontology
+   * @param config_data: configuration data
+   * @return a list of mappers
+   * @throws OWLOntologyCreationException
+   * @throws IOException
+   */
+  private static List<Mapper> get_mappers(YamlConfig config_data) throws OWLOntologyCreationException, IOException {
+    Map<String, OntologyConfig> ontologies = config_data.getOntologies();
     List<Mapper> mappers = new ArrayList<>();
-    List<String> paths = data.getPaths();
-    Map<String, List<RelationConfig>> relations = data.getRelations();
+    List<String> paths = config_data.getPaths();
+    Map<String, List<RelationConfig>> relations = config_data.getRelations();
     for (Map.Entry<String, OntologyConfig> entry : ontologies.entrySet()) {
       OntologyConfig ontology = entry.getValue();
       Mapper mapper = extract_info(ontology.getXmlUrl(), ontology.getPrefix(), ontology.getPrefixUri(), paths, relations);
@@ -51,19 +61,23 @@ class Oba {
     return mappers;
   }
 
-  private static void generate_openapi_spec(OpenAPI openapi_base, List<Mapper> mappers, String dir) throws IOException {
-    String fileName = dir;
-    Path destinationProject = Paths.get(fileName);
-    Path baseProject = Paths.get("./tools/base_project/");
-    if (Files.exists(destinationProject)) {
-      System.err.println("The destination project exists");
-    }
+  /**
+   * Copy the base project dir for a python project
+   * @param base_project_dir
+   * @param destination_dir
+   * @throws IOException
+   */
+  private static void python_copy_base_project(String base_project_dir, String destination_dir)  throws IOException {
+    Path destinationProject = Paths.get(destination_dir);
+    Path baseProject = Paths.get(base_project_dir);
     FileUtils.copyDirectory(baseProject.toFile(), destinationProject.toFile());
-    Serializer serializer = new Serializer(mappers, destinationProject, openapi_base);
+  }
 
-    Path destinationQueries = Paths.get(destinationProject + "/.openapi-generator/template/static_files/queries/");
-    Path sourceQueries = Paths.get("queries");
-    FileUtils.copyDirectory(sourceQueries.toFile(), destinationQueries.toFile());
+  private static void generate_openapi_spec(OpenAPI openapi_base, List<Mapper> mappers, String dir) throws IOException {
+    String destinationProjectDirectory = dir;
+    Path destinationProject = Paths.get(destinationProjectDirectory);
+    Serializer serializer = new Serializer(mappers, destinationProject, openapi_base);
+    SerializerPython serializer_python = new SerializerPython(mappers, destinationProject, openapi_base);
   }
 
   private static YamlConfig get_yaml_data(String config_yaml) {
