@@ -10,54 +10,54 @@ class MapperDataProperty {
   private final HashMap<String, String> dataTypes;
 
   private void setDataTypes() {
-    this.dataTypes.put("anyType", "string");
-    this.dataTypes.put("anySimpleType", "string");
-    this.dataTypes.put("string", "string");
-    this.dataTypes.put("integer", "number");
-    this.dataTypes.put("long", "number");
-    this.dataTypes.put("int", "number");
-    this.dataTypes.put("short", "number");
-    this.dataTypes.put("byte", "string");
-    this.dataTypes.put("decimal", "number");
-    this.dataTypes.put("float", "number");
-    this.dataTypes.put("boolean", "boolean");
-    this.dataTypes.put("double", "number");
-    this.dataTypes.put("nonPositiveInteger", "number");
-    this.dataTypes.put("negativeInteger", "number");
-    this.dataTypes.put("nonNegativeInteger", "number");
-    this.dataTypes.put("unsignedLong", "number");
-    this.dataTypes.put("unsignedInt", "number");
-    this.dataTypes.put("positiveInteger", "number");
-    this.dataTypes.put("base64Binary", "string");
-    this.dataTypes.put("normalizedString", "string");
-    this.dataTypes.put("hexBinary", "string");
-    this.dataTypes.put("anyURI", "string");
-    this.dataTypes.put("QName", "string");
-    this.dataTypes.put("NOTATION", "string");
-    this.dataTypes.put("token", "string");
-    this.dataTypes.put("language", "string");
-    this.dataTypes.put("Name", "string");
-    this.dataTypes.put("NCName", "string");
-    this.dataTypes.put("NMTOKEN", "string");
-    this.dataTypes.put("NMTOKENS", "string");
+    this.dataTypes.put("ENTITIES", "string");
+    this.dataTypes.put("ENTITY", "string");
     this.dataTypes.put("ID", "string");
     this.dataTypes.put("IDREF", "string");
     this.dataTypes.put("IDREFS", "string");
-    this.dataTypes.put("ENTITY", "string");
-    this.dataTypes.put("ENTITIES", "string");
-    this.dataTypes.put("unsignedShort", "string");
-    this.dataTypes.put("unsignedByte", "string");
-    this.dataTypes.put("duration", "string");
+    this.dataTypes.put("NCName", "string");
+    this.dataTypes.put("NMTOKEN", "string");
+    this.dataTypes.put("NMTOKENS", "string");
+    this.dataTypes.put("NOTATION", "string");
+    this.dataTypes.put("Name", "string");
+    this.dataTypes.put("QName", "string");
+    this.dataTypes.put("anySimpleType", "");
+    this.dataTypes.put("anyType", "");
+    this.dataTypes.put("anyURI", "");
+    this.dataTypes.put("base64Binary", "string");
+    this.dataTypes.put("boolean", "boolean");
+    this.dataTypes.put("byte", "integer");
+    this.dataTypes.put("date", "string");
     this.dataTypes.put("dateTime", "string");
     this.dataTypes.put("dateTimeStamp", "string");
-    this.dataTypes.put("time", "string");
-    this.dataTypes.put("date", "string");
-    this.dataTypes.put("gYearMonth", "string");
-    this.dataTypes.put("gYear", "string");
-    this.dataTypes.put("gMonthYear", "string");
+    this.dataTypes.put("decimal", "number");
+    this.dataTypes.put("double", "number");
+    this.dataTypes.put("duration", "string");
+    this.dataTypes.put("float", "number");
     this.dataTypes.put("gDay", "string");
     this.dataTypes.put("gMonth", "string");
-    this.dataTypes.put("positiveInteger", "number");
+    this.dataTypes.put("gMonthYear", "string");
+    this.dataTypes.put("gYear", "string");
+    this.dataTypes.put("gYearMonth", "string");
+    this.dataTypes.put("hexBinary", "string");
+    this.dataTypes.put("int", "integer");
+    this.dataTypes.put("integer", "integer");
+    this.dataTypes.put("language", "string");
+    this.dataTypes.put("long", "integer");
+    this.dataTypes.put("negativeInteger", "integer");
+    this.dataTypes.put("nonNegativeInteger", "integer");
+    this.dataTypes.put("nonPositiveInteger", "integer");
+    this.dataTypes.put("normalizedString", "string");
+    this.dataTypes.put("positiveInteger", "integer");
+    this.dataTypes.put("short", "integer");
+    this.dataTypes.put("string", "string");
+    this.dataTypes.put("time", "string");
+    this.dataTypes.put("token", "string");
+    this.dataTypes.put("unsignedByte", "integer");
+    this.dataTypes.put("unsignedInt", "integer");
+    this.dataTypes.put("unsignedLong", "integer");
+    this.dataTypes.put("unsignedShort", "integer");
+
   }
 
   private String getDataType(String key){
@@ -66,6 +66,8 @@ class MapperDataProperty {
 
   private static final String STRING_TYPE = "string";
   private static final String NUMBER_TYPE = "number";
+  private static final String INTEGER_TYPE = "integer";
+
   final String name;
   private List<String> type;
   private Boolean array;
@@ -92,7 +94,9 @@ class MapperDataProperty {
       case STRING_TYPE:
         return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
       case NUMBER_TYPE:
-        return (array) ? arraySchema(new NumberSchema(), nullable) : new IntegerSchema().nullable(nullable);
+        return (array) ? arraySchema(new NumberSchema(), nullable) : new NumberSchema().nullable(nullable);
+      case INTEGER_TYPE:
+        return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable);
       default:
         System.out.println("datatype mapping failed " + this.type.get(0));
         return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable);
