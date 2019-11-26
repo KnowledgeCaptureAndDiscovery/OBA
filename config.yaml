@@ -18,13 +18,3 @@ endpoint:
 
 firebase:
   key:
-
-relations:
-    ModelConfiguration:
-      - predicate: hasInput
-        path: inputs
-      - predicate: hasOutput
-        path: outputs
-    Setup:
-      - predicate: hasInput
-        path: inputs
