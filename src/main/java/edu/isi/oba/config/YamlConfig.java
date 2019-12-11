@@ -1,6 +1,10 @@
 package edu.isi.oba.config;
 
 
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +21,8 @@ public class YamlConfig {
   public EndpointConfig endpoint;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
+  private LinkedHashMap<String, PathItem> custom_paths = null;
+
 
   public String getOutput_dir() {
     return output_dir;
@@ -80,6 +86,15 @@ public class YamlConfig {
 
   public void setRelations(Map<String, List<RelationConfig>> relations) {
     this.relations = relations;
+  }
+
+
+  public LinkedHashMap<String, PathItem> getCustom_paths() {
+    return custom_paths;
+  }
+
+  public void setCustom_paths(LinkedHashMap<String, PathItem> custom_paths) {
+    this.custom_paths = custom_paths;
   }
 }
 

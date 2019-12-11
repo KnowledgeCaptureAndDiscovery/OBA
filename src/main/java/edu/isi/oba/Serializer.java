@@ -18,7 +18,7 @@ import java.util.*;
 
 class Serializer {
   //TODO: validate the yaml
-  public  Serializer(List<Mapper> mappers, java.nio.file.Path dir, OpenAPI openAPI) throws IOException {
+  public  Serializer(List<Mapper> mappers, java.nio.file.Path dir, OpenAPI openAPI, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
     Map<String, Object> extensions = new HashMap<String, Object>();
     final String openapi_file = "openapi.yaml";
 
@@ -36,6 +36,12 @@ class Serializer {
       mapper.schemas.forEach((k, v) -> components.addSchemas(k, v));
       components.securitySchemes(securitySchemes);
     }
+
+    //add custom paths
+    custom_paths.forEach((k, v) -> {
+      System.out.println("inserting custom query " + k);
+      paths.addPathItem(k, v);
+    });
 
     openAPI.setPaths(paths);
     openAPI.components(components);
