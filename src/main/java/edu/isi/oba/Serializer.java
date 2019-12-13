@@ -38,8 +38,12 @@ class Serializer {
     }
 
     //add custom paths
+    Map<String, Object> custom_extensions = new HashMap<String, Object>();
+    custom_extensions.put("x-oba-custom", true);
+
     custom_paths.forEach((k, v) -> {
       System.out.println("inserting custom query " + k);
+      v.setExtensions(custom_extensions);
       paths.addPathItem(k, v);
     });
 

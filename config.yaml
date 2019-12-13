@@ -21,30 +21,36 @@ firebase:
 
 
 custom_paths:
-    /custom/configurationsetups:
-      get:
-        description: Gets a list of all ConfigurationSetup entities
-        parameters:
-          - description: Username to query
-            in: query
-            name: username
-            required: false
-            schema:
-              type: string
-          - description: Filter by label
-            in: query
-            name: label
-            required: false
-            schema:
-              type: string
-        responses:
-          '200':
-            content:
-              application/json:
-                schema:
-                  items:
-                    $ref: '#/components/schemas/ConfigurationSetup'
-                  type: array
-            description: Successful response - returns an array of ConfigurationSetup
-              entities.
-        summary: List all ConfigurationSetup entities
+  /custom/configurationsetups/{id}:
+    get:
+      description: Gets the details of a single instance of a ModelConfigurationSetup
+      parameters:
+        - description: Username to query
+          in: query
+          name: username
+          required: false
+          schema:
+            type: string
+        - description: The ID of the resource
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - description: Name of the custom query
+          in: query
+          name: custom_query_name
+          required: false
+          schema:
+            type: string
+            default: custom_configurationsetups
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelConfigurationSetup'
+          description: Gets the details of a single instance of  ModelConfigurationSetup
+      summary: Get a ModelConfigurationSetup
+      tags:
+        - ConfigurationSetup
