@@ -88,6 +88,9 @@ class MapperDataProperty {
     if (this.type.size() == 0) {
       return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
     }
+    else if (this.type.size() > 1){
+      return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable);
+    }
 
     String schemaType = getDataType(this.type.get(0));
     switch (schemaType) {
