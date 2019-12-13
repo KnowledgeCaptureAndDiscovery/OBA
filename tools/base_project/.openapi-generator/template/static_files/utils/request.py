@@ -38,14 +38,14 @@ def get_one_resource(**kwargs):
     username = kwargs["username"]
     owl_class_name = kwargs["rdf_type_name"]
     resource_type_uri = kwargs["rdf_type_uri"]
-    query_type = "get_one_user"
+    query_type = "get_one_user" if "custom_query_name" not in kwargs else kwargs["custom_query_name"]
     kls = kwargs["kls"]
     request_args: Dict[str, str] = {
         "resource": build_instance_uri(kwargs["id"]),
         "g": generate_graph(username)
     }
     try:
-        response = query_manager.obtain_query(owl_class_name=owl_class_name,
+        response = query_manager.obtain_query(query_directory=owl_class_name,
                                               owl_class_uri=resource_type_uri,
                                               query_type=query_type,
                                               endpoint=ENDPOINT,
@@ -84,7 +84,7 @@ def get_all_resource(**kwargs):
         query_type = "get_all_user"
 
     try:
-        response = query_manager.obtain_query(owl_class_name=owl_class_name,
+        response = query_manager.obtain_query(query_directory=owl_class_name,
                                               owl_class_uri=resource_type_uri,
                                               query_type=query_type,
                                               endpoint=ENDPOINT,
