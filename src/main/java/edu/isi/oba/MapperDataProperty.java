@@ -21,9 +21,9 @@ class MapperDataProperty {
     this.dataTypes.put("NOTATION", "string");
     this.dataTypes.put("Name", "string");
     this.dataTypes.put("QName", "string");
-    this.dataTypes.put("anySimpleType", "");
-    this.dataTypes.put("anyType", "");
-    this.dataTypes.put("anyURI", "");
+    this.dataTypes.put("anySimpleType", "string");
+    this.dataTypes.put("anyType", "string");
+    this.dataTypes.put("anyURI", "string");
     this.dataTypes.put("base64Binary", "string");
     this.dataTypes.put("boolean", "boolean");
     this.dataTypes.put("byte", "integer");
@@ -85,6 +85,10 @@ class MapperDataProperty {
 
   public Schema getSchemaByDataProperty(){
     //TODO: Assumption: only one type
+    if (this.name.equalsIgnoreCase("hasMaximumAcceptedValue")){
+      System.out.println("a");
+    }
+
     if (this.type.size() == 0) {
       return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
     }
