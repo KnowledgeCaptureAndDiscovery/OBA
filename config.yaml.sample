@@ -1,0 +1,11 @@
+ontologies:
+modelCatalog:
+    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
+    prefix: sdm
+    prefixUri: https://w3id.org/okn/o/sdm#
+name: modelcatalog
+output_dir: outputs
+endpoint:
+url: https://endpoint.mint.isi.edu/modelCatalog-1.2.0
+prefix: https://w3id.org/okn/i/mint/
+graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/

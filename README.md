@@ -5,6 +5,10 @@ OBA project reads ontologies (OWL) and generates the OpenAPI Specification (OAS)
 
 ![Diagram](oba.svg) 
 
+## How to use?
+
+
+
 ## Tools
 
 ### OpenAPI
