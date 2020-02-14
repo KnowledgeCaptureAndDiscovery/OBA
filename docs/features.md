@@ -34,5 +34,5 @@ The methods POST, PUT, DELETE require log-in and the resources are stored in a n
 
 ## Other features
 
-- Filter the paths: Select the classes to expose.
+- Filter the paths: Select the classes to expose.g
 - Read an OpenAPI base file with the description, documentation and servers of the API.
