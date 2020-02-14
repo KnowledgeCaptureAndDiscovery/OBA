@@ -3,10 +3,7 @@
 
 OBA project reads ontologies (OWL) and generates the OpenAPI Specification (OAS). Using this definition, it creates a REST API server automatically. Optionally, OBA can query an RDF endpoint using [OBA_sparql: A Python module based on GRLC to execute queries](https://github.com/knowledgeCaptureAndDiscovery/oba_sparql)
 
-![Diagram](oba.svg) 
-
-## How to use?
-
+![Diagram](docs/figures/oba.svg) 
 
 
 ## Tools
