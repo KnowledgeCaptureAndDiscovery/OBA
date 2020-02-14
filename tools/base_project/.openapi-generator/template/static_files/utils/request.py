@@ -12,6 +12,13 @@ from openapi_server import logger
 def generate_graph(username):
     return "{}{}".format(GRAPH_BASE, username)
 
+def set_up(**kwargs):
+    username = kwargs["username"]
+    owl_class_name = kwargs["rdf_type_name"]
+    resource_type_uri = kwargs["rdf_type_uri"]
+    kls = kwargs["kls"]
+    return kls, owl_class_name, resource_type_uri, username
+
 
 def get_resource(**kwargs):
     """
@@ -21,68 +28,105 @@ def get_resource(**kwargs):
     :return:
     :rtype:
     """
-    if "id" in kwargs:
-        return get_one_resource(**kwargs)
+
+    #args
+    request_args: Dict[str, str] = {}
+
+    if "custom_query_name" in kwargs:
+        query_type = kwargs["custom_query_name"]
+        return get_resource_custom(request_args=request_args, query_type=query_type, **kwargs)
     else:
-        return get_all_resource(**kwargs)
+        return get_resource_not_custom(request_args=request_args, **kwargs)
 
 
-def get_one_resource(**kwargs):
+def get_resource_custom(query_type, request_args, **kwargs):
+    """
+    Prepare request for custom queries
+    :param query_type:
+    :param request_args: contains the values to replaced in the query
+    :param kwargs:
+    :return:
+    """
+    if "id" in kwargs:
+        return get_one_resource(request_args=request_args, query_type=query_type, **kwargs)
+    else:
+
+        if "label" in kwargs and kwargs["label"] is not None:
+            query_text = kwargs["label"]
+            request_args["label"] = query_text
+        return get_all_resource(request_args=request_args, query_type=query_type, **kwargs)
+
+
+def get_resource_not_custom(request_args, **kwargs):
+    """
+    Prepare request for not-custom queries
+
+    :param request_args: contains the values to replaced in the query
+    :param kwargs:
+    :return:
+    """
+    if "id" in kwargs:
+        return get_one_resource(request_args=request_args, query_type="get_one_user", **kwargs)
+
+    else:
+        query_type = "get_all_user"
+        if "label" in kwargs and kwargs["label"] is not None:
+            query_text = kwargs["label"]
+            query_type = "get_all_search_user"
+            request_args["text"] = query_text
+        return get_all_resource(request_args=request_args, query_type=query_type, **kwargs)
+
+
+def get_one_resource(request_args, query_type="get_one_user", **kwargs):
     """
     Handles a GET method to get one resource
+    :param query_type:
+    :param request_args:
     :param kwargs:
     :type kwargs:
     :return:
     :rtype:
     """
-    username = kwargs["username"]
-    owl_class_name = kwargs["rdf_type_name"]
-    resource_type_uri = kwargs["rdf_type_uri"]
-    query_type = "get_one_user" if "custom_query_name" not in kwargs else kwargs["custom_query_name"]
-    kls = kwargs["kls"]
-    request_args: Dict[str, str] = {
-        "resource": build_instance_uri(kwargs["id"]),
-        "g": generate_graph(username)
-    }
+    kls, owl_class_name, resource_type_uri, username = set_up(**kwargs)
+    request_args["resource"] = build_instance_uri(kwargs["id"])
+    request_args["g"] = generate_graph(username)
+    return request_one(kls, owl_class_name, request_args, resource_type_uri, query_type)
+
+
+def request_one(kls, owl_class_name, request_args, resource_type_uri, query_type="get_one_user"):
     try:
         response = query_manager.obtain_query(query_directory=owl_class_name,
                                               owl_class_uri=resource_type_uri,
                                               query_type=query_type,
                                               endpoint=ENDPOINT,
                                               request_args=request_args)
-        if response:
+        if len(response) > 0:
             return kls.from_dict(response[0])
+        else:
+            return "Not found", 404, {}
 
     except:
         logger.error("Exception occurred", exc_info=True)
         return "Bad request", 400, {}
 
 
-def get_all_resource(**kwargs):
+def get_all_resource(request_args, query_type, **kwargs):
     """
     Handles a GET method to get all resource by rdf_type
+    :param request_args:
+    :param query_type:
     :param kwargs:
     :type kwargs:
     :return:
     :rtype:
     """
-    resource_type_uri = kwargs["rdf_type_uri"]
-    username = kwargs["username"]
-    owl_class_name = kwargs["rdf_type_name"]
-    kls = kwargs["kls"]
-    request_args: Dict[str, str] = {
-        "type": resource_type_uri,
-        "g": generate_graph(username)
-    }
+    kls, owl_class_name, resource_type_uri, username = set_up(**kwargs)
+    request_args["type"] = resource_type_uri
+    request_args["g"] = generate_graph(username)
+    return request_all(kls, owl_class_name, request_args, resource_type_uri, query_type)
 
-    if "label" in kwargs and kwargs["label"] is not None:
-        query_text = kwargs["label"]
-        logger.debug("searching by label " + query_text)
-        query_type = "get_all_search"
-        request_args["text"] = query_text
-    else:
-        query_type = "get_all_user"
 
+def request_all(kls, owl_class_name, request_args, resource_type_uri, query_type="get_all_user"):
     try:
         response = query_manager.obtain_query(query_directory=owl_class_name,
                                               owl_class_uri=resource_type_uri,
@@ -112,12 +156,14 @@ def put_resource(**kwargs):
     #DELETE QUERY
     request_args_delete: Dict[str, str] = {
         "resource": resource_uri,
-        "g": generate_graph(username)
+        "g": generate_graph(username),
+        "delete_incoming_relations": False
     }
 
     try:
         query_manager.delete_query(UPDATE_ENDPOINT, request_args=request_args_delete)
     except:
+        logger.error("Exception occurred", exc_info=True)
         return "Error deleting query", 407, {}
 
     #INSERT QUERY
@@ -155,7 +201,8 @@ def delete_resource(**kwargs):
 
     request_args: Dict[str, str] = {
         "resource": resource_uri,
-        "g": generate_graph(username)
+        "g": generate_graph(username),
+        "delete_incoming_relations": True
     }
     return query_manager.delete_query(UPDATE_ENDPOINT, request_args=request_args)
 
