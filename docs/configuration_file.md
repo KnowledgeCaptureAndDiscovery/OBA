@@ -174,7 +174,7 @@ Example
 
 
 
-### ontologies.<ontology_name>.prefix
+### ontologies.{}.prefix
 
 The prefix name of the resources in this ontology.
 
@@ -189,7 +189,7 @@ The prefix name of the resources in this ontology.
     prefix: sd
 ```
 
-### ontologies.<ontology_name>.prefixUri
+### ontologies.{}.prefixUri
 
 The prefix uri of the resources in this ontology.
 
