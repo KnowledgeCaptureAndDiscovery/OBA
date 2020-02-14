@@ -4,12 +4,12 @@ nav:
   - Quickstart: quickstart.md
   - OBA features: features.md
   - Configuration file: configuration_file.md
-  theme:
-    name: material
-  
-  markdown_extensions:
-    - admonition
-    - codehilite:
-        guess_lang: false
-    - toc:
-        permalink: true
+theme:
+  name: material
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
