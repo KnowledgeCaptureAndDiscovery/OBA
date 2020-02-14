@@ -4,6 +4,12 @@ nav:
   - Quickstart: quickstart.md
   - OBA features: features.md
   - Configuration file: configuration_file.md
-theme: readthedocs
-markdown_extensions:
-  - admonition
+  theme:
+    name: material
+  
+  markdown_extensions:
+    - admonition
+    - codehilite:
+        guess_lang: false
+    - toc:
+        permalink: true
