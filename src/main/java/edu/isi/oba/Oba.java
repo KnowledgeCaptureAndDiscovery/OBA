@@ -35,7 +35,7 @@ class Oba {
     LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
 
     //get base of openapi
-    OpenAPI openapi_base = new OpenAPIV3Parser().read(config_data.getOpenapi_base());
+    OpenAPI openapi_base = config_data.getOpenapi();
     //obtain the output directory to write the openapi specification
     //write the openapi specification
     generate_openapi_spec(openapi_base, mappers, destination_dir, custom_paths);
