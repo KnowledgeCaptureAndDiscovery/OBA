@@ -18,6 +18,12 @@ import java.util.*;
 
 class SerializerPython {
   public SerializerPython(List<Mapper> mappers, java.nio.file.Path dir, OpenAPI openAPI) throws IOException {
+    //Create directory utils
+    final String utils_dir = ".openapi-generator/template/static_files/utils/";
+    File utils_dir_path = new File(dir + File.separator + utils_dir);
+    utils_dir_path.mkdir();
+
+    //Create variable file
     final String var_file_python = ".openapi-generator/template/static_files/utils/vars.py";
     FileWriter var_file_writer = new FileWriter(dir + File.separator + var_file_python);
     Iterator i = mappers.iterator();
