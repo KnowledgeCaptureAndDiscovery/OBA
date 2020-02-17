@@ -2,7 +2,6 @@ package edu.isi.oba.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.Paths;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ public class YamlConfig {
 
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
-  public String openapi_base;
   public List<String> paths;
   public Map<String, OntologyConfig> ontologies;
   public EndpointConfig endpoint;
@@ -48,14 +46,6 @@ public class YamlConfig {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getOpenapi_base() {
-    return openapi_base;
-  }
-
-  public void setOpenapi_base(String openapi_base) {
-    this.openapi_base = openapi_base;
   }
 
   public List<String> getPaths() {

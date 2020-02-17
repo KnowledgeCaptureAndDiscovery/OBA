@@ -85,9 +85,9 @@ class MapperDataProperty {
 
   public Schema getSchemaByDataProperty(){
     //TODO: Assumption: only one type
-    if (this.name.equalsIgnoreCase("hasMaximumAcceptedValue")){
-      System.out.println("a");
-    }
+    //if (this.name.equalsIgnoreCase("hasMaximumAcceptedValue")){
+    //  System.out.println("a");
+    ////}
 
     if (this.type.size() == 0) {
       return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);

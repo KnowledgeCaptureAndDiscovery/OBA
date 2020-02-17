@@ -9,7 +9,7 @@ ontologies:
     prefixUri: https://w3id.org/okn/o/sd#
 name: modelcatalog
 output_dir: outputs
-openapi_base: modelcatalog_info.yaml
+
 openapi:
   openapi: 3.0.1
   info:
