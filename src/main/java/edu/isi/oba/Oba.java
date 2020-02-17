@@ -20,7 +20,7 @@ import org.apache.commons.cli.*;
 
 class Oba {
   public static void main(String[] args) throws Exception {
-    final String base_project_dir = "./tools/base_project/";
+    final String base_project_dir = "./";
 
     //parse command line
     String config_yaml = get_config_yaml(args);
