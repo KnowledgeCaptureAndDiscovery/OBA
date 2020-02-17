@@ -203,8 +203,7 @@ Example
 
 ### ontologies.{}.prefix
 
-The prefix name of the resources in this ontology.
-
+Preferred Namespace Prefix of the ontology
 
 | Field | Value |
 |---|---|
@@ -218,7 +217,7 @@ The prefix name of the resources in this ontology.
 
 ### ontologies.{}.prefixUri
 
-The prefix uri of the resources in this ontology.
+Preferred Namespace Uri of the ontology
 
 
 | Field | Value |
