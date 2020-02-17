@@ -1,6 +1,6 @@
 package edu.isi.oba.config;
 
-
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 
@@ -12,6 +12,16 @@ import java.util.Map;
 public class YamlConfig {
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
   String DEFAULT_PROJECT_NAME = "default_project";
+
+  public OpenAPI getOpenapi() {
+    return openapi;
+  }
+
+  public void setOpenapi(OpenAPI openapi) {
+    this.openapi = openapi;
+  }
+
+  public OpenAPI openapi;
 
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
