@@ -1,12 +1,16 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.OntologyConfig;
 import edu.isi.oba.config.RelationConfig;
+import edu.isi.oba.config.YamlConfig;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.XML;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
 import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.io.IOException;
@@ -14,44 +18,38 @@ import java.util.*;
 
 class Mapper {
   public static final String DEFAULT_DIR_QUERY = "_default_";
-  private PrefixManager pm;
-
   public final Map<IRI, String> schemaNames = new HashMap<>();
-  public Map<String, Schema> schemas;
+  public Map<String, Schema> schemas = new HashMap<>();
   final Paths paths = new Paths();
-  public String ont_prefix;
   List<String> selected_paths;
+  public OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
-  public Mapper(String ont_url, String ont_prefix, Map<String, String> prefixes,
-                List<String> paths, Map<String, List<RelationConfig>> relations)
-          throws OWLOntologyCreationException, IOException {
-    OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-    OWLOntology ontology = manager.loadOntology(IRI.create(ont_url));
-    OWLDocumentFormat format = manager.getOntologyFormat(ontology);
+  public Mapper(YamlConfig config_data) throws OWLOntologyCreationException {
+    List<String> paths = config_data.getPaths();
+
     this.selected_paths = paths;
-    this.ont_prefix = ont_prefix;
-    setPrefixes(format, prefixes);
-    schemas = this.createSchemas(ontology, relations);
+    List<String>  config_ontologies = config_data.getOntologies();
+    Map<String, List<RelationConfig>> relations = config_data.getRelations();
 
-
-  }
-
-  /**
-   * Manually set the prefixes
-   * @param format: Represents the concrete representation format of an ontology
-   */
-  private void setPrefixes(OWLDocumentFormat format, Map<String, String> prefixes) {
-    if (format.isPrefixOWLDocumentFormat()) {
-      this.pm = format.asPrefixOWLDocumentFormat();
-    } else {
-      this.pm = new DefaultPrefixManager();
-
+    //Load the ontology into the manager
+    for (String ontologyURL : config_ontologies) {
+      this.manager.loadOntology(IRI.create(ontologyURL));
     }
-    for (Map.Entry prefix : prefixes.entrySet()) {
-      this.pm.setPrefix(prefix.getKey().toString(), prefix.getValue().toString());
+
+    //Create a temporal Map<IRI, String> schemaNames with the classes
+    for (OWLOntology ontology : this.manager.getOntologies()) {
+      OWLDocumentFormat format = ontology.getFormat();
+      OWLOntologyXMLNamespaceManager nsManager = new OWLOntologyXMLNamespaceManager(ontology, format);
+      Set<OWLClass> classes = ontology.getClassesInSignature();
+      setSchemaNames(classes);
+    }
+
+    //Add schema and paths
+    for (OWLOntology ontology : this.manager.getOntologies()) {
+      OWLDocumentFormat format = ontology.getFormat();
+      this.createSchemas(ontology, relations, format);
     }
   }
-
 
   /**
    * Obtain Schemas using the ontology classes
@@ -59,39 +57,28 @@ class Mapper {
    *
    * @param ontology  Represents an OWL 2 ontology
    * @param relations
+   * @param format
    * @return schemas
    */
-  private Map<String, Schema> createSchemas(OWLOntology ontology, Map<String, List<RelationConfig>> relations) {
-    Set<OWLClass> classes;
-    classes = ontology.   getClassesInSignature();
-    Map<String, Schema> schemas = new HashMap<>();
+  private void createSchemas(OWLOntology ontology, Map<String, List<RelationConfig>> relations, OWLDocumentFormat format) {
+    String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+
+    Set<OWLClass> classes = ontology.getClassesInSignature();
 
     Query query = new Query();
     Path pathGenerator = new Path();
     query.get_all(DEFAULT_DIR_QUERY);
 
-
     for (OWLClass cls : classes) {
-      String prefixIRI = this.pm.getPrefixIRI(cls.getIRI());
-      if (prefixIRI != null) {
-        String prefix = prefixIRI.split(":")[0];
-        String name =  prefixIRI.split(":")[1];
-        if (prefix.equals(this.ont_prefix)) {
-          schemaNames.put(cls.getIRI(), name);
-        }
-      }
-    }
-
-    for (OWLClass cls : classes) {
-
-      String prefixIRI = this.pm.getPrefixIRI(cls.getIRI());
-      if (prefixIRI != null) {
-        String prefix = prefixIRI.split(":")[0];
-        if (prefix.equals(this.ont_prefix)) {
+      //filter if the class prefix is not the default ontology's prefix
+      if (cls.getIRI() != null) {
+        String classPrefixIRI = cls.getIRI().getNamespace();
+        if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
           MapperSchema mapperSchema = new MapperSchema(ontology, cls, "object", schemaNames);
 
           query.write_readme(mapperSchema.name);
 
+          //Obtain and add OpenAPI schema
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
 
@@ -133,7 +120,12 @@ class Mapper {
       this.paths.addPathItem("/user/login", pathGenerator.user_login());
     }
 
-    return schemas;
+  }
+
+  private void setSchemaNames(Set<OWLClass> classes) {
+    for (OWLClass cls : classes) {
+        schemaNames.put(cls.getIRI(), cls.getIRI().getShortForm());
+    }
   }
 
   private void add_path(Path pathGenerator, MapperSchema mapperSchema) {

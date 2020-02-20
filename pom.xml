@@ -83,14 +83,39 @@
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
+<!--    <resources>-->
+<!--      <resource>-->
+<!--        <directory>src/main/resources/</directory>-->
+<!--      </resource>-->
+<!--    </resources>-->
 
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+
       <plugins>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${basedir}/target/classes/static/</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${basedir}/src/main/resources</directory>
+                    <includes>
+                      <include>**/*.*</include>
+                    </includes>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
@@ -149,6 +174,7 @@
               </transformers>
             </configuration>
           </execution>
+
         </executions>
       </plugin>
 

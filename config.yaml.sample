@@ -1,14 +1,8 @@
 ontologies:
-modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-    prefix: sdm
-    prefixUri: https://w3id.org/okn/o/sdm#
+  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
+  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
 name: modelcatalog
 output_dir: outputs
-endpoint:
-url: https://endpoint.mint.isi.edu/modelCatalog-1.2.0
-prefix: https://w3id.org/okn/i/mint/
-graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
 
 openapi:
   openapi: 3.0.1
@@ -24,3 +18,44 @@ openapi:
     - url: https://api.models.mint.isi.edu/v1.3.0
     - url: https://dev.api.models.mint.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
+
+firebase:
+  key:
+
+
+custom_paths:
+  /custom/model/index:
+    get:
+      description: Gets the details of a single instance of a Model
+      parameters:
+      - description: Name of the custom query
+        in: query
+        name: custom_query_name
+        required: false
+        schema:
+          default: custom_model_index
+          type: string
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: Label of NumericalIndex
+        in: query
+        name: label
+        required: true
+        schema:
+            type: string
+      responses:
+        '200':
+
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Model'
+          description: Gets the details of a single instance of Model
+      summary: Get a Model
+      tags:
+      - Model
