@@ -6,17 +6,25 @@ Below is an example YAML file which may require some changes for your project's 
 
 ```yaml
 ontologies:
-  modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-    prefix: sdm
-    prefixUri: https://w3id.org/okn/o/sdm#
-  softwareDescription:
-    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
-    prefix: sd
-    prefixUri: https://w3id.org/okn/o/sd#
+  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
+  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
 name: modelcatalog
 output_dir: outputs
-openapi_base: modelcatalog_info.yaml
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the  Software Description Ontology
+      at [https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.3.0/index-en.html](https://w3id.org/okn/o/sdm)
+    title: Model Catalog
+    version: v1.3.0
+  externalDocs:
+    description: Model Catalog
+    url: https://w3id.org/okn/o/sdm
+  servers:
+    - url: https://api.models.mint.isi.edu/v1.3.0
+    - url: https://dev.api.models.mint.isi.edu/v1.3.0
+    - url: http://localhost:8080/v1.3.0
 
 endpoint:
   url: https://endpoint.mint.isi.edu/modelCatalog-1.2.0
@@ -62,21 +70,34 @@ output_dir: outputs
 ```
 
 
-### openapi_base
+### openapi
 
 The path of the [OpenAPI Base file](https://swagger.io/docs/specification/basic-structure/)
 
 | Field | Value |
 |---|---|
 | **Required:** | ``true`` |
-| **Type:** | ``path`` |
+| **Type:** | ``OpenAPI`` |
 
 
 Example:
 
 ```yaml
-openapi_base: modelcatalog_info.yaml
-```
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the  Software Description Ontology
+      at [https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.3.0/index-en.html](https://w3id.org/okn/o/sdm)
+    title: Model Catalog
+    version: v1.3.0
+  externalDocs:
+    description: Model Catalog
+    url: https://w3id.org/okn/o/sdm
+  servers:
+    - url: https://api.models.mint.isi.edu/v1.3.0
+    - url: https://dev.api.models.mint.isi.edu/v1.3.0
+    - url: http://localhost:8080/v1.3.0
+  ```
 
 ### endpoint
 
@@ -147,62 +168,15 @@ Example:
 
 ```yaml
 ontologies:
-  modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-    prefix: sdm
-    prefixUri: https://w3id.org/okn/o/sdm#
-  softwareDescription:
-    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
-    prefix: sd
-    prefixUri: https://w3id.org/okn/o/sd#
+  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
+  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
 ```
-
-### ontologies.{}.xmlUrl
-
-The xml url of this ontolgy
-
-| Field | Value |
-|---|---|
-| **Required:** | ``true`` |
-| **Type:** | ``url`` |
-
-Example
-
-```yaml
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-```
-
-
-
-### ontologies.{}.prefix
-
-The prefix name of the resources in this ontology.
 
 
 | Field | Value |
 |---|---|
 | **Required:** | ``true`` |
-| **Type:** | ``string`` |
-
-
-```yaml
-    prefix: sd
-```
-
-### ontologies.{}.prefixUri
-
-The prefix uri of the resources in this ontology.
-
-
-| Field | Value |
-|---|---|
-| **Required:** | ``true`` |
-| **Type:** | ``url`` |
-
-```yaml
-    prefixUri: https://w3id.org/okn/o/sd#
-```
-
+| **Type:** | ``List[string]`` |
 
 ## firebase
 

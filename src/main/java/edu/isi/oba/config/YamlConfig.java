@@ -1,8 +1,7 @@
 package edu.isi.oba.config;
 
-
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.Paths;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,11 +12,20 @@ public class YamlConfig {
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
   String DEFAULT_PROJECT_NAME = "default_project";
 
+  public OpenAPI getOpenapi() {
+    return openapi;
+  }
+
+  public void setOpenapi(OpenAPI openapi) {
+    this.openapi = openapi;
+  }
+
+  public OpenAPI openapi;
+
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
-  public String openapi_base;
   public List<String> paths;
-  public Map<String, OntologyConfig> ontologies;
+  public List<String> ontologies;
   public EndpointConfig endpoint;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
@@ -40,14 +48,6 @@ public class YamlConfig {
     this.name = name;
   }
 
-  public String getOpenapi_base() {
-    return openapi_base;
-  }
-
-  public void setOpenapi_base(String openapi_base) {
-    this.openapi_base = openapi_base;
-  }
-
   public List<String> getPaths() {
     return paths;
   }
@@ -56,11 +56,11 @@ public class YamlConfig {
     this.paths = paths;
   }
 
-  public Map<String, OntologyConfig> getOntologies() {
+  public List<String>  getOntologies() {
     return ontologies;
   }
 
-  public void setOntologies(Map<String, OntologyConfig> ontologies) {
+  public void setOntologies(List<String> ontologies) {
     this.ontologies = ontologies;
   }
 

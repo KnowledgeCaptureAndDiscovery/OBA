@@ -18,7 +18,7 @@ import java.util.*;
 
 class Serializer {
   //TODO: validate the yaml
-  public  Serializer(List<Mapper> mappers, java.nio.file.Path dir, OpenAPI openAPI, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
+  public  Serializer(Mapper mapper, java.nio.file.Path dir, OpenAPI openAPI, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
     Map<String, Object> extensions = new HashMap<String, Object>();
     final String openapi_file = "openapi.yaml";
 
@@ -29,23 +29,20 @@ class Serializer {
 
     Components components = new Components();
     Paths paths = new Paths();
-    Iterator i = mappers.iterator();
-    while (i.hasNext()) {
-      Mapper mapper = (Mapper) i.next();
-      mapper.paths.forEach((k, v) -> paths.addPathItem(k, v));
-      mapper.schemas.forEach((k, v) -> components.addSchemas(k, v));
-      components.securitySchemes(securitySchemes);
-    }
+    mapper.paths.forEach((k, v) -> paths.addPathItem(k, v));
+    mapper.schemas.forEach((k, v) -> components.addSchemas(k, v));
+    components.securitySchemes(securitySchemes);
 
     //add custom paths
     Map<String, Object> custom_extensions = new HashMap<String, Object>();
     custom_extensions.put("x-oba-custom", true);
 
-    custom_paths.forEach((k, v) -> {
-      System.out.println("inserting custom query " + k);
-      v.setExtensions(custom_extensions);
-      paths.addPathItem(k, v);
-    });
+    if (custom_paths != null)
+      custom_paths.forEach((k, v) -> {
+        System.out.println("inserting custom query " + k);
+        v.setExtensions(custom_extensions);
+        paths.addPathItem(k, v);
+      });
 
     openAPI.setPaths(paths);
     openAPI.components(components);
