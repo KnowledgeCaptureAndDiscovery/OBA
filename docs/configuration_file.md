@@ -6,14 +6,8 @@ Below is an example YAML file which may require some changes for your project's 
 
 ```yaml
 ontologies:
-  modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-    prefix: sdm
-    prefixUri: https://w3id.org/okn/o/sdm#
-  softwareDescription:
-    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
-    prefix: sd
-    prefixUri: https://w3id.org/okn/o/sd#
+  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
+  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
 name: modelcatalog
 output_dir: outputs
 
@@ -174,61 +168,14 @@ Example:
 
 ```yaml
 ontologies:
-  modelCatalog:
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-    prefix: sdm
-    prefixUri: https://w3id.org/okn/o/sdm#
-  softwareDescription:
-    xmlUrl: https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
-    prefix: sd
-    prefixUri: https://w3id.org/okn/o/sd#
+  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
+  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
 ```
-
-### ontologies.{}.xmlUrl
-
-The xml url of this ontolgy
 
 | Field | Value |
 |---|---|
 | **Required:** | ``true`` |
-| **Type:** | ``url`` |
-
-Example
-
-```yaml
-    xmlUrl: https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-```
-
-
-
-### ontologies.{}.prefix
-
-Preferred Namespace Prefix of the ontology
-
-| Field | Value |
-|---|---|
-| **Required:** | ``true`` |
-| **Type:** | ``string`` |
-
-
-```yaml
-    prefix: sd
-```
-
-### ontologies.{}.prefixUri
-
-Preferred Namespace Uri of the ontology
-
-
-| Field | Value |
-|---|---|
-| **Required:** | ``true`` |
-| **Type:** | ``url`` |
-
-```yaml
-    prefixUri: https://w3id.org/okn/o/sd#
-```
-
+| **Type:** | ``List[string]`` |
 
 ## firebase
 

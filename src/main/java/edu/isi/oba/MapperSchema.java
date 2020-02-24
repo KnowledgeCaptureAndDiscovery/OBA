@@ -1,13 +1,16 @@
 package edu.isi.oba;
 
 import io.swagger.v3.oas.models.media.Schema;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.IRIShortFormProvider;
+import org.semanticweb.owlapi.util.OWLClassLiteralCollector;
 import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
-
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import java.util.*;
 
 class MapperSchema {
@@ -157,6 +160,10 @@ class MapperSchema {
      * @return A HashMap key: propertyName, value: SchemaProperty
      */
     private Map<String, Schema> getObjectProperties(OWLOntology ontology, OWLClass cls) {
+        OWLOntologyManager m = OWLManager.createOWLOntologyManager();
+        OWLDataFactory dataFactory = m.getOWLDataFactory();
+        OWLClass owlThing = dataFactory.getOWLThing();
+
         HashMap<String, String> propertyNameURI = new HashMap<>();
         Map<String, Schema> properties = new HashMap<>();
         for (OWLObjectPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
@@ -166,10 +173,11 @@ class MapperSchema {
                     Set<OWLObjectPropertyRangeAxiom> ranges = ontology.getObjectPropertyRangeAxioms(odp);
                     if (ranges.size() == 0)
                         System.err.println(odp.getIRI() + " range 0");
+
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
 
-                    List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp);
+                    List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing);
                     MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyRanges);
                     try {
                         properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
@@ -205,14 +213,24 @@ class MapperSchema {
      * Obtain SchemaPropertyType from the OWLRange of a OWLObjectProperty
      * @param ranges Represents a ObjectPropertyRange
      * @param odp  Represents a OWLObjectProperty
+     * @param owlThing
      * @return A list<String> with the properties
      */
-    private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp) {
+    private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp, OWLClass owlThing) {
         List<String> objectProperty = new ArrayList<>();
+
+
         for (OWLObjectPropertyAxiom propertyRangeAxiom : ranges) {
             for (OWLEntity rangeClass : propertyRangeAxiom.getSignature()) {
-                if (!rangeClass.containsEntityInSignature(odp)) {
-                    objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
+                System.out.println("Checking " + odp);
+
+                 if (!rangeClass.containsEntityInSignature(odp)) {
+                    if (rangeClass.asOWLClass().equals(owlThing)) {
+                        System.out.println("Ignoring owl:Thing" + odp);
+                    }
+                    else {
+                        objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
+                    }
                 }
             }
 

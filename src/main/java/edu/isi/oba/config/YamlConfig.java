@@ -25,7 +25,7 @@ public class YamlConfig {
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
   public List<String> paths;
-  public Map<String, OntologyConfig> ontologies;
+  public List<String> ontologies;
   public EndpointConfig endpoint;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
@@ -56,11 +56,11 @@ public class YamlConfig {
     this.paths = paths;
   }
 
-  public Map<String, OntologyConfig> getOntologies() {
+  public List<String>  getOntologies() {
     return ontologies;
   }
 
-  public void setOntologies(Map<String, OntologyConfig> ontologies) {
+  public void setOntologies(List<String> ontologies) {
     this.ontologies = ontologies;
   }
 

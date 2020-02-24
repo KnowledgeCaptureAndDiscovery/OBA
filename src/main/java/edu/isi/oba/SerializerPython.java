@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.util.*;
 
 class SerializerPython {
-  public SerializerPython(List<Mapper> mappers, java.nio.file.Path dir, OpenAPI openAPI) throws IOException {
+  public SerializerPython(Mapper mapper, java.nio.file.Path dir, OpenAPI openAPI) throws IOException {
     //Create directory utils
     final String utils_dir = ".openapi-generator/template/static_files/utils/";
     File utils_dir_path = new File(dir + File.separator + utils_dir);
@@ -26,13 +26,11 @@ class SerializerPython {
     //Create variable file
     final String var_file_python = ".openapi-generator/template/static_files/utils/vars.py";
     FileWriter var_file_writer = new FileWriter(dir + File.separator + var_file_python);
-    Iterator i = mappers.iterator();
-    while (i.hasNext()) {
-      Mapper mapper = (Mapper) i.next();
       Iterator it = mapper.schemaNames.entrySet().iterator();
       add_variable_python(var_file_writer, it);
-    }
     var_file_writer.close();
+
+
   }
 
 

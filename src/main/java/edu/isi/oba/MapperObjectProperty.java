@@ -28,7 +28,7 @@ class MapperObjectProperty {
 
   public Schema getSchemaByObjectProperty(){
     if (this.ref.size() == 0){
-      return new ObjectSchema().nullable(nullable);
+      return getComposedSchemaObject(this.ref, array, nullable);
     }
 
     if (this.ref.size() > 1){
