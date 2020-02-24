@@ -2,148 +2,103 @@ package edu.isi.oba;
 
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.Enumeration;
-import java.util.Optional;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 
 import static edu.isi.oba.Oba.logger;
 
 
 public class ObaUtils {
-
     /**
-     * URI prefix for JAR files.
+     * Method used to copy the local files: styles, images, etc.
+     *
+     * @param resourceName
+     *            Name of the resource
+     * @param dest
+     *            file where we should copy it.
      */
-    private static final String JAR_URI_PREFIX = "jar:file:";
-
-    /**
-     * The default buffer size.
-     */
-    private static final int BUFFER_SIZE = 8 * 1024;
-
-    /**
-     * Copies a set of resources into a temporal directory, optionally preserving
-     * the paths of the resources.
-     * @param preserve Whether the files should be placed directly in the
-     *  directory or the source path should be kept
-     * @param paths The paths to the resources
-     * @return The temporal directory
-     * @throws IOException If there is an I/O error
-     */
-    public File copyResourcesToTempDir(final boolean preserve,
-                                       final String... paths)
-            throws IOException {
-        final File parent = new File(System.getProperty("java.io.tmpdir"));
-        File directory;
-        do {
-            directory = new File(parent, String.valueOf(System.nanoTime()));
-        } while (!directory.mkdir());
-        return this.copyResourcesToDir(directory, preserve, paths);
-    }
-
-    /**
-     * Copies a set of resources into a directory, preserving the paths
-     * and names of the resources.
-     * @param directory The target directory
-     * @param preserve Whether the files should be placed directly in the
-     *  directory or the source path should be kept
-     * @param paths The paths to the resources
-     * @return The temporal directory
-     * @throws IOException If there is an I/O error
-     */
-    public File copyResourcesToDir(final File directory, final boolean preserve,
-                                   final String... paths) throws IOException {
-        for (final String path : paths) {
-            final File target;
-            if (preserve) {
-                target = new File(directory, path);
-                target.getParentFile().mkdirs();
-            } else {
-                target = new File(directory, new File(path).getName());
-            }
-            this.writeToFile(
-                    Thread.currentThread()
-                            .getContextClassLoader()
-                            .getResourceAsStream(path),
-                    target
-            );
+    public static void copyLocalResource(String resourceName, File dest) {
+        try {
+            copy(ObaUtils.class.getResourceAsStream(resourceName), dest);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception while copying " + resourceName + " - " + e.getMessage());
         }
-        return directory;
+    }
+
+    public static void copy(InputStream is, File dest) throws Exception {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception while copying resource. " + e.getMessage());
+            throw e;
+        } finally {
+            if (is != null)
+                is.close();
+            if (os != null)
+                os.close();
+        }
     }
 
     /**
-     * Copies a resource directory from inside a JAR file to a target directory.
-     * @param source The JAR file
-     * @param path The path to the directory inside the JAR file
-     * @param target The target directory
-     * @throws IOException If there is an I/O error
+     * Code to unzip a file. Inspired from
+     * http://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/ Taken
+     * from
+     *
+     * @param resourceName
+     * @param outputFolder
      */
-    public void copyResourceDirectory(final JarFile source, final String path,
-                                      final File target) throws IOException {
-        final Enumeration<JarEntry> entries = source.entries();
-        final String newpath = String.format("%s/", path);
-        while (entries.hasMoreElements()) {
-            final JarEntry entry = entries.nextElement();
-            if (entry.getName().startsWith(newpath) && !entry.isDirectory()) {
-                final File dest =
-                        new File(target, entry.getName().substring(newpath.length()));
-                final File parent = dest.getParentFile();
-                if (parent != null) {
-                    parent.mkdirs();
+    public static void unZipIt(String resourceName, String outputFolder) {
+
+        byte[] buffer = new byte[1024];
+
+        try {
+            ZipInputStream zis = new ZipInputStream(ObaUtils.class.getResourceAsStream(resourceName));
+            ZipEntry ze = zis.getNextEntry();
+
+            while (ze != null) {
+                String fileName = ze.getName();
+                File newFile = new File(outputFolder + File.separator + fileName);
+                // System.out.println("file unzip : "+ newFile.getAbsoluteFile());
+                if (ze.isDirectory()) {
+                    String temp = newFile.getAbsolutePath();
+                    new File(temp).mkdirs();
+                } else {
+                    String directory = newFile.getParent();
+                    if (directory != null) {
+                        File d = new File(directory);
+                        if (!d.exists()) {
+                            d.mkdirs();
+                        }
+                    }
+                    FileOutputStream fos = new FileOutputStream(newFile);
+                    int len;
+                    while ((len = zis.read(buffer)) > 0) {
+                        fos.write(buffer, 0, len);
+                    }
+                    fos.close();
                 }
-                this.writeToFile(source.getInputStream(entry), dest);
+                ze = zis.getNextEntry();
             }
-        }
-    }
 
-    /**
-     * The JAR file containing the given class.
-     * @param clazz The class
-     * @return The JAR file or null
-     * @throws IOException If there is an I/O error
-     */
-    public Optional<JarFile> jar(final Class<?> clazz) throws IOException {
-        final String path =
-                String.format("/%s.class", clazz.getName().replace('.', '/'));
-        final URL url = clazz.getResource(path);
-        Optional<JarFile> optional = Optional.empty();
-        if (url != null) {
-            final String jar = url.toString();
-            final int bang = jar.indexOf('!');
-            if (jar.startsWith(ObaUtils.JAR_URI_PREFIX) && bang != -1) {
-                optional = Optional.of(
-                        new JarFile(
-                                jar.substring(ObaUtils.JAR_URI_PREFIX.length(), bang)
-                        )
-                );
-            }
-        }
-        return optional;
-    }
+            zis.closeEntry();
+            zis.close();
 
-    /**
-     * Writes an input stream to a file.
-     * @param input The input stream
-     * @param target The target file
-     * @throws IOException If there is an I/O error
-     */
-    private void writeToFile(final InputStream input, final File target)
-            throws IOException {
-        final OutputStream output = Files.newOutputStream(target.toPath());
-        final byte[] buffer = new byte[ObaUtils.BUFFER_SIZE];
-        int length = input.read(buffer);
-        while (length > 0) {
-            output.write(buffer, 0, length);
-            length = input.read(buffer);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Exception while copying resource. " + ex.getMessage());
         }
-        input.close();
-        output.close();
+
     }
 
 

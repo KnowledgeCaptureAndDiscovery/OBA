@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import org.apache.commons.cli.*;
 
 class Oba {
+  public static final String SERVERS_ZIP = "/servers.zip";
   static Logger logger = Logger.getLogger(Oba.class.getName());
 
   public static void main(String[] args) throws Exception {
@@ -54,8 +55,7 @@ class Oba {
    * @throws IOException
    */
   private static void python_copy_base_project(String base_project_dir, String destination_dir) throws IOException, URISyntaxException {
-    ObaUtils.copyLocalResource("/oba ""install.sh",
-            new File(destination_dir + File.separator + "install.sh"));
+    ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
   }
 
   private static void generate_openapi_spec(OpenAPI openapi_base, Mapper mapper, String dir, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
