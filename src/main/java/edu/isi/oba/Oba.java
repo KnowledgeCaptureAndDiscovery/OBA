@@ -9,17 +9,24 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.*;
 
 class Oba {
+  static Logger logger = Logger.getLogger(Oba.class.getName());
+
   public static void main(String[] args) throws Exception {
-    String resourcesFolder = "oba_python";
+
+    logger.setLevel(Level.FINE);
+    logger.addHandler(new ConsoleHandler());
+
+    String resourcesFolder = "oba";
 
     //parse command line
     String config_yaml = get_config_yaml(args);
@@ -34,6 +41,7 @@ class Oba {
     LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
     OpenAPI openapi_base = config_data.getOpenapi();
     generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
+    python_copy_base_project(resourcesFolder, destination_dir);
 
     //python_copy_base_project(resourcesFolder, destination_dir);
   }
@@ -46,25 +54,8 @@ class Oba {
    * @throws IOException
    */
   private static void python_copy_base_project(String base_project_dir, String destination_dir) throws IOException, URISyntaxException {
-    DirectoryCopy d = new DirectoryCopy();
-    InputStream originFolder = Oba.class.getResourceAsStream(base_project_dir);
-
-    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-    URL url = loader.getResource("oba_python");
-    String path = url.getPath();
-    File[] a = new File(path).listFiles();
-    System.out.println(path);
-    //System.out.println(originFolder.getPath());
-    System.out.println(destination_dir);
-
-    d = new DirectoryCopy();
-    d.copyFolder(new File(path), new File(destination_dir));
-
-    System.out.println(destination_dir);
-
-
-
-
+    ObaUtils.copyLocalResource("/oba ""install.sh",
+            new File(destination_dir + File.separator + "install.sh"));
   }
 
   private static void generate_openapi_spec(OpenAPI openapi_base, Mapper mapper, String dir, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
