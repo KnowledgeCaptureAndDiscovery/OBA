@@ -1,6 +1,5 @@
 package edu.isi.oba;
 
-import edu.isi.oba.config.OntologyConfig;
 import edu.isi.oba.config.RelationConfig;
 import edu.isi.oba.config.YamlConfig;
 import io.swagger.v3.oas.models.Paths;
@@ -11,9 +10,8 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.*;
 
 class Mapper {
@@ -28,8 +26,8 @@ class Mapper {
     List<String> paths = config_data.getPaths();
 
     this.selected_paths = paths;
-    List<String>  config_ontologies = config_data.getOntologies();
-    Map<String, List<RelationConfig>> relations = config_data.getRelations();
+    List<String> config_ontologies = config_data.getOntologies();
+    String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
 
     //Load the ontology into the manager
     for (String ontologyURL : config_ontologies) {
@@ -47,7 +45,7 @@ class Mapper {
     //Add schema and paths
     for (OWLOntology ontology : this.manager.getOntologies()) {
       OWLDocumentFormat format = ontology.getFormat();
-      this.createSchemas(ontology, relations, format);
+      this.createSchemas(ontology, format, destination_dir);
     }
   }
 
@@ -56,16 +54,15 @@ class Mapper {
    * The schemas includes the properties
    *
    * @param ontology  Represents an OWL 2 ontology
-   * @param relations
    * @param format
    * @return schemas
    */
-  private void createSchemas(OWLOntology ontology, Map<String, List<RelationConfig>> relations, OWLDocumentFormat format) {
+  private void createSchemas(OWLOntology ontology, OWLDocumentFormat format, String destination_dir) {
     String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
 
     Set<OWLClass> classes = ontology.getClassesInSignature();
 
-    Query query = new Query();
+    Query query = new Query(destination_dir);
     Path pathGenerator = new Path();
     query.get_all(DEFAULT_DIR_QUERY);
 
@@ -81,14 +78,6 @@ class Mapper {
           //Obtain and add OpenAPI schema
           Schema schema = mapperSchema.getSchema();
           schemas.put(schema.getName(), schema);
-
-
-          //obtain the relations
-//          List<RelationConfig> model_relations = relations.get(mapperSchema.name);
-//          for (RelationConfig model_relation : model_relations){
-//              add_path_relation(pathGenerator, model_relation.getSubject(), model_relation.getPredicate(), model_relation.getPath());
-//          }
-
 
           if (this.selected_paths == null){
             add_path(pathGenerator, mapperSchema);

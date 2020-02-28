@@ -171,7 +171,6 @@ ontologies:
   - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
   - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
 ```
-
 | Field | Value |
 |---|---|
 | **Required:** | ``true`` |

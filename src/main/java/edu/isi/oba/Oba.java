@@ -27,7 +27,6 @@ class Oba {
     logger.setLevel(Level.FINE);
     logger.addHandler(new ConsoleHandler());
 
-    String resourcesFolder = "oba";
 
     //parse command line
     String config_yaml = get_config_yaml(args);
@@ -35,41 +34,20 @@ class Oba {
     YamlConfig config_data = get_yaml_data(config_yaml);
     //copy base project
     String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
-
     //read ontologies and get schema and paths
-
     Mapper mapper = new Mapper(config_data);
     LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
     OpenAPI openapi_base = config_data.getOpenapi();
-    generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
-    python_copy_base_project(resourcesFolder, destination_dir);
-
-    //python_copy_base_project(resourcesFolder, destination_dir);
-  }
-
-
-  /**
-   * Copy the base project dir for a python project
-   * @param base_project_dir
-   * @param destination_dir
-   * @throws IOException
-   */
-  private static void python_copy_base_project(String base_project_dir, String destination_dir) throws IOException, URISyntaxException {
     ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
+    generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
   }
+
 
   private static void generate_openapi_spec(OpenAPI openapi_base, Mapper mapper, String dir, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
-    String destinationProjectDirectory = dir;
+    String destinationProjectDirectory = dir + File.separator + "servers" + File.separator + "python";
     Path destinationProject = Paths.get(destinationProjectDirectory);
     Serializer serializer = new Serializer(mapper, destinationProject, openapi_base, custom_paths);
     SerializerPython serializer_python = new SerializerPython(mapper, destinationProject, openapi_base);
-  }
-
-  private static File[] getResourceFolderFiles (String folder) {
-    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-    URL url = loader.getResource(folder);
-    String path = url.getPath();
-    return new File(path).listFiles();
   }
 
 

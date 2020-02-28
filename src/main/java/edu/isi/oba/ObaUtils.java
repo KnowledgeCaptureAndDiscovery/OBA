@@ -1,56 +1,13 @@
 package edu.isi.oba;
 
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-
 import static edu.isi.oba.Oba.logger;
-
-
 public class ObaUtils {
-    /**
-     * Method used to copy the local files: styles, images, etc.
-     *
-     * @param resourceName
-     *            Name of the resource
-     * @param dest
-     *            file where we should copy it.
-     */
-    public static void copyLocalResource(String resourceName, File dest) {
-        try {
-            copy(ObaUtils.class.getResourceAsStream(resourceName), dest);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception while copying " + resourceName + " - " + e.getMessage());
-        }
-    }
-
-    public static void copy(InputStream is, File dest) throws Exception {
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(dest);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) > 0) {
-                os.write(buffer, 0, length);
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception while copying resource. " + e.getMessage());
-            throw e;
-        } finally {
-            if (is != null)
-                is.close();
-            if (os != null)
-                os.close();
-        }
-    }
-
     /**
      * Code to unzip a file. Inspired from
      * http://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/ Taken
@@ -62,7 +19,6 @@ public class ObaUtils {
     public static void unZipIt(String resourceName, String outputFolder) {
 
         byte[] buffer = new byte[1024];
-
         try {
             ZipInputStream zis = new ZipInputStream(ObaUtils.class.getResourceAsStream(resourceName));
             ZipEntry ze = zis.getNextEntry();
@@ -101,5 +57,60 @@ public class ObaUtils {
 
     }
 
+    public static void copy(InputStream is, File dest) throws Exception {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error while extracting the reosurces: " + e.getMessage());
+            throw e;
+        } finally {
+            if (is != null)
+                is.close();
+            if (os != null)
+                os.close();
+        }
+    }
 
+    /**
+     * This function recursively copy all the sub folder and files from sourceFolder to destinationFolder
+     * */
+    public static void copyFolder(File sourceFolder, File destinationFolder) throws IOException
+    {
+        //Check if sourceFolder is a directory or file
+        //If sourceFolder is file; then copy the file directly to new location
+        if (sourceFolder.isDirectory())
+        {
+            //Verify if destinationFolder is already present; If not then create it
+            if (!destinationFolder.exists())
+            {
+                destinationFolder.mkdir();
+                System.out.println("Directory created :: " + destinationFolder);
+            }
+
+            //Get all files from source directory
+            String files[] = sourceFolder.list();
+
+            //Iterate over all files and copy them to destinationFolder one by one
+            for (String file : files)
+            {
+                File srcFile = new File(sourceFolder, file);
+                File destFile = new File(destinationFolder, file);
+
+                //Recursive function call
+                copyFolder(srcFile, destFile);
+            }
+        }
+        else
+        {
+            //Copy the file content from one place to another
+            Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("File copied :: " + destinationFolder);
+        }
+    }
 }

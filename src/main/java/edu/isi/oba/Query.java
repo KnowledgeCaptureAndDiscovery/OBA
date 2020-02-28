@@ -22,7 +22,7 @@ import java.io.IOException;
  * $NAME/delete/query-graph.sparql
  */
 class Query {
-  private String query_directory = "outputs/modelcatalog/.openapi-generator/template/static_files/queries/";
+  private String query_directory;
   //private static final String get_all_query_file = "get_all.rq";
   private static final String get_all_graph_query_file = "get_all_user.rq";
   //private static final String get_one_query_file = "get_one.rq";
@@ -32,7 +32,8 @@ class Query {
   private static final String get_all_search_graph_query_file = "get_all_search_user.rq";
 
 
-  public Query() {
+  public Query(String query_directory) {
+    this.query_directory = query_directory + File.separator + "queries";
   }
 
   public void get_all(String schema_name){

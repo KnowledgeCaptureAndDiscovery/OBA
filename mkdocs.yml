@@ -1,8 +1,9 @@
 site_name: OBA documentation
 nav:
   - Home: index.md
-  - Quickstart: quickstart.md
   - OBA features: features.md
+  - Quickstart: quickstart.md
+  - Generating the server: server.md
   - Configuration file: configuration_file.md
 theme:
   name: material
