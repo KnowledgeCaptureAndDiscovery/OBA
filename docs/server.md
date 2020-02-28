@@ -65,7 +65,16 @@ To do that, OBA requires a file with the context. Simply speaking, a context is 
     Visit the [JSON/LD documentation](https://json-ld.org/spec/latest/json-ld/#the-context) for more information
 
 Currently, OBA does not support the generation of the context file. 
-We recommend to use the project [owl2jsonld](https://github.com/stain/owl2jsonld)
+We recommend to use the project [owl2jsonld](https://github.com/sirspock/owl2jsonld)
+
+!!! info
+    This package is a fork of [owl2jsonld](https://github.com/stain/owl2jsonld). Thanks Stain!
+
+```bash
+wget https://github.com/sirspock/owl2jsonld/releases/download/0.3.0/owl2jsonld-0.3.0-SNAPSHOT-standalone.jar
+java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
+    https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml > server/context.json
+```
 
 
 #### One ontology
@@ -77,7 +86,7 @@ java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
     https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml > server/context.json
 ```
 
-### Two or more ontologies
+#### Two or more ontologies
 
 To merge the multiple JSON files, you can install the [jq](https://stedolan.github.io/jq/)
 
