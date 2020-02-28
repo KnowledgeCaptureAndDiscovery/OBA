@@ -15,7 +15,8 @@
 
 ## Running
 
-1. Create the OBA config file from the [sample configuration](../config.yaml.sample)
+
+1. Create the OBA config file from the [sample configuration](config.yaml.sample)
 2. Pass the configuration and run OBA
 ```bash
 $ java -jar oba-2.0.0-jar-with-dependencies.jar -c config.yaml

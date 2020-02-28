@@ -1,5 +1,0 @@
-server/requirements.txt
-server/Dockerfile
-server/docker-compose.yml 
-server/requirements.txt
-server/.gitignore
