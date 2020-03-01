@@ -8,6 +8,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import static edu.isi.oba.Oba.logger;
 public class ObaUtils {
+
+    public static void write_file(String file_path, String content){
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(file_path));
+            writer.write(content);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Code to unzip a file. Inspired from
      * http://www.mkyong.com/java/how-to-decompress-files-from-a-zip-file/ Taken
