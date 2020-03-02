@@ -21,42 +21,6 @@ As result, the server can:
  2. Connect and insert resources to the SPARQL endpoint.
     - Convert the JSON to RDF triples (using JSON/LD).
     
-## Generating the server
-
-Currently, the following languages/frameworks are supported by OBA:
-
-- Python/flash
-
-### How to generate it?
-
-!!! warning
-    You must install Docker.
-    
-Run the OpenAPI generator script to generate the server
-
-```bash
-$ bash generate-server.sh
-...
-...
-SUCCESS
-```
-
-#### Structure of the server
-
-The server directory contains the following files and directories
-
-```bash
-$ ls server/
-Dockerfile: A Dockerfile to build the Docker Images
-README.md: A README.md with the instructions to run the server
-contexts: The directory with the JSON/LD contests
-openapi_server: The server implemenation
-queries: The directory with the SPARQL queries
-requirements.txt: The Python requirements of the server 
-test-requirements.txt: The Python requirements of testing the server 
-```
-
-
 ### Generating the JSON/LD context
 
 Since the adoption of JSON/LD is in progress, OBA can convert the format of the responses from JSON/LD to JSON.
@@ -97,7 +61,7 @@ java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
     $ONTOLOGY_URL1 > a.json
 java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar \
     $ONTOLOGY_URL2 > b.json    
-jq -s '.[0] * .[1]' a.json b.json  | jq -S > server/contexts/context.json
+jq -s '.[0] * .[1]' a.json b.json  | jq -S > context.json
 rm a.json b.json
 
 ```
@@ -110,16 +74,60 @@ java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
     https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml > a.json
 java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar \
     https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.2.0/ontology.xml > b.json
-jq -s '.[0] * .[1]' a.json b.json  | jq -S > server/contexts/context.json
+jq -s '.[0] * .[1]' a.json b.json  | jq -S > context.json
 rm a.json b.json
 
 ```
 
+    
+## Generating the server
+
+Currently, the following languages/frameworks are supported by OBA:
+
+- Python/flash
+
 ### Copying the files
 
-Finally, you must copy the context file and OpenAPI specification 
+First, you must copy the context file and OpenAPI specification
 
 ```bash
-mv context.json python/server/contexts
-mv openapi.yaml python/
+mv context.json openapi.yaml python/
 ```
+
+### How to generate it?
+
+!!! warning
+    You must install Docker.
+
+Change the directory the server implementation 
+
+```bash
+$ cd python
+```
+
+ 
+Run the OpenAPI generator script to generate the server
+
+```bash
+$ bash generate-server.sh
+...
+...
+SUCCESS
+```
+
+#### Structure of the server
+
+The server directory contains the following files and directories
+
+```bash
+$ ls server/
+Dockerfile: A Dockerfile to build the Docker Images
+README.md: A README.md with the instructions to run the server
+contexts: The directory with the JSON/LD contests
+openapi_server: The server implemenation
+queries: The directory with the SPARQL queries
+requirements.txt: The Python requirements of the server 
+test-requirements.txt: The Python requirements of testing the server 
+```
+
+
