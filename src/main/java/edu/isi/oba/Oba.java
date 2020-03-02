@@ -1,5 +1,7 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.EndpointConfig;
+import edu.isi.oba.config.FirebaseConfig;
 import edu.isi.oba.config.YamlConfig;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
@@ -7,8 +9,6 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -20,18 +20,23 @@ import org.apache.commons.cli.*;
 
 class Oba {
   public static final String SERVERS_ZIP = "/servers.zip";
+  public static final String SERVERS_DIRECTORY = "servers";
   static Logger logger = Logger.getLogger(Oba.class.getName());
-
+  public enum LANGUAGE {
+    PYTHON_FLASK
+  }
   public static void main(String[] args) throws Exception {
-
+    //We are supporting one language. Issue #42
+    LANGUAGE selected_language = LANGUAGE.PYTHON_FLASK;
     logger.setLevel(Level.FINE);
     logger.addHandler(new ConsoleHandler());
-
 
     //parse command line
     String config_yaml = get_config_yaml(args);
     //read the config yaml from command line
     YamlConfig config_data = get_yaml_data(config_yaml);
+    EndpointConfig endpoint_data = config_data.getEndpoint();
+    FirebaseConfig firebase_data = config_data.getFirebase();
     //copy base project
     String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
     //read ontologies and get schema and paths
@@ -40,14 +45,32 @@ class Oba {
     OpenAPI openapi_base = config_data.getOpenapi();
     ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
     generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
+    generate_openapi_template(mapper, destination_dir, endpoint_data, firebase_data, selected_language);
   }
 
+  private static void generate_openapi_template(Mapper mapper,
+                                                String destination_directory,
+                                                EndpointConfig endpoint_config,
+                                                FirebaseConfig firebase_config,
+                                                LANGUAGE language) throws IOException {
+    switch (language) {
+      case PYTHON_FLASK:
+        new SerializerPython(mapper, destination_directory, endpoint_config, firebase_config);
+        break;
+      default:
+        logger.severe("Language is not supported");
+    }
 
-  private static void generate_openapi_spec(OpenAPI openapi_base, Mapper mapper, String dir, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
-    String destinationProjectDirectory = dir + File.separator + "servers" + File.separator + "python";
+  }
+
+  private static void generate_openapi_spec(OpenAPI openapi_base,
+                                            Mapper mapper,
+                                            String dir,
+                                            LinkedHashMap<String, PathItem> custom_paths
+                                            ) throws IOException {
+    String destinationProjectDirectory = dir + File.separator + SERVERS_DIRECTORY;
     Path destinationProject = Paths.get(destinationProjectDirectory);
-    Serializer serializer = new Serializer(mapper, destinationProject, openapi_base, custom_paths);
-    SerializerPython serializer_python = new SerializerPython(mapper, destinationProject, openapi_base);
+    new Serializer(mapper, destinationProject, openapi_base, custom_paths);
   }
 
 

@@ -19,6 +19,7 @@ openapi:
     - url: https://dev.api.models.mint.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
 
+
 firebase:
   key:
 

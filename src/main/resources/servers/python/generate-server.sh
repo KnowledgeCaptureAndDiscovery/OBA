@@ -27,9 +27,11 @@ docker run -ti --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v4.1.2 \
 cp -r ${PWD}/.openapi-generator/template/static_files/utils/ ${PWD}/$SERVER_DIR/openapi_server/utils/
 cp -r ${PWD}/.openapi-generator/template/static_files/settings/ ${PWD}/$SERVER_DIR/openapi_server/settings/
 cp -r ${PWD}/.openapi-generator/template/static_files/user_controller.py ${PWD}/$SERVER_DIR/openapi_server/controllers/
+cp -r ${PWD}/.openapi-generator/template/static_files/cached.py ${PWD}/$SERVER_DIR/openapi_server/
 mkdir -p ${PWD}/$SERVER_DIR/contexts/
 echo "Copying query files"
 cp -r ../../queries ${PWD}/$SERVER_DIR/queries
+cp -r context.json ${PWD}/$SERVER_DIR/contexts/
 if [ "$?" == "0" ]; then
         echo -e "${GREEN}SUCCESS${RESET}"
 fi

@@ -22,6 +22,10 @@ openapi:
 firebase:
   key:
 
+endpoint:
+  url: http://endpoint.mint.isi.edu/modelCatalog-1.2.0
+  prefix: https://w3id.org/okn/i/mint
+  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
 
 custom_paths:
   /custom/model/index:
