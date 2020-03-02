@@ -116,6 +116,13 @@ rm a.json b.json
 
 ## Running the server
 
+### Copying the files
+
+```bash
+mv context.json python/server/contexts
+mv openapi.yaml python/
+```
+
 ## Running with Docker
 
 To run the server on a Docker container, please execute the following from the root directory:
