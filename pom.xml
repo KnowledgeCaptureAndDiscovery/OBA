@@ -6,7 +6,7 @@
 
   <groupId>edu.isi.oba</groupId>
   <artifactId>oba</artifactId>
-  <version>2.3.0</version>
+  <version>2.3.1</version>
   <name>core</name>
   <!-- FIXME change it to the project's website -->
   <url>https://github.com/KnowledgeCaptureAndDiscovery/OBA</url>
