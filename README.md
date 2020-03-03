@@ -27,7 +27,7 @@ There are two option to run OBA:
 
 ## Running
 
-1. Create the OBA config file from the [sample configuration](config.yaml.sample)
+1. Create the OBA config file (config.yaml) from the [sample configuration](config.yaml.sample)
 2. Pass the configuration and run OBA
 
 ```bash
