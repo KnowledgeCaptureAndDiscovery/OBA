@@ -24,6 +24,10 @@ There are two option to run OBA:
 
 ## Running
 
+!!! info
+    For the configuration file documentation, go to [here](configuration_file.md)
+
+
 1. Create the OBA config file (config.yaml) from the [sample configuration](config.yaml.sample)
 2. Pass the configuration and run OBA
 
