@@ -1,3 +1,8 @@
+
+## Requirements
+
+You will need Java 1.8 or higher (SDK 1.8 or JRE 8).
+
 ## Installation 
 
 There are two option to run OBA:
