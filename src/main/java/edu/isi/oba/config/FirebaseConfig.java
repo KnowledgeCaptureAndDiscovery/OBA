@@ -1,7 +1,7 @@
 package edu.isi.oba.config;
 
 public class FirebaseConfig {
-  public String key;
+  public String key = "";
 
   public String getKey() {
     return key;

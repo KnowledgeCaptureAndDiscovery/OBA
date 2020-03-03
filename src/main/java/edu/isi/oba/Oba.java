@@ -34,12 +34,20 @@ class Oba {
     //parse command line
     String config_yaml = get_config_yaml(args);
     //read the config yaml from command line
-    YamlConfig config_data = get_yaml_data(config_yaml);
+    YamlConfig config_data = new YamlConfig();
+
+    try {
+      config_data = get_yaml_data(config_yaml);
+
+    } catch (Exception e){
+      logger.severe("Error in the configuration file. Please review it \n " + e);
+      System.exit(1);
+    }
+    String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
+    //copy base project
+    //read ontologies and get schema and paths
     EndpointConfig endpoint_data = config_data.getEndpoint();
     FirebaseConfig firebase_data = config_data.getFirebase();
-    //copy base project
-    String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
-    //read ontologies and get schema and paths
     Mapper mapper = new Mapper(config_data);
     LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
     OpenAPI openapi_base = config_data.getOpenapi();
@@ -83,6 +91,7 @@ class Oba {
       config_input = new FileInputStream(new File(config_yaml));
     } catch (FileNotFoundException e) {
       System.err.println("Configuration file not found: " + config_yaml);
+      System.exit(1);
     }
     //Yaml config parse
     return yaml.loadAs(config_input, YamlConfig.class);
@@ -105,7 +114,7 @@ class Oba {
       config_yaml = cmd.getOptionValue("config");
     } catch (ParseException e) {
       System.out.println(e.getMessage());
-      formatter.printHelp("utility-name", options);
+      formatter.printHelp("utiConfiguration filelity-name", options);
       System.exit(1);
     }
     return config_yaml;
