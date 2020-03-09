@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.media.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import static edu.isi.oba.Oba.logger;
 
 class MapperDataProperty {
   private final HashMap<String, String> dataTypes;
@@ -57,6 +58,7 @@ class MapperDataProperty {
     this.dataTypes.put("unsignedInt", "integer");
     this.dataTypes.put("unsignedLong", "integer");
     this.dataTypes.put("unsignedShort", "integer");
+    this.dataTypes.put("langString", "string");
 
   }
 
@@ -67,6 +69,7 @@ class MapperDataProperty {
   private static final String STRING_TYPE = "string";
   private static final String NUMBER_TYPE = "number";
   private static final String INTEGER_TYPE = "integer";
+  private static final String BOOLEAN_TYPE = "boolean";
 
   final String name;
   private List<String> type;
@@ -97,6 +100,9 @@ class MapperDataProperty {
     }
 
     String schemaType = getDataType(this.type.get(0));
+    if (schemaType == null){
+      logger.severe("property " + this.name + " type " + this.type);
+    }
     switch (schemaType) {
       case STRING_TYPE:
         return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
@@ -104,8 +110,10 @@ class MapperDataProperty {
         return (array) ? arraySchema(new NumberSchema(), nullable) : new NumberSchema().nullable(nullable);
       case INTEGER_TYPE:
         return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable);
-      default:
-        System.out.println("datatype mapping failed " + this.type.get(0));
+      case BOOLEAN_TYPE:
+        return (array) ? arraySchema(new BooleanSchema(), nullable) : new BooleanSchema().nullable(nullable);
+     default:
+        logger.warning("datatype mapping failed " + this.type.get(0));
         return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable);
     }
   }

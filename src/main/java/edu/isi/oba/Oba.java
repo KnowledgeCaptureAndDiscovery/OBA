@@ -26,9 +26,12 @@ class Oba {
     PYTHON_FLASK
   }
   public static void main(String[] args) throws Exception {
-    //We are supporting one language. Issue #42
+    /*
+    TODO: we are supporting one language. Issue #42
+    */
+
     LANGUAGE selected_language = LANGUAGE.PYTHON_FLASK;
-    logger.setLevel(Level.FINE);
+    logger.setLevel(Level.WARNING);
     logger.addHandler(new ConsoleHandler());
 
     //parse command line
@@ -38,20 +41,21 @@ class Oba {
 
     try {
       config_data = get_yaml_data(config_yaml);
-
     } catch (Exception e){
       logger.severe("Error in the configuration file. Please review it \n " + e);
       System.exit(1);
     }
+
     String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
-    //copy base project
-    //read ontologies and get schema and paths
     EndpointConfig endpoint_data = config_data.getEndpoint();
     FirebaseConfig firebase_data = config_data.getFirebase();
     Mapper mapper = new Mapper(config_data);
     LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
     OpenAPI openapi_base = config_data.getOpenapi();
+
+    //copy base project
     ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
+    //get schema and paths
     generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
     generate_openapi_template(mapper, destination_dir, endpoint_data, firebase_data, selected_language);
   }

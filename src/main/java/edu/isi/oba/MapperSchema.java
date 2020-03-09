@@ -12,6 +12,7 @@ import org.semanticweb.owlapi.util.OWLClassLiteralCollector;
 import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import java.util.*;
+import static edu.isi.oba.Oba.logger;
 
 class MapperSchema {
 
@@ -109,7 +110,7 @@ class MapperSchema {
 
                     Set<OWLDataPropertyRangeAxiom> ranges = ontology.getDataPropertyRangeAxioms(odp);
                     if (ranges.size() == 0)
-                        System.err.println(odp.getIRI() + " range 0");
+                        logger.info(odp.getIRI() + " range 0");
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
@@ -172,7 +173,7 @@ class MapperSchema {
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     Set<OWLObjectPropertyRangeAxiom> ranges = ontology.getObjectPropertyRangeAxioms(odp);
                     if (ranges.size() == 0)
-                        System.err.println(odp.getIRI() + " range 0");
+                        logger.info(odp.getIRI() + " range 0");
 
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
@@ -222,11 +223,9 @@ class MapperSchema {
 
         for (OWLObjectPropertyAxiom propertyRangeAxiom : ranges) {
             for (OWLEntity rangeClass : propertyRangeAxiom.getSignature()) {
-                System.out.println("Checking " + odp);
-
                  if (!rangeClass.containsEntityInSignature(odp)) {
                     if (rangeClass.asOWLClass().equals(owlThing)) {
-                        System.out.println("Ignoring owl:Thing" + odp);
+                        logger.info("Ignoring owl:Thing" + odp);
                     }
                     else {
                         objectProperty.add(getSchemaName(rangeClass.asOWLClass()));

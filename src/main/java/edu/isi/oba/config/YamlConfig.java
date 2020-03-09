@@ -25,6 +25,13 @@ public class YamlConfig {
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
   public List<String> paths;
+
+  
+  public Boolean generate_get_path = true;
+  public Boolean enable_user = true;
+  public Boolean generate_insert_paths = true;
+
+
   public List<String> ontologies;
   public EndpointConfig endpoint;
   public FirebaseConfig firebase;
