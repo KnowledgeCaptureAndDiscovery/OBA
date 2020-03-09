@@ -49,10 +49,9 @@ custom_paths:
         name: label
         required: true
         schema:
-            type: string
+          type: string
       responses:
         '200':
-
           content:
             application/json:
               schema:
@@ -84,7 +83,7 @@ custom_paths:
         name: label
         required: true
         schema:
-            type: string
+          type: string
       responses:
         '200':
           content:
@@ -94,6 +93,40 @@ custom_paths:
                   $ref: '#/components/schemas/Model'
           description: Gets the details of a single instance of Model
       summary: Get a Model
+      tags:
+      - Model
+  /custom/models/standard_variable:
+    get:
+      description: Gets a list of model filter by the label of a standard variable
+      parameters:
+      - description: Name of the custom query
+        in: query
+        name: custom_query_name
+        required: false
+        schema:
+          default: custom_model_standard_variable
+          type: string
+      - description: Username to query
+        in: query
+        name: username
+        required: false
+        schema:
+          type: string
+      - description: standard variable name
+        in: query
+        name: label
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Model'
+          description: Gets a list of models
+      summary: Get a list of models
       tags:
       - Model
   /custom/model/region:
@@ -118,7 +151,7 @@ custom_paths:
         name: label
         required: true
         schema:
-            type: string
+          type: string
       responses:
         '200':
           content:

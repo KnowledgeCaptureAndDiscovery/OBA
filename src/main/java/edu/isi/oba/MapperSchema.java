@@ -167,13 +167,15 @@ class MapperSchema {
 
         HashMap<String, String> propertyNameURI = new HashMap<>();
         Map<String, Schema> properties = new HashMap<>();
+        logger.info("Parsing class " + cls.toString());
         for (OWLObjectPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
             if (checkDomainClass(cls, dp)) {
+                logger.info( "Parsing property " + dp.toString());
                 for (OWLObjectProperty odp : dp.getObjectPropertiesInSignature()) {
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     Set<OWLObjectPropertyRangeAxiom> ranges = ontology.getObjectPropertyRangeAxioms(odp);
                     if (ranges.size() == 0)
-                        logger.info(odp.getIRI() + " range 0");
+                        logger.warning("Property " + odp.getIRI() + " has range equals zero");
 
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);

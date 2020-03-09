@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.apache.commons.cli.*;
@@ -21,7 +22,7 @@ import org.apache.commons.cli.*;
 class Oba {
   public static final String SERVERS_ZIP = "/servers.zip";
   public static final String SERVERS_DIRECTORY = "servers";
-  static Logger logger = Logger.getLogger(Oba.class.getName());
+  static Logger logger = null;
   public enum LANGUAGE {
     PYTHON_FLASK
   }
@@ -30,8 +31,17 @@ class Oba {
     TODO: we are supporting one language. Issue #42
     */
 
+    InputStream stream = Oba.class.getClassLoader().getResourceAsStream("logging.properties");
+    try {
+      LogManager.getLogManager().readConfiguration(stream);
+      logger = Logger.getLogger(Oba.class.getName());
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     LANGUAGE selected_language = LANGUAGE.PYTHON_FLASK;
-    logger.setLevel(Level.WARNING);
+    logger.setLevel(Level.FINE);
     logger.addHandler(new ConsoleHandler());
 
     //parse command line
