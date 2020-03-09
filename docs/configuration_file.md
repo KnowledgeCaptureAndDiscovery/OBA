@@ -70,9 +70,10 @@ output_dir: outputs
 ```
 
 
-### openapi
+### OpenAPI
 
-The path of the [OpenAPI Base file](https://swagger.io/docs/specification/basic-structure/)
+Basic information of API using OpenAPI Spec.
+More info: [OpenAPI Base file](https://swagger.io/docs/specification/basic-structure/)
 
 | Field | Value |
 |---|---|
@@ -97,7 +98,7 @@ openapi:
     - url: https://api.models.mint.isi.edu/v1.3.0
     - url: https://dev.api.models.mint.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
-  ```
+```
 
 ### endpoint
 

@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static edu.isi.oba.Oba.SERVERS_DIRECTORY;
+import static edu.isi.oba.Oba.logger;
 
 class SerializerPython {
   static final String name = "python";
@@ -47,9 +48,14 @@ class SerializerPython {
     Iterator it = mapper.schemaNames.entrySet().iterator();
     add_variable_python(var_file_writer, it);
     var_file_writer.close();
-
+    try {
+      String key = firebase_config.getKey();
+    } catch (Exception e){
+      logger.severe("Please setup the Firebase key");
+      System.exit(1);
+    }
     //Create the config.ini
-    create_settings_file(endpoint_config.url, endpoint_config.prefix, endpoint_config.graph_base, firebase_config.key);
+    create_settings_file(endpoint_config.url, endpoint_config.prefix, endpoint_config.graph_base, firebase_config.getKey());
   }
 
   private void create_settings_file(String endpoint, String prefix, String graph_base, String firebase_key ){

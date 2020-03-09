@@ -1,3 +1,8 @@
+
+## Requirements
+
+You will need Java 1.8 or higher (SDK 1.8 or JRE 8).
+
 ## Installation 
 
 There are two option to run OBA:
@@ -19,7 +24,11 @@ There are two option to run OBA:
 
 ## Running
 
-1. Create the OBA config file from the [sample configuration](config.yaml.sample)
+!!! info
+    For the configuration file documentation, go to [here](configuration_file.md)
+
+
+1. Create the OBA config file (config.yaml) from the [sample configuration](config.yaml.sample)
 2. Pass the configuration and run OBA
 
 ```bash

@@ -18,3 +18,8 @@ openapi:
     - url: https://api.models.mint.isi.edu/v1.3.0
     - url: https://dev.api.models.mint.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
+
+endpoint:
+  url: http://endpoint.mint.isi.edu/modelCatalog-1.2.0
+  prefix: https://w3id.org/okn/i/mint
+  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
