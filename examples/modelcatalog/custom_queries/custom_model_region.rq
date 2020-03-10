@@ -1,0 +1,33 @@
+#+ summary: Given a rdf type, returns all the resources related to the type
+#+   - graph: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/mint@isi.edu
+
+PREFIX sd: <https://w3id.org/okn/o/sd#>
+PREFIX sdm: <https://w3id.org/okn/o/sdm#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+
+CONSTRUCT {
+    ?model ?predicate ?prop .
+    ?prop a ?type
+}
+WHERE {
+    GRAPH ?_g_iri {
+        {
+      		SELECT DISTINCT ?model {
+                ?model sd:hasVersion ?model_version .
+                ?model_version sd:hasConfiguration ?model_c .
+	            ?model_c sd:hasSetup ?setup .
+        		{	?model_c sdm:hasRegion ?region }
+        		union {
+              		?setup sdm:hasRegion ?region .
+      			}
+                ?region rdfs:label ?regionLabel .
+                FILTER REGEX(?regionLabel, ?_label, "i")
+      		}
+    	}
+        ?model ?predicate ?prop
+        OPTIONAL {
+         ?prop a ?type
+        }
+    }
+}

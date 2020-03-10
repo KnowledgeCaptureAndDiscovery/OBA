@@ -62,12 +62,24 @@ class Oba {
     Mapper mapper = new Mapper(config_data);
     LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
     OpenAPI openapi_base = config_data.getOpenapi();
+    String custom_queries_dir = config_data.getCustom_queries_directory();
 
     //copy base project
     ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
     //get schema and paths
     generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
     generate_openapi_template(mapper, destination_dir, endpoint_data, firebase_data, selected_language);
+    copy_custom_queries(custom_queries_dir, destination_dir);
+  }
+
+  private static void copy_custom_queries(String source, String destination){
+    if (source != null) {
+      try {
+        ObaUtils.copyFolder(new File(source), new File(destination + File.separator + "queries" + File.separator + "custom"));
+      } catch (IOException e) {
+        logger.severe("The directory custom queries doesn't exists ");
+      }
+    }
   }
 
   private static void generate_openapi_template(Mapper mapper,

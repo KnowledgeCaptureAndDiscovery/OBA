@@ -31,6 +31,15 @@ public class YamlConfig {
   public Boolean enable_user = true;
   public Boolean generate_insert_paths = true;
 
+  public String custom_queries_directory = "custom_queries";
+
+  public String getCustom_queries_directory() {
+    return custom_queries_directory;
+  }
+
+  public void setCustom_queries_directory(String custom_queries_directory) {
+    this.custom_queries_directory = custom_queries_directory;
+  }
 
   public List<String> ontologies;
   public EndpointConfig endpoint;

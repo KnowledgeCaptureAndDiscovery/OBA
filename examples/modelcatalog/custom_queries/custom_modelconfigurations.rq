@@ -1,0 +1,34 @@
+PREFIX sd: <https://w3id.org/okn/o/sd#>
+PREFIX sdm: <https://w3id.org/okn/o/sdm#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+
+CONSTRUCT {
+?_resource_iri ?predicate ?prop .
+?prop ?p ?o .
+?input ?input_p ?input_o .
+?output ?output_p ?output_o .
+?parameter ?parameter_p ?parameter_o
+}
+WHERE {
+    GRAPH ?_g_iri {
+        {
+            ?_resource_iri ?predicate ?prop .
+            OPTIONAL {
+                ?prop ?p ?o
+            }
+        }
+        UNION {
+            ?_resource_iri  sd:hasInput ?input .
+            ?input ?input_p ?input_o
+        }
+        UNION {
+            ?_resource_iri  sd:hasOutput ?output .
+            ?output ?output_p ?output_o
+        }
+        UNION {
+            ?_resource_iri  sd:hasParameter ?parameter .
+            ?parameter ?parameter_p ?parameter_o
+        }
+    }
+}

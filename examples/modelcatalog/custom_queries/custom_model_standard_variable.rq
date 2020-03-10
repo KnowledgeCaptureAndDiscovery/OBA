@@ -1,0 +1,37 @@
+#+ summary: Given a rdf type, returns all the resources related to the type
+PREFIX sd: <https://w3id.org/okn/o/sd#>
+PREFIX sdm: <https://w3id.org/okn/o/sdm#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+
+CONSTRUCT {
+    ?model ?predicate ?prop .
+    ?prop a ?type
+}
+WHERE {
+    GRAPH ?_g_iri {
+        {
+            SELECT DISTINCT ?model where {
+                  ?model a sdm:Model .
+                  ?model sd:hasVersion ?modelV .
+                  ?modelV sd:hasConfiguration ?config .
+                  {
+                   ?config ?prop ?w .
+                   ?w a sd:VariablePresentation .
+                  } UNION {
+                   ?config ?prop ?d.
+                   ?d a sd:DatasetSpecification.
+                   ?d sd:hasPresentation/sd:hasStandardVariable ?w.
+                   ?w a <http://www.geoscienceontology.org/svo/svu#Variable> .
+                  }
+                  ?w ?property ?desc.
+                  FILTER REGEX(str(?desc), ?_label, "i")
+                  VALUES ?property { sd:description rdfs:label }
+            }
+        }
+        ?model ?predicate ?prop
+        OPTIONAL {
+         ?prop a ?type
+        }
+    }
+}

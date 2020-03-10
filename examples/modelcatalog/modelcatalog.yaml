@@ -26,6 +26,8 @@ endpoint:
   prefix: https://w3id.org/okn/i/mint
   graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.3.0/data/
 
+custom_queries_directory: examples/modelcatalog/custom_queries
+
 custom_paths:
   /custom/model/index:
     get:
@@ -95,40 +97,6 @@ custom_paths:
       summary: Get a Model
       tags:
       - Model
-  /custom/models/standard_variable:
-    get:
-      description: Gets a list of model filter by the label of a standard variable
-      parameters:
-      - description: Name of the custom query
-        in: query
-        name: custom_query_name
-        required: false
-        schema:
-          default: custom_model_standard_variable
-          type: string
-      - description: Username to query
-        in: query
-        name: username
-        required: false
-        schema:
-          type: string
-      - description: standard variable name
-        in: query
-        name: label
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Model'
-          description: Gets a list of models
-      summary: Get a list of models
-      tags:
-      - Model
   /custom/model/region:
     get:
       description: Gets the details of a single instance of a Model
@@ -163,6 +131,74 @@ custom_paths:
       summary: Get a Model
       tags:
       - Model
+  /custom/models/variable:
+    get:
+      description: Get models by variable name
+      parameters:
+        - description: Name of the custom query
+          in: query
+          name: custom_query_name
+          required: false
+          schema:
+            default: custom_models_variable
+            type: string
+        - description: Username to query
+          in: query
+          name: username
+          required: false
+          schema:
+            type: string
+        - description: variable to search
+          in: query
+          name: label
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Model'
+          description: Gets a list of instance of Model
+      summary: Get a list of Model
+      tags:
+        - Model
+  /custom/modelconfigurationsetups/variable:
+    get:
+      description: Get model configurations by variable name
+      parameters:
+        - description: Name of the custom query
+          in: query
+          name: custom_query_name
+          required: false
+          schema:
+            default: custom_modelconfigurationsetups_variable
+            type: string
+        - description: Username to query
+          in: query
+          name: username
+          required: false
+          schema:
+            type: string
+        - description: variable to search
+          in: query
+          name: label
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ModelConfigurationSetup'
+          description: Gets a list of instance of ModelConfigurationSetup
+      summary: Get a list  Model
+      tags:
+        - ModelConfigurationSetup
   /custom/configurationsetups/{id}:
     get:
       description: Gets the details of a single instance of a ModelConfigurationSetup
@@ -262,3 +298,37 @@ custom_paths:
       summary: Get a ModelConfiguration
       tags:
       - ModelConfiguration
+  /custom/models/standard_variable:
+    get:
+      description: Gets a list of model filter by the label of a standard variable
+      parameters:
+        - description: Name of the custom query
+          in: query
+          name: custom_query_name
+          required: false
+          schema:
+            default: custom_model_standard_variable
+            type: string
+        - description: Username to query
+          in: query
+          name: username
+          required: false
+          schema:
+            type: string
+        - description: standard variable name
+          in: query
+          name: label
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Model'
+          description: Gets a list of models
+      summary: Get a list of models
+      tags:
+        - Model
