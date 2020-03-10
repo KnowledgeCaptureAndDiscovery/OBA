@@ -1,51 +1,56 @@
 package edu.isi.oba;
 
 import io.swagger.v3.oas.models.media.Schema;
-import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.IRIShortFormProvider;
-import org.semanticweb.owlapi.util.OWLClassLiteralCollector;
 import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import java.util.*;
+
 import static edu.isi.oba.Oba.logger;
 
 class MapperSchema {
 
     private final OWLReasoner reasoner;
     private final IRIShortFormProvider sfp = new SimpleIRIShortFormProvider();
+    private final String type;
+    private final OWLClass cls;
+    private final List<OWLOntology> ontologies;
     private Map<String, Schema> dataProperties;
     private Map<String, Schema> objectProperties;
     private Map<String, Schema> properties;
     final String name;
-    private final String type;
     private final Map<IRI, String> schemaNames;
     private final Schema schema;
+    private OWLOntology ontology_cls;
+    private OWLReasonerFactory reasonerFactory;
 
 
     public Schema getSchema() {
         return schema;
     }
 
-    public MapperSchema(OWLOntology ontology, OWLClass cls, String type, Map<IRI, String> schemaNames) {
-        OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
-        reasoner = reasonerFactory.createReasoner(ontology);
-
-        this.type = type;
+    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, Map<IRI, String> schemaNames, OWLOntology class_ontology) {
         this.schemaNames = schemaNames;
-        this.name = getSchemaName(cls);
-        this.properties = setProperties(ontology, cls);
-        this.schema = setSchema();
+        this.cls = cls;
+        this.type = "object";
+        this.ontologies = ontologies;
+        this.ontology_cls = class_ontology;
+        reasonerFactory = new StructuralReasonerFactory();
+        this.reasoner = reasonerFactory.createReasoner(this.ontology_cls);
 
+        this.name = getSchemaName(cls);
+        this.properties = setProperties();
+        this.schema = setSchema();
     }
 
-    private Map<String, Schema> setProperties(OWLOntology ontology, OWLClass cls) {
-        dataProperties = this.getDataProperties(ontology, cls);
-        objectProperties = this.getObjectProperties(ontology, cls);
+    private Map<String, Schema> setProperties() {
+        dataProperties = this.getDataProperties();
+        objectProperties = this.getObjectProperties();
         properties = new HashMap<>();
         properties.putAll(dataProperties);
         properties.putAll(objectProperties);
@@ -94,23 +99,27 @@ class MapperSchema {
     /**
      * Obtain a list of Codegenproperty of a OWLClass
      *
-     * @param ontology Ontology
-     * @param cls      Class
      * @return A HashMap key: property name, value: SchemaProperty
      */
-    private Map<String, Schema> getDataProperties(OWLOntology ontology, OWLClass cls) {
+    private Map<String, Schema> getDataProperties() {
         HashMap<String, String> propertyNameURI = new HashMap<>();
         Map<String, Schema> properties = new HashMap<>();
-        Set<OWLDataPropertyDomainAxiom> properties_class = ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN);
+        Set<OWLDataPropertyDomainAxiom> properties_class = new HashSet<>();
+        for (OWLOntology ontology : ontologies)
+            properties_class.addAll(ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN));
+
         for (OWLDataPropertyDomainAxiom dp : properties_class) {
             if (checkDomainClass(cls, dp)) {
                 for (OWLDataProperty odp : dp.getDataPropertiesInSignature()) {
                     Boolean array = true;
                     Boolean nullable = true;
 
-                    Set<OWLDataPropertyRangeAxiom> ranges = ontology.getDataPropertyRangeAxioms(odp);
+                    Set<OWLDataPropertyRangeAxiom> ranges = new HashSet<>();
+                    for (OWLOntology ontology : ontologies)
+                        ranges.addAll(ontology.getDataPropertyRangeAxioms(odp));
                     if (ranges.size() == 0)
-                        logger.info(odp.getIRI() + " range 0");
+                        logger.warning("Property " + odp.getIRI() + " has range equals zero");
+
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
@@ -156,24 +165,30 @@ class MapperSchema {
 
     /**
      * Read the Ontology, obtain the ObjectProperties, obtain the range for each property and generate the SchemaProperty
-     * @param ontology  Represents an OWL 2 ontology
-     * @param cls   Represents a OWL class
      * @return A HashMap key: propertyName, value: SchemaProperty
      */
-    private Map<String, Schema> getObjectProperties(OWLOntology ontology, OWLClass cls) {
+    private Map<String, Schema> getObjectProperties() {
         OWLOntologyManager m = OWLManager.createOWLOntologyManager();
         OWLDataFactory dataFactory = m.getOWLDataFactory();
         OWLClass owlThing = dataFactory.getOWLThing();
 
+        Set<OWLObjectPropertyDomainAxiom> properties_class = new HashSet<>();
+        for (OWLOntology ontology : ontologies)
+            properties_class.addAll(ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN));
+
         HashMap<String, String> propertyNameURI = new HashMap<>();
         Map<String, Schema> properties = new HashMap<>();
         logger.info("Parsing class " + cls.toString());
-        for (OWLObjectPropertyDomainAxiom dp : ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
+
+        for (OWLObjectPropertyDomainAxiom dp : properties_class) {
             if (checkDomainClass(cls, dp)) {
                 logger.info( "Parsing property " + dp.toString());
                 for (OWLObjectProperty odp : dp.getObjectPropertiesInSignature()) {
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
-                    Set<OWLObjectPropertyRangeAxiom> ranges = ontology.getObjectPropertyRangeAxioms(odp);
+
+                    Set<OWLObjectPropertyRangeAxiom> ranges = new HashSet<>();
+                    for (OWLOntology ontology : ontologies)
+                        ranges.addAll(ontology.getObjectPropertyRangeAxioms(odp));
                     if (ranges.size() == 0)
                         logger.warning("Property " + odp.getIRI() + " has range equals zero");
 

@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.rdf.rdfxml.renderer.OWLOntologyXMLNamespaceManager
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 class Mapper {
   public static final String DEFAULT_DIR_QUERY = "_default_";
@@ -20,6 +21,8 @@ class Mapper {
   public Map<String, Schema> schemas = new HashMap<>();
   final Paths paths = new Paths();
   List<String> selected_paths;
+  List<OWLOntology> ontologies;
+
   public OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
   public Mapper(YamlConfig config_data) throws OWLOntologyCreationException {
@@ -33,20 +36,15 @@ class Mapper {
     for (String ontologyURL : config_ontologies) {
       this.manager.loadOntology(IRI.create(ontologyURL));
     }
+    ontologies = this.manager.ontologies().collect(Collectors.toList());
 
     //Create a temporal Map<IRI, String> schemaNames with the classes
-    for (OWLOntology ontology : this.manager.getOntologies()) {
-      OWLDocumentFormat format = ontology.getFormat();
-      OWLOntologyXMLNamespaceManager nsManager = new OWLOntologyXMLNamespaceManager(ontology, format);
+    for (OWLOntology ontology : ontologies) {
       Set<OWLClass> classes = ontology.getClassesInSignature();
       setSchemaNames(classes);
     }
-
-    //Add schema and paths
-    for (OWLOntology ontology : this.manager.getOntologies()) {
-      OWLDocumentFormat format = ontology.getFormat();
-      this.createSchemas(ontology, format, destination_dir);
-    }
+    //Create OpenAPI spec
+    this.createSchemas(destination_dir);
   }
 
   /**
@@ -57,41 +55,51 @@ class Mapper {
    * @param format
    * @return schemas
    */
-  private void createSchemas(OWLOntology ontology, OWLDocumentFormat format, String destination_dir) {
-    String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
-
-    Set<OWLClass> classes = ontology.getClassesInSignature();
-
+  private void createSchemas(String destination_dir) {
     Query query = new Query(destination_dir);
     Path pathGenerator = new Path();
     query.get_all(DEFAULT_DIR_QUERY);
 
-    for (OWLClass cls : classes) {
-      //filter if the class prefix is not the default ontology's prefix
-      if (cls.getIRI() != null) {
-        String classPrefixIRI = cls.getIRI().getNamespace();
-        if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
-          MapperSchema mapperSchema = new MapperSchema(ontology, cls, "object", schemaNames);
+    for (OWLOntology ontology  : this.ontologies){
+      OWLDocumentFormat format = ontology.getFormat();
+      String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+      Set<OWLClass> classes = ontology.getClassesInSignature();
+      for (OWLClass cls : classes) {
+        //filter if the class prefix is not the default ontology's prefix
+        if (cls.getIRI() != null) {
+          String classPrefixIRI = cls.getIRI().getNamespace();
+          if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
+            //Convert from OWL Class to OpenAPI Schema.
+            MapperSchema mapperSchema = new MapperSchema(this.ontologies, cls, schemaNames, ontology);
+            //Write the query
+            query.write_readme(mapperSchema.name);
 
-          query.write_readme(mapperSchema.name);
+            //Create the schema
+            Schema schema = mapperSchema.getSchema();
+            schemas.put(schema.getName(), schema);
 
-          //Obtain and add OpenAPI schema
-          Schema schema = mapperSchema.getSchema();
-          schemas.put(schema.getName(), schema);
 
-          if (this.selected_paths == null){
-            add_path(pathGenerator, mapperSchema);
-          } else {
-            for (String str : this.selected_paths) {
-              String search = str.trim().toLowerCase();
-              String schemaName = mapperSchema.name.toLowerCase();
-              if (search.trim().toLowerCase().equals(schemaName)) {
-                add_path(pathGenerator, mapperSchema);
+            //Add the paths
+            if (this.selected_paths == null){
+              add_path(pathGenerator, mapperSchema);
+            } else {
+              for (String str : this.selected_paths) {
+                String search = str.trim().toLowerCase();
+                String schemaName = mapperSchema.name.toLowerCase();
+                if (search.trim().toLowerCase().equals(schemaName)) {
+                  add_path(pathGenerator, mapperSchema);
+                }
               }
             }
           }
         }
-      }
+
+    }
+
+
+
+
+
       //User schema
       Map<String, Schema> userProperties = new HashMap<>();
       StringSchema username = new StringSchema();
