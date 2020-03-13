@@ -100,6 +100,51 @@ openapi:
     - url: http://localhost:8080/v1.3.0
 ```
 
+
+
+### enable_get_paths
+
+Enable the GET method for the paths
+
+| Field | Value |
+|---|---|
+| **Required:** | ``false`` |
+| **Type:** | ``boolean``  |
+| **Default:** | ``true``  |
+
+### enable_post_paths: 
+
+Enable the POST method for the paths
+
+| Field | Value |
+|---|---|
+| **Required:** | ``false`` |
+| **Type:** | ``boolean``  |
+| **Default:** | ``false``  |
+
+
+### enable_delete_paths
+
+Enable the DELETE method for the paths
+
+| Field | Value |
+|---|---|
+| **Required:** | ``false`` |
+| **Type:** | ``boolean``  |
+| **Default:** | ``false``  |
+
+### enable_put_paths
+
+Enable the PUT method for the paths
+
+| Field | Value |
+|---|---|
+| **Required:** | ``false`` |
+| **Type:** | ``boolean``  |
+| **Default:** | ``false``  |
+
+
+
 ### endpoint
 
 Example
@@ -206,3 +251,11 @@ To authenticate a service account and authorize it to access Firebase services, 
 firebase:
   key: key
 ```
+
+
+### custom_queries_directory
+
+| Field | Value |
+|---|---|
+| **Required:** | ``true`` |
+| **Type:** | ``str`` |

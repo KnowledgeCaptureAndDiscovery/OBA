@@ -44,20 +44,23 @@ class Mapper {
       setSchemaNames(classes);
     }
     //Create OpenAPI spec
-    this.createSchemas(destination_dir);
+    this.createSchemas(destination_dir, config_data);
   }
 
   /**
    * Obtain Schemas using the ontology classes
    * The schemas includes the properties
    *
-   * @param ontology  Represents an OWL 2 ontology
-   * @param format
+   * @param config_data
    * @return schemas
    */
-  private void createSchemas(String destination_dir) {
+  private void createSchemas(String destination_dir, YamlConfig config_data) {
     Query query = new Query(destination_dir);
-    Path pathGenerator = new Path();
+    Path pathGenerator = new Path(config_data.getEnable_get_paths(),
+                                  config_data.getEnable_post_paths(),
+                                  config_data.getEnable_put_paths(),
+                                  config_data.getEnable_delete_paths()
+                                 );
     query.get_all(DEFAULT_DIR_QUERY);
 
     for (OWLOntology ontology  : this.ontologies){

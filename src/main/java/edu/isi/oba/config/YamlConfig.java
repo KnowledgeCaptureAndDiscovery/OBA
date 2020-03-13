@@ -11,25 +11,52 @@ import java.util.Map;
 public class YamlConfig {
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
   String DEFAULT_PROJECT_NAME = "default_project";
-
-  public OpenAPI getOpenapi() {
-    return openapi;
-  }
-
-  public void setOpenapi(OpenAPI openapi) {
-    this.openapi = openapi;
-  }
-
   public OpenAPI openapi;
-
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
   public List<String> paths;
+  public Boolean enable_get_paths = true;
+  public Boolean enable_post_paths = false;
+  public Boolean enable_put_paths = false;
+  public Boolean enable_delete_paths = false;
+  public List<String> ontologies;
+  public EndpointConfig endpoint;
+  public FirebaseConfig firebase;
+  public Map<String, List<RelationConfig>> relations;
+  private LinkedHashMap<String, PathItem> custom_paths = null;
 
-  
-  public Boolean generate_get_path = true;
-  public Boolean enable_user = true;
-  public Boolean generate_insert_paths = true;
+
+  public Boolean getEnable_get_paths() {
+    return enable_get_paths;
+  }
+
+  public void setEnable_get_paths(Boolean enable_get_paths) {
+    this.enable_get_paths = enable_get_paths;
+  }
+
+  public Boolean getEnable_post_paths() {
+    return enable_post_paths;
+  }
+
+  public void setEnable_post_paths(Boolean enable_post_paths) {
+    this.enable_post_paths = enable_post_paths;
+  }
+
+  public Boolean getEnable_put_paths() {
+    return enable_put_paths;
+  }
+
+  public void setEnable_put_paths(Boolean enable_put_paths) {
+    this.enable_put_paths = enable_put_paths;
+  }
+
+  public Boolean getEnable_delete_paths() {
+    return enable_delete_paths;
+  }
+
+  public void setEnable_delete_paths(Boolean enable_delete_paths) {
+    this.enable_delete_paths = enable_delete_paths;
+  }
 
   public String custom_queries_directory = "custom_queries";
 
@@ -40,13 +67,6 @@ public class YamlConfig {
   public void setCustom_queries_directory(String custom_queries_directory) {
     this.custom_queries_directory = custom_queries_directory;
   }
-
-  public List<String> ontologies;
-  public EndpointConfig endpoint;
-  public FirebaseConfig firebase;
-  public Map<String, List<RelationConfig>> relations;
-  private LinkedHashMap<String, PathItem> custom_paths = null;
-
 
   public String getOutput_dir() {
     return output_dir;
@@ -111,6 +131,14 @@ public class YamlConfig {
 
   public void setCustom_paths(LinkedHashMap<String, PathItem> custom_paths) {
     this.custom_paths = custom_paths;
+  }
+
+  public OpenAPI getOpenapi() {
+    return openapi;
+  }
+
+  public void setOpenapi(OpenAPI openapi) {
+    this.openapi = openapi;
   }
 }
 

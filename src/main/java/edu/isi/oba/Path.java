@@ -10,10 +10,8 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
-import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,23 +19,40 @@ import java.util.List;
 import java.util.Map;
 
 class Path {
+  public Boolean enable_get_paths;
+  public Boolean enable_post_paths;
+  public Boolean enable_put_paths;
+  public Boolean enable_delete_paths;
 
-  public Path() {
+  public Path(Boolean enable_get_paths, Boolean enable_post_paths, Boolean enable_put_paths, Boolean enable_delete_paths) {
+    this.enable_get_paths = enable_get_paths;
+    this.enable_post_paths = enable_post_paths;
+    this.enable_put_paths = enable_put_paths;
+    this.enable_delete_paths = enable_delete_paths;
   }
 
   public PathItem generate_singular(String schemaName){
-    return new PathItem()
-            .get(new MapperOperation(schemaName, Method.GET, Cardinality.SINGULAR).getOperation())
-            .put(new MapperOperation(schemaName, Method.PUT, Cardinality.SINGULAR).getOperation())
-            .delete(new MapperOperation(schemaName, Method.DELETE, Cardinality.SINGULAR).getOperation());
+    PathItem path_item = new PathItem();
+    if (enable_get_paths)
+      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.SINGULAR).getOperation());
+
+    if (enable_delete_paths)
+      path_item.delete(new MapperOperation(schemaName, Method.DELETE, Cardinality.SINGULAR).getOperation());
+
+    if (enable_put_paths)
+      path_item.put(new MapperOperation(schemaName, Method.PUT, Cardinality.SINGULAR).getOperation());
+
+    return path_item;
   }
 
 
   public PathItem generate_plural(String schemaName){
-    return new PathItem()
-            .get(new MapperOperation(schemaName, Method.GET, Cardinality.PLURAL).getOperation())
-            .post(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL).getOperation());
-
+    PathItem path_item = new PathItem();
+    if (enable_get_paths)
+      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.PLURAL).getOperation());
+    if (enable_post_paths)
+      path_item.put(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL).getOperation());
+    return path_item;
   }
 
 
