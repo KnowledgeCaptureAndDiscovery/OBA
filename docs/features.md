@@ -1,12 +1,11 @@
-# OBA features
+# OBA: Features
 
-OBA features has the following features
+##  Generating an OpenAPI specification from multiple OWL ontologies
 
-##  Generate an OpenAPI specification from multiple ontologies (OWL).
-
-We support converting OWL Classes to OpenAPI schemas and create paths (GET, POST, DELETE, PUT) for each schema.
+OBA converts OWL Classes to OpenAPI schemas and creates paths (GET, POST, DELETE, PUT) for each schema.
 
 ### Paths
+For each class in the provided ontology (unless filtered) OBA generates the following paths:
 
 - Get all the resources of a type `GET /persons`
     - Search by a free text `GET /persons?label=pattern`
@@ -16,23 +15,21 @@ We support converting OWL Classes to OpenAPI schemas and create paths (GET, POST
 - Delete a existing resource `DELETE /persons/{id}`
 
 
+## Generating SPARQL query templates
 
-## Generate SPARQL queries
-
-For each of the previous paths, OBA generates the related queries
+For each of these paths, OBA generates the SPARQL queries that are necessary to retrieve them from a target SPARQL endpoint.
 
 
-## Generate a Python Server
+## Generating a Python Server
 
-OBA can generate a Python Server using [OpenAPITools/openapi-generator](https://github.com/OpenAPITools/openapi-generator) and [Connexion](https://github.com/zalando/connexion) and integrate the previous queries with the server.
+OBA generates a Python Server using [OpenAPITools/openapi-generator](https://github.com/OpenAPITools/openapi-generator) and [Connexion](https://github.com/zalando/connexion), integrating the SPARQL queries with the server.
 
 
 ### Authorization
 
-OBA supports authorization using Firebase as backend. 
-The methods POST, PUT, DELETE require log-in and the resources are stored in a namespace (graph) per user.
+OBA supports authorization using Firebase as backend. When using POST, PUT and DELETE methods with a Knowledge Graph, OBA requires log-in per user. OBA separates the contributions and editions of each user in a different named graph, the user id as the id named graph URI.
 
 ## Other features
 
-- Filter the paths: Select the classes to expose.g
+- Filter the paths: OBA allows selecting a subset of the classes to expose, as large ontologies may lead to big specifications. 
 - Read an OpenAPI base file with the description, documentation and servers of the API.

@@ -3,7 +3,7 @@ nav:
   - Home: index.md
   - OBA features: features.md
   - Quickstart: quickstart.md
-  - Directory structure: result.md
+  - OBA Output: result.md
   - Generating the server: server.md
   - Running the server: running_server.md
   - Adding custom queries: adding_custom_queries.md
