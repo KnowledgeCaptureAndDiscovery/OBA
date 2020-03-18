@@ -1,7 +1,7 @@
-# OBA [![Build Status](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA.svg?branch=master)](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA)
+# Ontology-Based APIs (OBA) [![Build Status](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA.svg?branch=master)](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA)
 
 
-OBA project reads ontologies (OWL) and generates the OpenAPI Specification (OAS). Using this definition, it creates a REST API server automatically.
+The Ontology-Based API (OBA) project reads ontologies (specified in OWL) and generates an OpenAPI Specification (OAS). Using this definition, it creates a REST API server automatically.
 
 ![Diagram](figures/oba.svg) 
 
