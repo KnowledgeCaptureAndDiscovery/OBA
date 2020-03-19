@@ -25,7 +25,7 @@ The queries directory contains the query files that are automatically generated 
 
 ### Default queries
 
-OBA generates the following queries for each class. We show the examples assuming the class **Person**:
+OBA generates the following queries for each class. For example, if we had the class **Person**:
 
 - get_all: Get all the resources of a type.  `GET /persons`.
 - get_all_user: Get all the resources of a type.  `GET /persons?username=USER` in the graph **USER**.

@@ -1,14 +1,13 @@
 
-OBA can create paths using custom queries
+Sometimes, building the REST API from an ontology does not cover all the target queries that need to be supported. In order to address this issue, OBA can create paths in the API using custom SPARQL queries specified by users. 
 
-## Defining the query
+## Defining Custom Queries
 
-First, we must define the SPARQL query. In the Model Catalog, we need a special query: get all the Models related 
-with a Variable.
+First, we must define the SPARQL queries we would like our API to support. For example, let's consider a [sample ontology](https://w3id.org/okn/o/sdm#)which we have already used with OBA. The ontology describes software metadata of complex physical models and, among other classes, it has a Model class and a Variable class. We need to support a special query: get all Models associated with a particular Variable label, which is described in the query below:
 
 
 !!!info
-    The query must use **CONSTRUCT**
+    The query must be a **CONSTRUCT**, not GET
 
 
 ```
@@ -38,21 +37,21 @@ WHERE {
 }
 ```
 
-Then, we have two parameters:
+The query has two parameters:
 
-- g (IRI): the IRI of the user graph.
-- label (string): A string to filter by label.
+- g (IRI): IRI of the user graph.
+- label (string): String of the label belonging to the variable we want to filter by.
 
-Save the query in the custom directory. For example, *custom_models_variable.rq*. 
+Next, you have to save the query in the **custom** directory. For example, as *custom_models_variable.rq*. 
 
-## Defining the parameters
+## Defining Custom Query Parameters
 
-We must to define the parameters on the OpenAPI specification.
+Now we have to extend the OpenAPI specification with the custom query:
 
 !!! warning
-    You must add a new parameter with the name: custom_query_name. 
+    You must add a new parameter with the name *custom_query_name*. 
     The default value of the parameter must be the filename of the custom query without the extension.
-    In this example: **custom_models_variable**
+    In our example, this name is: **custom_models_variable**
 
 
 ```yaml
@@ -79,9 +78,9 @@ We must to define the parameters on the OpenAPI specification.
 ```
 
 
-## Defining the responses
+## Defining the Custom Query Responses
 
-The response is going to be a List of Model as a JSON Format.
+Following the OpenAPI specification, we must select the type of response the query is returning. In this case, the response is a list of *Model* in a JSON Format.
 
 ```yaml
       responses:
@@ -97,9 +96,9 @@ The response is going to be a List of Model as a JSON Format.
 
 ## Defining the path name and method
 
-In this case, the name is going to be `/custom/modelconfigurationsetups/variable` 
+In this case, the name is going to be `/custom/models/variable`; and we want it to be a GET method:
 ```yaml
-  /custom/modelconfigurationsetups/variable:
+  /custom/models/variable:
     get:
 ```
 
