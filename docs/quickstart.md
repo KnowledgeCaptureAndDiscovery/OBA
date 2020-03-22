@@ -1,35 +1,35 @@
 
 ## Requirements
 
-You will need Java 1.8 or higher (SDK 1.8 or JRE 8).
+Java 1.8 or higher (SDK 1.8 or JRE 8).
 
 ## Installation 
 
-There are two option to run OBA:
+There are two options to run OBA:
  
-1. Download the binary.
-2. Build the binary from the repository.
+1. Download the binary
+2. Build the binary from the repository
 
 
-### Downloading binary
+### 1 Downloading binary
 
-1. Go the [latest release](https://github.com/KnowledgeCaptureAndDiscovery/OBA/releases/latest)
+1. Go the [latest release page](https://github.com/KnowledgeCaptureAndDiscovery/OBA/releases/latest)
 2. Download the file with extension .jar
 
-### Building binary
+### 2 Building binary
 
 1. Clone the repository `git clone https://github.com/KnowledgeCaptureAndDiscovery/OBA.git`
-2. Install it using `mvn package`
-3. The binary is available in the `target` directory
+2. Install it executing `mvn package`
+3. The binary will be available in the `target` directory
 
-## Running
+## Running OBA
 
 !!! info
-    For the configuration file documentation, go to [here](configuration_file.md)
+    Documentation on the configuration file can be accessed [in the configuration page](configuration_file.md)
 
 
-1. Create the OBA config file (config.yaml) from the [sample configuration](config.yaml.sample)
-2. Pass the configuration and run OBA
+1. Create the OBA config file (config.yaml) from the [sample configuration we provide](config.yaml.sample)
+2. Use the configuration to run the OBA JAR:
 
 ```bash
 $ java -jar oba-*-jar-with-dependencies.jar -c config.yaml
