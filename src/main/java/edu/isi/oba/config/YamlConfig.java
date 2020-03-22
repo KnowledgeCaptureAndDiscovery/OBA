@@ -25,7 +25,7 @@ public class YamlConfig {
   public Map<String, List<RelationConfig>> relations;
   private LinkedHashMap<String, PathItem> custom_paths = null;
   public List<String> classes;
-
+  public Boolean follow_references = false;
 
   public Boolean getEnable_get_paths() {
     return enable_get_paths;
@@ -148,6 +148,14 @@ public class YamlConfig {
 
   public void setClasses(List<String> classes) {
     this.classes = classes;
+  }
+
+  public Boolean getFollow_references() {
+    return follow_references;
+  }
+
+  public void setFollow_references(Boolean follow_references) {
+    this.follow_references = follow_references;
   }
 }
 

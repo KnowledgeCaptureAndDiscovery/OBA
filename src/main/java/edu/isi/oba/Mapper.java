@@ -27,12 +27,14 @@ class Mapper {
     YamlConfig config_data;
 
     public OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+    private Boolean follow_references;
 
     public Mapper(YamlConfig config_data) throws OWLOntologyCreationException {
         this.config_data = config_data;
         List<String> paths = config_data.getPaths();
         this.selected_paths = paths;
         this.mapped_classes = new ArrayList<>();
+        this.follow_references = config_data.getFollow_references();
 
         List<String> config_ontologies = config_data.getOntologies();
         String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
@@ -114,12 +116,13 @@ class Mapper {
                     logger.info("The class " + ref_class + " exists ");
                 } else {
                     for (OWLOntology temp_ontology : this.ontologies) {
-                        this.mapped_classes.add(ref_class);
-                        getMapperSchema(query, temp_ontology, ref_class);
-
-                        OWLDocumentFormat format = ontology.getFormat();
-                        String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
-                        add_owlclass_to_openapi(query, pathGenerator, temp_ontology, temp_defaultOntologyPrefixIRI, ref_class, false);
+                        if ( follow_references) {
+                            this.mapped_classes.add(ref_class);
+                            getMapperSchema(query, temp_ontology, ref_class);
+                            OWLDocumentFormat format = ontology.getFormat();
+                            String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+                            add_owlclass_to_openapi(query, pathGenerator, temp_ontology, temp_defaultOntologyPrefixIRI, ref_class, false);
+                        }
                     }
                 }
             }
@@ -133,7 +136,7 @@ class Mapper {
 
     private MapperSchema getMapperSchema(Query query, OWLOntology ontology, OWLClass cls) {
         //Convert from OWL Class to OpenAPI Schema.
-        MapperSchema mapperSchema = new MapperSchema(this.ontologies, cls, schemaNames, ontology);
+        MapperSchema mapperSchema = new MapperSchema(this.ontologies, cls, schemaNames, ontology, follow_references);
         //Write queries
         query.write_readme(mapperSchema.name);
         //Create the OpenAPI schema

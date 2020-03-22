@@ -29,6 +29,7 @@ class MapperSchema {
     private OWLOntology ontology_cls;
     private OWLReasonerFactory reasonerFactory;
     public List<OWLClass> properties_range;
+    private boolean follow_references;
 
     public List<OWLClass> getProperties_range() {
         return properties_range;
@@ -38,8 +39,9 @@ class MapperSchema {
         return schema;
     }
 
-    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, Map<IRI, String> schemaNames, OWLOntology class_ontology) {
+    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, Map<IRI, String> schemaNames, OWLOntology class_ontology, Boolean follow_references) {
         this.schemaNames = schemaNames;
+        this.follow_references = follow_references;
         this.cls = cls;
         this.type = "object";
         this.ontologies = ontologies;
@@ -201,7 +203,7 @@ class MapperSchema {
                     String propertyURI = odp.getIRI().toString();
                     propertyNameURI.put(propertyURI, propertyName);
 
-                    List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing);
+                    List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing, follow_references);
                     MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyRanges);
                     try {
                         properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
@@ -238,9 +240,10 @@ class MapperSchema {
      * @param ranges Represents a ObjectPropertyRange
      * @param odp  Represents a OWLObjectProperty
      * @param owlThing
+     * @param follow_references
      * @return A list<String> with the properties
      */
-    private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp, OWLClass owlThing) {
+    private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp, OWLClass owlThing, boolean follow_references) {
         List<String> objectProperty = new ArrayList<>();
 
         for (OWLObjectPropertyAxiom propertyRangeAxiom : ranges) {
@@ -251,7 +254,8 @@ class MapperSchema {
                     }
                     else {
                         this.properties_range.add(rangeClass.asOWLClass());
-                        objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
+                        if (follow_references)
+                            objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
                     }
                 }
             }

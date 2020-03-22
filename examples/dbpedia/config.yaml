@@ -19,9 +19,13 @@ enable_get_paths: true
 enable_post_paths: false
 enable_delete_paths: false
 enable_put_paths: false
+
 classes:
   - http://dbpedia.org/ontology/Genre
   - http://dbpedia.org/ontology/Band
+
+follow_references: true
+
 firebase:
   key:
 
