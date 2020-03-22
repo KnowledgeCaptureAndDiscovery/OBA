@@ -1,5 +1,10 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.YamlConfig;
+import org.apache.commons.cli.*;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -124,5 +129,43 @@ public class ObaUtils {
             Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File copied :: " + destinationFolder);
         }
+    }
+
+    public static String get_config_yaml(String[] args) {
+      //obtain the options to pass configuration
+      Options options = new Options();
+      Option input = new Option("c", "config", true, "configuration file path");
+      input.setRequired(true);
+      options.addOption(input);
+
+      CommandLineParser parser = new DefaultParser();
+      HelpFormatter formatter = new HelpFormatter();
+      CommandLine cmd;
+      String config_yaml = null;
+
+      try {
+        cmd = parser.parse(options, args);
+        config_yaml = cmd.getOptionValue("config");
+      } catch (ParseException e) {
+        System.out.println(e.getMessage());
+        formatter.printHelp("utiConfiguration filelity-name", options);
+        System.exit(1);
+      }
+      return config_yaml;
+    }
+
+    public static YamlConfig get_yaml_data(String config_yaml) {
+      Constructor constructor = new Constructor(YamlConfig.class);
+      Yaml yaml = new Yaml(constructor);
+
+      InputStream config_input = null;
+      try {
+        config_input = new FileInputStream(new File(config_yaml));
+      } catch (FileNotFoundException e) {
+        System.err.println("Configuration file not found: " + config_yaml);
+        System.exit(1);
+      }
+      //Yaml config parse
+      return yaml.loadAs(config_input, YamlConfig.class);
     }
 }

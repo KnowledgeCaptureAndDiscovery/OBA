@@ -28,7 +28,11 @@ class MapperSchema {
     private final Schema schema;
     private OWLOntology ontology_cls;
     private OWLReasonerFactory reasonerFactory;
+    public List<OWLClass> properties_range;
 
+    public List<OWLClass> getProperties_range() {
+        return properties_range;
+    }
 
     public Schema getSchema() {
         return schema;
@@ -42,6 +46,8 @@ class MapperSchema {
         this.ontology_cls = class_ontology;
         reasonerFactory = new StructuralReasonerFactory();
         this.reasoner = reasonerFactory.createReasoner(this.ontology_cls);
+
+        properties_range = new ArrayList<>();
 
         this.name = getSchemaName(cls);
         this.properties = setProperties();
@@ -237,7 +243,6 @@ class MapperSchema {
     private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp, OWLClass owlThing) {
         List<String> objectProperty = new ArrayList<>();
 
-
         for (OWLObjectPropertyAxiom propertyRangeAxiom : ranges) {
             for (OWLEntity rangeClass : propertyRangeAxiom.getSignature()) {
                  if (!rangeClass.containsEntityInSignature(odp)) {
@@ -245,6 +250,7 @@ class MapperSchema {
                         logger.info("Ignoring owl:Thing" + odp);
                     }
                     else {
+                        this.properties_range.add(rangeClass.asOWLClass());
                         objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
                     }
                 }

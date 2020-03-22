@@ -24,6 +24,7 @@ public class YamlConfig {
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
   private LinkedHashMap<String, PathItem> custom_paths = null;
+  public List<String> classes;
 
 
   public Boolean getEnable_get_paths() {
@@ -139,6 +140,14 @@ public class YamlConfig {
 
   public void setOpenapi(OpenAPI openapi) {
     this.openapi = openapi;
+  }
+
+    public List<String> getClasses() {
+      return this.classes;
+    }
+
+  public void setClasses(List<String> classes) {
+    this.classes = classes;
   }
 }
 

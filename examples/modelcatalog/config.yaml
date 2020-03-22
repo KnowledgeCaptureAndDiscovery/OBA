@@ -1,13 +1,13 @@
 ontologies:
-  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.3.0/ontology.xml
-  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
+  - http://shorturl.at/fmsvM
+  - http://shorturl.at/nRYZ2
 name: modelcatalog
 output_dir: outputs
 
 openapi:
   openapi: 3.0.1
   info:
-    description: This is the API of the  Software Description Ontology at [https://w3id.org/okn/o/sdm](https://w3id.org/okn/o/sdm)
+    description: This is the API of the Software Description Ontology at [https://w3id.org/okn/o/sdm](https://w3id.org/okn/o/sdm)
     title: Model Catalog
     version: v1.4.0
   externalDocs:

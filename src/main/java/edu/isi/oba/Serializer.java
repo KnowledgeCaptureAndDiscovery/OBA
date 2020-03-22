@@ -1,11 +1,14 @@
 package edu.isi.oba;
 
 
+import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.openapitools.codegen.serializer.SerializerUtils;
 import org.semanticweb.owlapi.model.IRI;
 
@@ -18,6 +21,7 @@ import java.util.*;
 
 class Serializer {
   //TODO: validate the yaml
+  String openapi_path;
   public  Serializer(Mapper mapper, java.nio.file.Path dir, OpenAPI openAPI, LinkedHashMap<String, PathItem> custom_paths) throws IOException {
     Map<String, Object> extensions = new HashMap<String, Object>();
     final String openapi_file = "openapi.yaml";
@@ -49,10 +53,22 @@ class Serializer {
 
     //write the filename
     String content = SerializerUtils.toYamlString(openAPI);
-    File file = new File(dir + File.separator + openapi_file );
+    this.openapi_path = dir + File.separator + openapi_file;
+    File file = new File(openapi_path);
     BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
     writer.write(content);
     writer.close();
+    this.validate();
+  }
+
+  private void validate(){
+    ParseOptions options = new ParseOptions();
+    options.setResolve(true);
+    SwaggerParseResult result = new OpenAPIParser().readLocation(openapi_path, null, options);
+    List<String> messageList = result.getMessages();
+    Set<String> errors = new HashSet<>(messageList);
+    Set<String> warnings = new HashSet<>();
+
   }
 
   private SecurityScheme getSecurityScheme(Map<String, Object> extensions) {
