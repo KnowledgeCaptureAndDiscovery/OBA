@@ -85,23 +85,27 @@ class Mapper {
                     add_owlclass_to_openapi(query, pathGenerator, ontology, defaultOntologyPrefixIRI, cls, true);
                 }
             }
-
-            //User schema
-            Map<String, Schema> userProperties = new HashMap<>();
-            StringSchema username = new StringSchema();
-            StringSchema password = new StringSchema();
-            userProperties.put("username", username);
-            userProperties.put("password", password);
-
-            Schema userSchema = new Schema();
-            userSchema.setName("User");
-            userSchema.setType("object");
-            userSchema.setProperties(userProperties);
-            userSchema.setXml(new XML().name("User"));
-            schemas.put("User", userSchema);
-
-            this.paths.addPathItem("/user/login", pathGenerator.user_login());
         }
+        if (this.config_data.getAuth().getEnable())
+            add_user_path(pathGenerator);
+    }
+
+    private void add_user_path(Path pathGenerator) {
+        //User schema
+        Map<String, Schema> userProperties = new HashMap<>();
+        StringSchema username = new StringSchema();
+        StringSchema password = new StringSchema();
+        userProperties.put("username", username);
+        userProperties.put("password", password);
+
+        Schema userSchema = new Schema();
+        userSchema.setName("User");
+        userSchema.setType("object");
+        userSchema.setProperties(userProperties);
+        userSchema.setXml(new XML().name("User"));
+        schemas.put("User", userSchema);
+
+        this.paths.addPathItem("/user/login", pathGenerator.user_login());
     }
 
     private List<OWLClass> add_owlclass_to_openapi(Query query, Path pathGenerator, OWLOntology ontology,

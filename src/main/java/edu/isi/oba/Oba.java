@@ -1,8 +1,6 @@
 package edu.isi.oba;
 
-import edu.isi.oba.config.EndpointConfig;
-import edu.isi.oba.config.FirebaseConfig;
-import edu.isi.oba.config.YamlConfig;
+import edu.isi.oba.config.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 
@@ -22,6 +20,7 @@ class Oba {
   public enum LANGUAGE {
     PYTHON_FLASK
   }
+
   public static void main(String[] args) throws Exception {
     /*
     TODO: we are supporting one language. Issue #42
@@ -55,6 +54,16 @@ class Oba {
     String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
     EndpointConfig endpoint_data = config_data.getEndpoint();
     FirebaseConfig firebase_data = config_data.getFirebase();
+    AuthConfig authConfig = config_data.getAuth();
+    if (authConfig != null) {
+      Provider provider = authConfig.getProvider_obj();
+      if (provider.equals(Provider.FIREBASE) && firebase_data.getKey() == null) {
+        logger.severe("Must set up the firebase key");
+        System.exit(1);
+      }
+    } else {
+      config_data.setAuth(new AuthConfig());
+    }
     Mapper mapper = new Mapper(config_data);
     mapper.createSchemas(destination_dir, config_data);
 
@@ -66,7 +75,7 @@ class Oba {
     ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
     //get schema and paths
     generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
-    generate_openapi_template(mapper, destination_dir, endpoint_data, firebase_data, selected_language);
+    generate_openapi_template(mapper, destination_dir, config_data, selected_language);
     copy_custom_queries(custom_queries_dir, destination_dir);
   }
 
@@ -82,12 +91,11 @@ class Oba {
 
   private static void generate_openapi_template(Mapper mapper,
                                                 String destination_directory,
-                                                EndpointConfig endpoint_config,
-                                                FirebaseConfig firebase_config,
+                                                YamlConfig config,
                                                 LANGUAGE language) throws IOException {
     switch (language) {
       case PYTHON_FLASK:
-        new SerializerPython(mapper, destination_directory, endpoint_config, firebase_config);
+        new SerializerPython(mapper, destination_directory, config);
         break;
       default:
         logger.severe("Language is not supported");

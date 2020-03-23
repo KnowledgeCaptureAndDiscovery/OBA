@@ -1,7 +1,9 @@
-ontologies:
-  - https://gist.githubusercontent.com/sirspock/cec147b24bd241295584dfcc21c21b93/raw/b6fa41ddf93212d967f35da20278f54d2ae2d40d/gistfile1.txt
+#Name of the project
 name: dbpedia
 
+## OpenAPI Section
+### Name, version and URL of the OpenAPI
+### For more information about the section. Go to the official documentation
 openapi:
   openapi: 3.0.1
   info:
@@ -15,23 +17,25 @@ openapi:
     - url: https:///dbpedia.dbpedia.oba.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
 
+## Ontologies
+### List of ontologies
+ontologies:
+  - https://gist.githubusercontent.com/sirspock/cec147b24bd241295584dfcc21c21b93/raw/b6fa41ddf93212d967f35da20278f54d2ae2d40d/gistfile1.txt
 
-enable_get_paths: true
-enable_post_paths: false
-enable_delete_paths: false
-enable_put_paths: false
-
-classes:
-  - http://dbpedia.org/ontology/Genre
-  - http://dbpedia.org/ontology/Band
-
-follow_references: false
-
-firebase:
-  key:
-
+## SPARQL information
 endpoint:
   url: http://endpoint.mint.isi.edu/modelCatalog-1.2.0
   prefix: https://w3id.org/okn/i/mint
   graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
 
+## Filter the paths by methods
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+## Select the classes to add in the API
+classes:
+  - http://dbpedia.org/ontology/Genre
+  - http://dbpedia.org/ontology/Band
+follow_references: false

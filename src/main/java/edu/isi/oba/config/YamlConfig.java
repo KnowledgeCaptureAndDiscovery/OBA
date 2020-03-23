@@ -21,6 +21,8 @@ public class YamlConfig {
   public Boolean enable_delete_paths = false;
   public List<String> ontologies;
   public EndpointConfig endpoint;
+
+  public AuthConfig auth;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
   private LinkedHashMap<String, PathItem> custom_paths = null;
@@ -156,6 +158,14 @@ public class YamlConfig {
 
   public void setFollow_references(Boolean follow_references) {
     this.follow_references = follow_references;
+  }
+
+  public AuthConfig getAuth() {
+    return auth;
+  }
+
+  public void setAuth(AuthConfig auth) {
+    this.auth = auth;
   }
 }
 
