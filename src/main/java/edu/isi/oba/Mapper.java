@@ -116,7 +116,7 @@ class Mapper {
                     logger.info("The class " + ref_class + " exists ");
                 } else {
                     for (OWLOntology temp_ontology : this.ontologies) {
-                        if ( follow_references) {
+                        if ( follow_references ) {
                             this.mapped_classes.add(ref_class);
                             getMapperSchema(query, temp_ontology, ref_class);
                             OWLDocumentFormat format = ontology.getFormat();
