@@ -23,8 +23,10 @@ class Path {
   public Boolean enable_post_paths;
   public Boolean enable_put_paths;
   public Boolean enable_delete_paths;
+  private Boolean auth;
 
-  public Path(Boolean enable_get_paths, Boolean enable_post_paths, Boolean enable_put_paths, Boolean enable_delete_paths) {
+  public Path(Boolean enable_get_paths, Boolean enable_post_paths, Boolean enable_put_paths, Boolean enable_delete_paths, Boolean auth) {
+    this.auth = auth;
     this.enable_get_paths = enable_get_paths;
     this.enable_post_paths = enable_post_paths;
     this.enable_put_paths = enable_put_paths;
@@ -34,13 +36,13 @@ class Path {
   public PathItem generate_singular(String schemaName){
     PathItem path_item = new PathItem();
     if (enable_get_paths)
-      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.SINGULAR).getOperation());
+      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.SINGULAR, auth).getOperation());
 
     if (enable_delete_paths)
-      path_item.delete(new MapperOperation(schemaName, Method.DELETE, Cardinality.SINGULAR).getOperation());
+      path_item.delete(new MapperOperation(schemaName, Method.DELETE, Cardinality.SINGULAR, auth).getOperation());
 
     if (enable_put_paths)
-      path_item.put(new MapperOperation(schemaName, Method.PUT, Cardinality.SINGULAR).getOperation());
+      path_item.put(new MapperOperation(schemaName, Method.PUT, Cardinality.SINGULAR, auth).getOperation());
 
     return path_item;
   }
@@ -49,9 +51,9 @@ class Path {
   public PathItem generate_plural(String schemaName){
     PathItem path_item = new PathItem();
     if (enable_get_paths)
-      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.PLURAL).getOperation());
+      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.PLURAL, auth).getOperation());
     if (enable_post_paths)
-      path_item.put(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL).getOperation());
+      path_item.put(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL, auth).getOperation());
     return path_item;
   }
 

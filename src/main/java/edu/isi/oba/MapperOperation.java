@@ -19,6 +19,7 @@ enum Cardinality {
 }
 
 class MapperOperation {
+  private boolean auth;
   private String summary;
   private String description;
   private final String schemaName;
@@ -35,7 +36,8 @@ class MapperOperation {
   private final Operation operation;
 
 
-  public MapperOperation(String schemaName, Method method, Cardinality cardinality) {
+  public MapperOperation(String schemaName, Method method, Cardinality cardinality, Boolean auth) {
+    this.auth = auth;
     this.cardinality = cardinality;
     this.schemaName = schemaName;
     String ref_text = "#/components/schemas/" + schemaName;
@@ -65,7 +67,7 @@ class MapperOperation {
               .schema(new StringSchema()));
     }
 
-    if (method == Method.PUT || method == Method.POST  || method == Method.DELETE ) {
+    if (auth && (method == Method.PUT || method == Method.POST  || method == Method.DELETE )) {
       parameters.add(new PathParameter()
               .description("Username")
               .name("user")
@@ -97,11 +99,12 @@ class MapperOperation {
     String responseDescriptionOk;
     ApiResponse responseOk;
     //Set parameters
-    parameters.add(new QueryParameter()
-            .name("username")
-            .description("Username to query")
-            .required(false)
-            .schema(new StringSchema()));
+    if (this.auth)
+      parameters.add(new QueryParameter()
+              .name("username")
+              .description("Username to query")
+              .required(false)
+              .schema(new StringSchema()));
 
     switch (cardinality) {
       case PLURAL:

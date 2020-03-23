@@ -65,7 +65,8 @@ class Mapper {
         Path pathGenerator = new Path(config_data.getEnable_get_paths(),
                 config_data.getEnable_post_paths(),
                 config_data.getEnable_put_paths(),
-                config_data.getEnable_delete_paths()
+                config_data.getEnable_delete_paths(),
+                config_data.getAuth().getEnable()
         );
         query.get_all(DEFAULT_DIR_QUERY);
         for (OWLOntology ontology : this.ontologies) {
