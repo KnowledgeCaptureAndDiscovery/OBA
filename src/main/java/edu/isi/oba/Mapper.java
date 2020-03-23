@@ -68,7 +68,11 @@ class Mapper {
                 config_data.getEnable_delete_paths(),
                 config_data.getAuth().getEnable()
         );
-        query.get_all(DEFAULT_DIR_QUERY);
+        try {
+            query.get_all(DEFAULT_DIR_QUERY);
+        } catch (Exception e) {
+            logger.severe("Unable write the queries");
+        }
         for (OWLOntology ontology : this.ontologies) {
 
             OWLDocumentFormat format = ontology.getFormat();

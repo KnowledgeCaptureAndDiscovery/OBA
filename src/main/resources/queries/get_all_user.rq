@@ -1,0 +1,18 @@
+#+ summary: Given a rdf type, returns all the resources related to the type
+CONSTRUCT {
+?item ?predicate ?prop .
+?prop a ?type
+}
+WHERE {
+GRAPH ?_g_iri {
+{
+ SELECT DISTINCT ?item where {
+   ?item a ?_type_iri .
+ }
+}
+?item ?predicate ?prop
+OPTIONAL {
+ ?prop a ?type
+}
+}
+}
