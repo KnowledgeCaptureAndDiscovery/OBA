@@ -24,9 +24,8 @@ ontologies:
 
 ## SPARQL information
 endpoint:
-  url: http://endpoint.mint.isi.edu/modelCatalog-1.2.0
-  prefix: https://w3id.org/okn/i/mint
-  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
+  url: http://dbpedia.org/sparql
+  prefix: http://dbpedia.org/resource
 
 ## Filter the paths by methods
 enable_get_paths: true
@@ -35,7 +34,4 @@ enable_delete_paths: false
 enable_put_paths: false
 
 ## Select the classes to add in the API
-classes:
-  - http://dbpedia.org/ontology/Genre
-  - http://dbpedia.org/ontology/Band
 follow_references: false
