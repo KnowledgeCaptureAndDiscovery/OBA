@@ -1,3 +1,4 @@
+import logging
 from configparser import ConfigParser
 import os
 from pathlib import Path
@@ -49,4 +50,4 @@ QUERY_ENDPOINT = f'{ENDPOINT}/query'
 
 QUERIES_TYPES = ["get_all", "get_all_related", "get_all_related_user", "get_all_user", "get_one", "get_one_user"]
 
-
+logging_file = Path(__file__).parent / "logging.ini"
