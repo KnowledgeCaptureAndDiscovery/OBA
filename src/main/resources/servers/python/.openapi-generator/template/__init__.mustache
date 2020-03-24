@@ -1,5 +1,7 @@
 from obasparql import QueryManager
 from {{packageName}}.settings import CONTEXT_DIRECTORY, QUERY_DIRECTORY, QUERIES_TYPES
+import logging.config
+
 
 try:
     logging.config.fileConfig(logging_file)
