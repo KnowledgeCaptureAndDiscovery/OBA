@@ -14,7 +14,7 @@ openapi:
     description: DBpedia
     url: https://w3id.org/okn/o/sdm
   servers:
-    - url: https:///dbpedia.dbpedia.oba.isi.edu/v1.3.0
+    - url: https://dbpedia.dbpedia.oba.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
 
 ## Ontologies
