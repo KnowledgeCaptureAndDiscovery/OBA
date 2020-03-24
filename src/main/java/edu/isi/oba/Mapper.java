@@ -50,7 +50,8 @@ class Mapper {
             Set<OWLClass> classes = ontology.getClassesInSignature();
             setSchemaNames(classes);
         }
-        this.selected_classes = filter_classes();
+        if (config_data.getClasses() != null)
+            this.selected_classes = filter_classes();
     }
 
     /**

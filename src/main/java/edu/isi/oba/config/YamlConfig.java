@@ -61,7 +61,7 @@ public class YamlConfig {
     this.enable_delete_paths = enable_delete_paths;
   }
 
-  public String custom_queries_directory = "custom_queries";
+  public String custom_queries_directory;
 
   public String getCustom_queries_directory() {
     return custom_queries_directory;
