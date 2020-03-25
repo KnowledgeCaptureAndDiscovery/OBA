@@ -13,7 +13,10 @@ def generate_graph(username):
     return "{}{}".format(GRAPH_BASE, username)
 
 def set_up(**kwargs):
-    username = kwargs["username"]
+    if "username" in kwargs:
+        username = kwargs["username"]
+    else:
+        username = None
     owl_class_name = kwargs["rdf_type_name"]
     resource_type_uri = kwargs["rdf_type_uri"]
     kls = kwargs["kls"]
@@ -89,7 +92,8 @@ def get_one_resource(request_args, query_type="get_one_user", **kwargs):
     """
     kls, owl_class_name, resource_type_uri, username = set_up(**kwargs)
     request_args["resource"] = build_instance_uri(kwargs["id"])
-    request_args["g"] = generate_graph(username)
+    if username:
+        request_args["g"] = generate_graph(username)
     return request_one(kls, owl_class_name, request_args, resource_type_uri, query_type)
 
 
@@ -122,7 +126,8 @@ def get_all_resource(request_args, query_type, **kwargs):
     """
     kls, owl_class_name, resource_type_uri, username = set_up(**kwargs)
     request_args["type"] = resource_type_uri
-    request_args["g"] = generate_graph(username)
+    if username:
+        request_args["g"] = generate_graph(username)
     return request_all(kls, owl_class_name, request_args, resource_type_uri, query_type)
 
 
@@ -153,7 +158,11 @@ def put_resource(**kwargs):
         logger.error("Missing username", exc_info=True)
         return "Bad request: missing username", 400, {}
 
-    #DELETE QUERY
+    '''
+    DELETE QUERY
+    Since we are updating the resource, we don't want to delete the incoming_relations
+    '''
+
     request_args_delete: Dict[str, str] = {
         "resource": resource_uri,
         "g": generate_graph(username),
@@ -181,14 +190,6 @@ def put_resource(**kwargs):
         return body, 201, {}
     else:
         return "Error inserting query", 407, {}
-
-
-def convert_json_to_triples(body):
-    body_json = prepare_jsonld(body)
-    prefixes, triples = get_insert_query(body_json)
-    prefixes = '\n'.join(prefixes)
-    triples = '\n'.join(triples)
-    return prefixes, triples
 
 
 def delete_resource(**kwargs):
@@ -262,6 +263,13 @@ def build_instance_uri(uri):
     if validators.url(uri):
         return uri
     return "{}{}".format(PREFIX, uri)
+
+def convert_json_to_triples(body):
+    body_json = prepare_jsonld(body)
+    prefixes, triples = get_insert_query(body_json)
+    prefixes = '\n'.join(prefixes)
+    triples = '\n'.join(triples)
+    return prefixes, triples
 
 def generate_new_uri():
     return str(uuid.uuid4())
