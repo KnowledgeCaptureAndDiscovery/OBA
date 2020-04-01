@@ -1,4 +1,5 @@
- rsync -av /Users/mosorio/repos/modelcatalog/server/.openapi-generator/template/ tools/base_project/.openapi-generator/template/
- rm -rf tools/base_project/.openapi-generator/template/static_files/contexts
- rm -rf tools/base_project/.openapi-generator/template/static_files/queries
- rm -rf tools/base_project/.openapi-generator/template/static_files/utils/vars.py
+dest=src/main/resources/servers/python/.openapi-generator/template/
+rsync -av /Users/mosorio/repos/modelcatalog/server/.openapi-generator/template/ $dest
+ rm -rf $dest/static_files/contexts
+ rm -rf $dest/static_files/queries
+ rm -rf $dest/static_files/utils/vars.py
