@@ -1,6 +1,6 @@
 ontologies:
-  - http://shorturl.at/fmsvM
-  - http://shorturl.at/nRYZ2
+  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.4.0/ontology.xml
+  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.5.0/ontology.xml
 name: modelcatalog
 output_dir: outputs
 
@@ -22,9 +22,9 @@ firebase:
   key:
 
 endpoint:
-  url: http://endpoint.mint.isi.edu/modelCatalog-1.3.0
+  url: http://endpoint.mint.isi.edu/modelCatalog-1.4.0
   prefix: https://w3id.org/okn/i/mint
-  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.3.0/data/
+  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.4.0/data/
 
 custom_queries_directory: examples/modelcatalog/custom_queries
 
