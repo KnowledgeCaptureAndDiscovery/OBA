@@ -53,7 +53,7 @@ class Path {
     if (enable_get_paths)
       path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.PLURAL, auth).getOperation());
     if (enable_post_paths)
-      path_item.put(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL, auth).getOperation());
+      path_item.post(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL, auth).getOperation());
     return path_item;
   }
 
