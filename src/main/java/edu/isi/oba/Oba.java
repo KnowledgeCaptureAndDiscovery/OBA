@@ -56,6 +56,7 @@ class Oba {
     FirebaseConfig firebase_data = config_data.getFirebase();
     AuthConfig authConfig = config_data.getAuth();
     if (authConfig != null) {
+
       Provider provider = authConfig.getProvider_obj();
       if (provider.equals(Provider.FIREBASE) && firebase_data.getKey() == null) {
         logger.severe("Must set up the firebase key");
