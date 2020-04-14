@@ -70,6 +70,6 @@ def user_login_get(username, password):  # noqa: E501
         "expires_in": JWT_LIFETIME_SECONDS,
         "refresh_token": "IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk",
         "scope": "create"
-    }
+    }, 200, {'X-Expires-After': JWT_LIFETIME_SECONDS, 'X-Rate-Limit': 1000}
 
 
