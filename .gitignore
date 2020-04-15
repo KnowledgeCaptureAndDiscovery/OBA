@@ -101,6 +101,7 @@ fabric.properties
 
 # Package Files #
 *.jar
+!src/main/resources/owl2jsonld-0.3.0-SNAPSHOT-standalone.jar
 *.war
 *.nar
 *.ear

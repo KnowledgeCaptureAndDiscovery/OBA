@@ -9,17 +9,17 @@ openapi:
   info:
     description: This is the API of the Software Description Ontology at [https://w3id.org/okn/o/sdm](https://w3id.org/okn/o/sdm)
     title: Model Catalog
-    version: v1.4.0
+    version: v1.5.0
   externalDocs:
     description: Model Catalog
     url: https://w3id.org/okn/o/sdm
   servers:
-    - url: https://api.models.mint.isi.edu/v1.4.0
-    - url: https://dev.api.models.mint.isi.edu/v1.4.0
-    - url: http://localhost:8080/v1.4.0
+    - url: https://api.models.mint.isi.edu/v1.5.0
+    - url: https://dev.api.models.mint.isi.edu/v1.5.0
+    - url: http://localhost:8080/v1.5.0
 
 firebase:
-  key:
+  key: "test"
 
 endpoint:
   url: http://endpoint.mint.isi.edu/modelCatalog-1.4.0
@@ -27,6 +27,15 @@ endpoint:
   graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.4.0/data/
 
 custom_queries_directory: examples/modelcatalog/custom_queries
+
+enable_get_paths: true
+enable_post_paths: true
+enable_delete_paths: true
+enable_put_paths: true
+
+auth:
+  provider: firebase
+follow_references: true
 
 custom_paths:
   /custom/model/index:

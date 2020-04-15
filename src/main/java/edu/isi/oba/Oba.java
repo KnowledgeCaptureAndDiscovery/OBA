@@ -3,6 +3,7 @@ package edu.isi.oba;
 import edu.isi.oba.config.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -56,6 +57,7 @@ class Oba {
     FirebaseConfig firebase_data = config_data.getFirebase();
     AuthConfig authConfig = config_data.getAuth();
     if (authConfig != null) {
+
       Provider provider = authConfig.getProvider_obj();
       if (provider.equals(Provider.FIREBASE) && firebase_data.getKey() == null) {
         logger.severe("Must set up the firebase key");
@@ -76,7 +78,15 @@ class Oba {
     //get schema and paths
     generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
     generate_openapi_template(mapper, destination_dir, config_data, selected_language);
+    generate_context(config_data, destination_dir);
     copy_custom_queries(custom_queries_dir, destination_dir);
+  }
+
+  private static void generate_context(YamlConfig config_data, String destination_dir) {
+    List<String> ontologies = config_data.getOntologies();
+    JSONObject context_json_object = ObaUtils.generate_context_file(ontologies.toArray(new String[0]));
+    String file_path = destination_dir + File.separator + "servers" + File.separator + "context.json";
+    ObaUtils.write_file(file_path, context_json_object.toString());
   }
 
   private static void copy_custom_queries(String source, String destination){

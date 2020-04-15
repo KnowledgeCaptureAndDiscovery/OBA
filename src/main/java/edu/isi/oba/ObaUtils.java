@@ -2,6 +2,8 @@ package edu.isi.oba;
 
 import edu.isi.oba.config.YamlConfig;
 import org.apache.commons.cli.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -14,7 +16,7 @@ import java.util.zip.ZipInputStream;
 import static edu.isi.oba.Oba.logger;
 public class ObaUtils {
 
-    public static void write_file(String file_path, String content){
+    public static void write_file(String file_path, String content) {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(file_path));
@@ -96,16 +98,13 @@ public class ObaUtils {
 
     /**
      * This function recursively copy all the sub folder and files from sourceFolder to destinationFolder
-     * */
-    public static void copyFolder(File sourceFolder, File destinationFolder) throws IOException
-    {
+     */
+    public static void copyFolder(File sourceFolder, File destinationFolder) throws IOException {
         //Check if sourceFolder is a directory or file
         //If sourceFolder is file; then copy the file directly to new location
-        if (sourceFolder.isDirectory())
-        {
+        if (sourceFolder.isDirectory()) {
             //Verify if destinationFolder is already present; If not then create it
-            if (!destinationFolder.exists())
-            {
+            if (!destinationFolder.exists()) {
                 destinationFolder.mkdir();
                 System.out.println("Directory created :: " + destinationFolder);
             }
@@ -114,17 +113,14 @@ public class ObaUtils {
             String files[] = sourceFolder.list();
 
             //Iterate over all files and copy them to destinationFolder one by one
-            for (String file : files)
-            {
+            for (String file : files) {
                 File srcFile = new File(sourceFolder, file);
                 File destFile = new File(destinationFolder, file);
 
                 //Recursive function call
                 copyFolder(srcFile, destFile);
             }
-        }
-        else
-        {
+        } else {
             //Copy the file content from one place to another
             Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File copied :: " + destinationFolder);
@@ -132,40 +128,112 @@ public class ObaUtils {
     }
 
     public static String get_config_yaml(String[] args) {
-      //obtain the options to pass configuration
-      Options options = new Options();
-      Option input = new Option("c", "config", true, "configuration file path");
-      input.setRequired(true);
-      options.addOption(input);
+        //obtain the options to pass configuration
+        Options options = new Options();
+        Option input = new Option("c", "config", true, "configuration file path");
+        input.setRequired(true);
+        options.addOption(input);
 
-      CommandLineParser parser = new DefaultParser();
-      HelpFormatter formatter = new HelpFormatter();
-      CommandLine cmd;
-      String config_yaml = null;
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+        String config_yaml = null;
 
-      try {
-        cmd = parser.parse(options, args);
-        config_yaml = cmd.getOptionValue("config");
-      } catch (ParseException e) {
-        System.out.println(e.getMessage());
-        formatter.printHelp("utiConfiguration filelity-name", options);
-        System.exit(1);
-      }
-      return config_yaml;
+        try {
+            cmd = parser.parse(options, args);
+            config_yaml = cmd.getOptionValue("config");
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utiConfiguration filelity-name", options);
+            System.exit(1);
+        }
+        return config_yaml;
     }
 
     public static YamlConfig get_yaml_data(String config_yaml) {
-      Constructor constructor = new Constructor(YamlConfig.class);
-      Yaml yaml = new Yaml(constructor);
+        Constructor constructor = new Constructor(YamlConfig.class);
+        Yaml yaml = new Yaml(constructor);
 
-      InputStream config_input = null;
-      try {
-        config_input = new FileInputStream(new File(config_yaml));
-      } catch (FileNotFoundException e) {
-        System.err.println("Configuration file not found: " + config_yaml);
-        System.exit(1);
-      }
-      //Yaml config parse
-      return yaml.loadAs(config_input, YamlConfig.class);
+        InputStream config_input = null;
+        try {
+            config_input = new FileInputStream(new File(config_yaml));
+        } catch (FileNotFoundException e) {
+            System.err.println("Configuration file not found: " + config_yaml);
+            System.exit(1);
+        }
+        //Yaml config parse
+        return yaml.loadAs(config_input, YamlConfig.class);
     }
+
+
+    public static JSONObject concat_json(JSONObject []objects){
+        JSONObject mergeJSON = objects[0];
+        for(int i=1; i<objects.length; i++){
+            mergeJSON = mergeJSONObjects(mergeJSON, objects[i]);
+        }
+        return mergeJSON;
+    }
+
+    public static JSONObject mergeJSONObjects(JSONObject json1, JSONObject json2) {
+        JSONObject mergedJSON = new JSONObject();
+        try {
+            mergedJSON = new JSONObject(json1, JSONObject.getNames(json1));
+            for (String crunchifyKey : JSONObject.getNames(json2)) {
+                mergedJSON.put(crunchifyKey, json2.get(crunchifyKey));
+            }
+
+        } catch (JSONException e) {
+            throw new RuntimeException("JSON Exception" + e);
+        }
+        return mergedJSON;
+    }
+
+    public static JSONObject generate_context_file(String []ontologies)
+    {
+        JSONObject[] jsons = new JSONObject[ontologies.length];
+        for (int i=0; i<ontologies.length; i++){
+            try {
+                jsons[i] = run_owl_jsonld(ontologies[i]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return ObaUtils.concat_json(jsons);
+    }
+
+    private static JSONObject run_owl_jsonld(String ontology_url) throws IOException, InterruptedException {
+        String owl2jsonld = "owl2jsonld-0.3.0-SNAPSHOT-standalone.jar";
+        String owl2jsonldPath = Oba.class.getClassLoader().getResource(owl2jsonld).getFile();
+
+        Process ps= Runtime.getRuntime().exec(new String[]{"java","-jar", owl2jsonldPath, ontology_url});
+        ps.waitFor();
+        if (ps.exitValue() != 0)
+            throw new IOException("owljson failed");
+
+        InputStream is=ps.getInputStream();
+        byte b[]=new byte[is.available()];
+        if(is.read(b) == b.length) {
+            JSONObject json = new JSONObject(new String(b));
+            return json;
+        }
+        throw new IOException("no data");
+    }
+
+    /**
+     * @param file_name
+     * @throws IOException
+     * @return
+     */
+    public static JSONObject read_json_file(String file_name) throws IOException {
+        InputStream stream = Oba.class.getClassLoader().getResourceAsStream(file_name);
+        byte b[]=new byte[stream.available()];
+        JSONObject jsonObject = null;
+        if(stream.read(b) == b.length) {
+            jsonObject = new JSONObject(new String(b));
+        }
+        return jsonObject;
+    }
+
 }

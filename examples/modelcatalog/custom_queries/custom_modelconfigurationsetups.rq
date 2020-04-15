@@ -1,33 +1,83 @@
 PREFIX sd: <https://w3id.org/okn/o/sd#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sdm: <https://w3id.org/okn/o/sdm#>
+
 CONSTRUCT {
 ?_resource_iri ?predicate ?prop .
 ?prop ?p ?o .
 ?input_resource ?input_resource_p ?input_resource_o .
 ?output_resource ?output_resource_p ?output_resource_o .
-?parameter ?parameter_p ?parameter_o
+?parameter ?parameter_p ?parameter_o .
+?region ?region_p ?region_o .
+?region_o ?sub_region_p ?sub_region_o .
+?grid ?grid_p ?grid_o .
+?process ?process_p ?process_o .
+?variable_presentation ?variable_presentation_o ?variable_presentation_p .
+?variable_presentation_output ?variable_presentation_o_output ?variable_presentation_p_output .
+?variable_presentation_p ?variable_o ?variable_p .
+?variable_presentation_p_output ?variable_o_output ?variable_p_output .
+?unit ?unit_p ?unit_o
 }
 WHERE {
     GRAPH ?_g_iri {
         {
             ?_resource_iri ?predicate ?prop .
             OPTIONAL {
-                ?prop ?p ?o
+                ?prop ?p ?o .
+        		FILTER (?p != <https://w3id.org/okn/o/sdm#geo>) .
+        		FILTER (?p != <https://w3id.org/okn/o/sdm#hasPart>)
             }
         }
         UNION {
-            ?_resource_iri  sd:hasInput ?input .
-            ?input sd:hasFixedResource ?input_resource  .
-            ?input_resource ?input_resource_p ?input_resource_o
+            ?_resource_iri  sd:hasInput ?input
+            OPTIONAL {
+               ?input sd:hasFixedResource ?input_resource  .
+               ?input_resource ?input_resource_p ?input_resource_o
+            }
+            OPTIONAL {
+               ?input sd:hasPresentation ?variable_presentation .
+               ?variable_presentation ?variable_presentation_o ?variable_presentation_p .
+               ?variable_presentation_p ?variable_o ?variable_p
+            }
+
         }
         UNION {
-            ?_resource_iri  sd:hasOutput ?output .
-            ?output sd:hasFixedResource ?output_resource  .
+            ?_resource_iri  sdm:hasOutputTimeInterval ?output_time_interval_resource .
+            ?output_time_interval_resource sdm:intervalUnit ?unit .
+            OPTIONAL {
+                ?unit ?unit_p ?unit_o
+            }
+        }
+        UNION {
+            ?_resource_iri  sd:hasOutput ?output_resource .
             ?output_resource ?output_resource_p ?output_resource_o
+            OPTIONAL {
+               ?output_resource sd:hasPresentation ?variable_presentation_output .
+               ?variable_presentation_output ?variable_presentation_o_output ?variable_presentation_p_output .
+               ?variable_presentation_p_output ?variable_o_output ?variable_p_output
+
+            }
         }
         UNION {
             ?_resource_iri  sd:hasParameter ?parameter .
             ?parameter ?parameter_p ?parameter_o
         }
+        UNION {
+            ?_resource_iri sdm:hasRegion ?region .
+            ?region ?region_p ?region_o .
+            OPTIONAL {
+                ?region_o ?sub_region_p ?sub_region_o
+            }
+            FILTER (?region_p != <https://w3id.org/okn/o/sdm#geo>)
+       }
+       UNION {
+            ?_resource_iri sdm:hasGrid ?grid .
+            ?grid ?grid_p ?grid_o .
+       }
+       UNION {
+            ?_resource_iri sdm:hasProcess ?process .
+            ?process ?process_p ?process_o .
+            FILTER (?process_p != <https://w3id.org/okn/o/sdm#influences>)
+       }
     }
 }

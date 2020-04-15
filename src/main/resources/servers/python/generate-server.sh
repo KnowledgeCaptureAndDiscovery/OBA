@@ -15,6 +15,8 @@ fi
 
 
 dir=${PWD}
+cp ../openapi.yaml ${PWD}
+
 SERVER_DIR=server
 docker run -ti --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v4.1.2 \
      generate  \

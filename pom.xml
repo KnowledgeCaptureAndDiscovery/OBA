@@ -21,6 +21,13 @@
 
 
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.json/json -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20190722</version>
+    </dependency>
+
     <!-- logging -->
     <dependency>
       <groupId>log4j</groupId>
@@ -110,7 +117,21 @@
                       <include>**/*.*</include>
                     </includes>
                   </resource>
-                </resources>
+              </resources>
+                <testResources>
+                  <testResource>
+                    <directory>${basedir}/src/main/resources</directory>
+                    <includes>
+                      <include>**/*.*</include>
+                    </includes>
+                  </testResource>
+                  <testResource>
+                    <directory>${basedir}/src/test/resources</directory>
+                     <includes>
+                       <include>**/*.*</include>
+                     </includes>
+                    </testResource>
+                </testResources>
               </configuration>
             </execution>
           </executions>
