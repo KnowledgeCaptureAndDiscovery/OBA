@@ -25,70 +25,17 @@ OBA converts the format of the responses from JSON/LD to plain JSON, which is a 
 !!! info 
     See the [JSON/LD documentation](https://json-ld.org/spec/latest/json-ld/#the-context) for more information.
 
-OBA does not currently support the generation of context file. However, this can be easily achieved with [owl2jsonld](https://github.com/sirspock/owl2jsonld).
+OBA supports the generation of context file.
 
 !!! info
     Our package is a fork of [owl2jsonld](https://github.com/stain/owl2jsonld), developed by [Stain Soiland-Reyes](https://github.com/stain).
 
-#### Generating Contexts with One Ontology
-
-If you have a single ontology, execute the following command:
-
-```bash
-java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
-    $ONTOLOGY_URL > server/context.json
-```
-
-For example, here is how to execute the command using a [sample ontology](https://w3id.org/okn/o/sdm#) with the RDF/XML serialization:
-
-```bash
-java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
-    https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml > server/context.json
-```
-
-#### Generating Contexts with Two or More Ontologies
-
-Since each ontology creates an independent context JSON file, you will need to merge them together. This can be easily achieved by installing  [jq](https://stedolan.github.io/jq/):
-
-```bash
-
-java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
-    $ONTOLOGY_URL1 > a.json
-java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar \
-    $ONTOLOGY_URL2 > b.json    
-jq -s '.[0] * .[1]' a.json b.json  | jq -S > context.json
-rm a.json b.json
-
-```
-
-For example, in our sample ontology we imported another one:
-
-```bash
-
-java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar  \
-    https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml > a.json
-java -jar owl2jsonld-0.3.0-SNAPSHOT-standalone.jar \
-    https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.2.0/ontology.xml > b.json
-
-jq -s '.[0] * .[1]' a.json b.json  | jq -S > context.json
-rm a.json b.json
-
-```
-
-    
+   
 ## Generating the Server
 
 Currently, OBA supports **Python/Flask** for the server implementation. In order to generate the server, you should follow the instructions below:
 
-### 1 Copying the Context Files
-
-First, you must copy the context file and OpenAPI specification to the right folder:
-
-```bash
-mv context.json openapi.yaml python/
-```
-
-### 2 Execute Server Generation Scripts
+### Execute Server Generation Scripts
 
 !!! warning
     You must have [Docker](https://docs.docker.com/get-started/) installed.
