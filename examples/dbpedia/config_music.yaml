@@ -38,4 +38,4 @@ enable_put_paths: false
 classes:
   - http://dbpedia.org/ontology/Genre
   - http://dbpedia.org/ontology/Band
-follow_references: false
+follow_references: true
