@@ -1,1 +1,7 @@
-{"JSON2": "Bye, World"}
+{
+  "@context": {
+    "Setup": {
+      "@id": "http://www.w3.org/ns/prov#Setup"
+    }
+  }
+}

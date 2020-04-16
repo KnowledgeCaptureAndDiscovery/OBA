@@ -13,7 +13,7 @@ public class ObaUtilsTest {
     @Test
     public void read_json_file() throws IOException {
         JSONObject actual = ObaUtils.read_json_file("json_one.json");
-        Assert.assertEquals(actual.get("JSON1"), "Hello, World");
+        Assert.assertNotNull(actual.get("@context"));
     }
 
     @Test
@@ -21,20 +21,21 @@ public class ObaUtilsTest {
         JSONObject one = ObaUtils.read_json_file("json_one.json");
         JSONObject two = ObaUtils.read_json_file("json_two.json");
         JSONObject merge = ObaUtils.mergeJSONObjects(one, two);
-        Assert.assertEquals(merge.get("JSON1"), "Hello, World");
-        Assert.assertEquals(merge.get("JSON2"), "Bye, World");
+        Assert.assertNotNull(merge.get("@context"));
+        Assert.assertNotNull(merge.get("@context"));
     }
 
     @Test
-    public void mergeJSONObjectsMultiple() throws IOException {
+    public void concat_json_common_key() throws IOException {
         JSONObject one = ObaUtils.read_json_file("json_one.json");
         JSONObject two = ObaUtils.read_json_file("json_two.json");
         JSONObject three = ObaUtils.read_json_file("json_three.json");
         JSONObject[] jsons = new JSONObject[]{ one, two, three};
-        JSONObject merge = ObaUtils.concat_json(jsons);
-        Assert.assertEquals(merge.get("JSON1"), "Hello, World");
-        Assert.assertEquals(merge.get("JSON2"), "Bye, World");
-        Assert.assertEquals(merge.get("JSON3"), "Hi again, World");
+        JSONObject merge = ObaUtils.concat_json_common_key(jsons, "@context");
+        JSONObject o = (JSONObject) merge.get("@context");
+        assertNotNull(o.get("Entity"));
+        assertNotNull(o.get("Model"));
+        assertNotNull(o.get("Setup"));
     }
 
     @Test
@@ -51,5 +52,8 @@ public class ObaUtilsTest {
         JSONObject o = (JSONObject) context.get("@context");
         assertEquals(o.get("id"), "@id");
         assertEquals(o.get("type"), "@type");
+        assertNotNull(o.get("Entity"));
+        assertNotNull(o.get("Model"));
     }
+
 }

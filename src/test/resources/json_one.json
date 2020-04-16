@@ -1,1 +1,7 @@
-{"JSON1": "Hello, World"}
+{
+  "@context": {
+    "Entity": {
+      "@id": "http://www.w3.org/ns/prov#Entity"
+    }
+  }
+}

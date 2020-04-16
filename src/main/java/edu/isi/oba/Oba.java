@@ -86,7 +86,7 @@ class Oba {
     List<String> ontologies = config_data.getOntologies();
     JSONObject context_json_object = ObaUtils.generate_context_file(ontologies.toArray(new String[0]));
     String file_path = destination_dir + File.separator + "servers" + File.separator + "context.json";
-    ObaUtils.write_file(file_path, context_json_object.toString());
+    ObaUtils.write_file(file_path, context_json_object.toString(4));
   }
 
   private static void copy_custom_queries(String source, String destination){

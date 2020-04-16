@@ -165,6 +165,14 @@ public class ObaUtils {
         return yaml.loadAs(config_input, YamlConfig.class);
     }
 
+    public static JSONObject concat_json_common_key(JSONObject []objects, String common_key){
+        JSONObject mergeJSON = (JSONObject) objects[0].get(common_key);
+        for(int i=1; i<objects.length; i++){
+            mergeJSON = mergeJSONObjects(mergeJSON, (JSONObject) objects[i].get(common_key));
+        }
+
+        return new JSONObject().put(common_key, mergeJSON);
+    }
 
     public static JSONObject concat_json(JSONObject []objects){
         JSONObject mergeJSON = objects[0];
@@ -175,6 +183,7 @@ public class ObaUtils {
     }
 
     public static JSONObject mergeJSONObjects(JSONObject json1, JSONObject json2) {
+
         JSONObject mergedJSON = new JSONObject();
         try {
             mergedJSON = new JSONObject(json1, JSONObject.getNames(json1));
@@ -200,7 +209,7 @@ public class ObaUtils {
                 e.printStackTrace();
             }
         }
-        return ObaUtils.concat_json(jsons);
+        return ObaUtils.concat_json_common_key(jsons, "@context");
     }
 
     private static JSONObject run_owl_jsonld(String ontology_url) throws IOException, InterruptedException {
