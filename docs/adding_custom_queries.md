@@ -7,8 +7,7 @@ First, we must define the SPARQL queries we would like our API to support. For e
 
 
 !!!info
-    The query must be a **CONSTRUCT**, not GET
-
+    The query must be a **CONSTRUCT**, not SELECT
 
 ```
 PREFIX sd: <https://w3id.org/okn/o/sd#>
@@ -39,14 +38,20 @@ WHERE {
 
 The query has two parameters:
 
-- g (IRI): IRI of the user graph.
-- label (string): String of the label belonging to the variable we want to filter by.
+- ?_g_iri (IRI): IRI of the user graph.
+- ?_label (string): String of the label belonging to the variable we want to filter by.
+
+We are using [BASIL's convention](https://github.com/the-open-university/basil/wiki/SPARQL-variable-name-convention-for-WEB-API-parameters-mapping).
 
 Next, you have to save the query in the **custom** directory. For example, as *custom_models_variable.rq*. 
 
 ## Defining Custom Query Parameters
 
 Now we have to extend the OpenAPI specification with the custom query:
+
+!!! info
+   You must be familiar with OpenAPI specitification. Please, read (Describing parameters)[https://swagger.io/docs/specification/describing-parameters/]
+
 
 !!! warning
     You must add a new parameter with the name *custom_query_name*. 
