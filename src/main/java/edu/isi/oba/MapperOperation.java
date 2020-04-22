@@ -2,6 +2,7 @@ package edu.isi.oba;
 
 import io.swagger.models.Method;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 enum Cardinality {
@@ -115,8 +117,11 @@ class MapperOperation {
         //Set response
         ArraySchema schema = new ArraySchema();
         schema.setItems(this.schema);
+        Map<String, Header> headers =  new HashMap<>();
+        headers.put("link", new Header().schema(new StringSchema()).description("Information about pagination"));
         responseOk = new ApiResponse()
                 .description(responseDescriptionOk)
+                .headers(headers)
                 .content(new Content().addMediaType("application/json", new MediaType().schema(schema)));
         apiResponses.addApiResponse("200", responseOk);
         parameters.add(new QueryParameter()
@@ -124,6 +129,16 @@ class MapperOperation {
                 .description("Filter by label")
                 .required(false)
                 .schema(new StringSchema()));
+        parameters.add(new QueryParameter()
+                .name("page")
+                .description("The page number")
+                .required(false)
+                .schema(new IntegerSchema()._default(1)));
+        parameters.add(new QueryParameter()
+                .name("per_page")
+                .description("Items per page")
+                .required(false)
+                .schema(new IntegerSchema()._default(100).maximum(BigDecimal.valueOf(200)).minimum(BigDecimal.valueOf(1))));
         break;
       case SINGULAR:
         summary = "Get a " + this.schemaName;
