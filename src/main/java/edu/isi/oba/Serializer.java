@@ -68,7 +68,6 @@ class Serializer {
     List<String> messageList = result.getMessages();
     Set<String> errors = new HashSet<>(messageList);
     Set<String> warnings = new HashSet<>();
-
   }
 
   private SecurityScheme getSecurityScheme(Map<String, Object> extensions) {
