@@ -7,8 +7,9 @@ deploy:
   provider: releases
   api_key:
     secure: kwGuFQM3EVfxdYiJtnXHyBUyYun/MfFPAhz6rHmk1n9jhsBQAd4xNG5RM+ZBAbI0NljZdPEQh7CNJ7s9vFYw8cR42gZahTE16EvtZixa8ymqORNJGJTBgZZlzoz6WseyjBVtEhUn3CKDRPjziqksCRsuh6FE4VRAk2ok32kjucSnmQX7qD9F3DLuPIa7/3e4dBb2T7qPRjmJptr0Q4a1dKmzmzcqCnarEj4MH+Il8mvTPor0oeHKRP9xGbAA89RwQDcghKBj0G58nFmb9Lnj9JQKmp9nfAN2kJQxAZafIh3X5hc4obfQhZHE/n7WJN6zTwFr3GDYxxwf9LAacv4cod51nGL3aSzB1AFfQPxHanPEtt1MPx+TeWHko4hdIbT4QC7forw5OB/ntEjQiAvKJY3LnjPMkUhexsgi/4JwwpZTyA1UOVPXc5pqmmpfhcJrV+4EWQzxIMW0ZkgWVTuiMsS6XFrQh9phJj+XBjsyPpIEzPEXPX6riWRdfExIPHjeo7YO7QP8Yh0bGmRzs7sRb/W4LTfUTd28FJXzCYh6Cgc87TFn9JSTfXMnZbS25I6Da4NlXUvojgzBUfp6co16oS9EtdL5Qx6nkVji16xJsxLDsvFrrIKJ3JJrrG0Cdr34TYR1B73Y0bxjxpd7Nkbgn7ehrCQe5XIiBfozdr+ezF0=
+    file_glob: true
     file:
-      - target/oba-$TRAVIS_TAG-jar-with-dependencies.jar
+      - target/oba*.jar
       - README.md
     skip_cleanup: true
     on:
