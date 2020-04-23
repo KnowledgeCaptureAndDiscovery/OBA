@@ -13,7 +13,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import static edu.isi.oba.Oba.logger;
+
 public class ObaUtils {
 
     public static void write_file(String file_path, String content) {
@@ -165,18 +167,18 @@ public class ObaUtils {
         return yaml.loadAs(config_input, YamlConfig.class);
     }
 
-    public static JSONObject concat_json_common_key(JSONObject []objects, String common_key){
+    public static JSONObject concat_json_common_key(JSONObject[] objects, String common_key) {
         JSONObject mergeJSON = (JSONObject) objects[0].get(common_key);
-        for(int i=1; i<objects.length; i++){
+        for (int i = 1; i < objects.length; i++) {
             mergeJSON = mergeJSONObjects(mergeJSON, (JSONObject) objects[i].get(common_key));
         }
 
         return new JSONObject().put(common_key, mergeJSON);
     }
 
-    public static JSONObject concat_json(JSONObject []objects){
+    public static JSONObject concat_json(JSONObject[] objects) {
         JSONObject mergeJSON = objects[0];
-        for(int i=1; i<objects.length; i++){
+        for (int i = 1; i < objects.length; i++) {
             mergeJSON = mergeJSONObjects(mergeJSON, objects[i]);
         }
         return mergeJSON;
@@ -197,10 +199,9 @@ public class ObaUtils {
         return mergedJSON;
     }
 
-    public static JSONObject generate_context_file(String []ontologies)
-    {
+    public static JSONObject generate_context_file(String[] ontologies) throws Exception {
         JSONObject[] jsons = new JSONObject[ontologies.length];
-        for (int i=0; i<ontologies.length; i++){
+        for (int i = 0; i < ontologies.length; i++) {
             try {
                 jsons[i] = run_owl_jsonld(ontologies[i]);
             } catch (IOException e) {
@@ -212,34 +213,47 @@ public class ObaUtils {
         return ObaUtils.concat_json_common_key(jsons, "@context");
     }
 
-    private static JSONObject run_owl_jsonld(String ontology_url) throws IOException, InterruptedException {
-        String owl2jsonld = "owl2jsonld-0.3.0-SNAPSHOT-standalone.jar";
-        String owl2jsonldPath = Oba.class.getClassLoader().getResource(owl2jsonld).getFile();
+    private static JSONObject run_owl_jsonld(String ontology_url) throws Exception {
+        String owl2jsonld = "/owl2jsonld-0.3.0-SNAPSHOT-standalone.jar";
+        InputStream owl2_jar = ObaUtils.class.getResourceAsStream(owl2jsonld);
+        File tempFile = File.createTempFile("oba", "jar");
+        copy(owl2_jar,tempFile);
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec(new String[]{"java", "-jar", tempFile.getPath(), ontology_url});
 
-        Process ps= Runtime.getRuntime().exec(new String[]{"java","-jar", owl2jsonldPath, ontology_url});
-        ps.waitFor();
-        if (ps.exitValue() != 0)
-            throw new IOException("owljson failed");
+        BufferedReader stdInput = new BufferedReader(new
+                InputStreamReader(proc.getInputStream()));
 
-        InputStream is=ps.getInputStream();
-        byte b[]=new byte[is.available()];
-        if(is.read(b) == b.length) {
-            JSONObject json = new JSONObject(new String(b));
+        BufferedReader stdError = new BufferedReader(new
+                InputStreamReader(proc.getErrorStream()));
+
+        String s = null;
+        StringBuilder result = new StringBuilder();
+        while ((s = stdInput.readLine()) != null) {
+            result.append(s);
+        }
+        if (result != null){
+            JSONObject json = new JSONObject(result.toString());
             return json;
         }
+        while ((s = stdError.readLine()) != null) {
+            logger.severe(s);
+        }
+
         throw new IOException("no data");
+
     }
 
     /**
      * @param file_name
-     * @throws IOException
      * @return
+     * @throws IOException
      */
     public static JSONObject read_json_file(String file_name) throws IOException {
         InputStream stream = Oba.class.getClassLoader().getResourceAsStream(file_name);
-        byte b[]=new byte[stream.available()];
+        byte b[] = new byte[stream.available()];
         JSONObject jsonObject = null;
-        if(stream.read(b) == b.length) {
+        if (stream.read(b) == b.length) {
             jsonObject = new JSONObject(new String(b));
         }
         return jsonObject;

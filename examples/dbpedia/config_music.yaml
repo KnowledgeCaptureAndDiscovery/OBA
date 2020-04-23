@@ -12,7 +12,7 @@ openapi:
     version: v1.3.0
   externalDocs:
     description: DBpedia
-    url: https://w3id.org/okn/o/sdm
+    url:  http://dbpedia.org/
   servers:
     - url: https://dbpedia.dbpedia.oba.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
@@ -24,8 +24,8 @@ ontologies:
 
 ## SPARQL information
 endpoint:
-  url: http://endpoint.mint.isi.edu/modelCatalog-1.2.0
-  prefix: https://w3id.org/okn/i/mint
+  url: http://dbpedia.org/sparql
+  prefix: http://dbpedia.org/resource
   graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
 
 ## Filter the paths by methods
@@ -38,4 +38,4 @@ enable_put_paths: false
 classes:
   - http://dbpedia.org/ontology/Genre
   - http://dbpedia.org/ontology/Band
-follow_references: true
+follow_references: false
