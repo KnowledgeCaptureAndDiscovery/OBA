@@ -4,13 +4,15 @@ CONSTRUCT {
     ?prop a ?type
 }
 WHERE {
-        {
-             SELECT DISTINCT ?item where {
-               ?item a ?_type_iri .
-             }
+    {
+        SELECT DISTINCT ?item where {
+            ?item a ?_type_iri .
         }
-        ?item ?predicate ?prop
-        OPTIONAL {
-            ?prop a ?type
-        }
+        LIMIT 100
+        OFFSET 0
+    }
+    ?item ?predicate ?prop
+    OPTIONAL {
+        ?prop a ?type
+    }
 }

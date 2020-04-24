@@ -33,7 +33,7 @@ cp -r ${PWD}/.openapi-generator/template/static_files/cached.py ${PWD}/$SERVER_D
 mkdir -p ${PWD}/$SERVER_DIR/contexts/
 echo "Copying query files"
 cp -r ../../queries ${PWD}/$SERVER_DIR/queries
-cp -r context.json ${PWD}/$SERVER_DIR/contexts/
+cp -r ../context.json ${PWD}/$SERVER_DIR/contexts/
 if [ "$?" == "0" ]; then
         echo -e "${GREEN}SUCCESS${RESET}"
 fi

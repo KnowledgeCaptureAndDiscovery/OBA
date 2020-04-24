@@ -1,6 +1,6 @@
 import connexion
 import six
-from openapi_server.utils.request import get_resource, get_all_resource, put_resource, post_resource, delete_resource
+from openapi_server import query_manager
 from openapi_server.utils.vars import {{#lambda.uppercase}}{{baseName}}_type_name{{/lambda.uppercase}}, {{#lambda.uppercase}}{{baseName}}_type_uri{{/lambda.uppercase}}
 
 {{#imports}}{{import}}  # noqa: E501
@@ -110,7 +110,7 @@ def {{operationId}}({{#allParams}}{{paramName}}{{^required}}=None{{/required}}{{
         {{/isMapContainer}}
     {{/allParams}}
 
-    return {{#lambda.lowercase}}{{httpMethod}}_resource{{/lambda.lowercase}}({{#pathParams}}{{paramName}}={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/pathParams}}{{#queryParams}}
+    return query_manager.{{#lambda.lowercase}}{{httpMethod}}_resource{{/lambda.lowercase}}({{#pathParams}}{{paramName}}={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/pathParams}}{{#queryParams}}
         {{paramName}}={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/queryParams}}{{#bodyParams}}
         body={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/bodyParams}}
         rdf_type_uri={{#lambda.uppercase}}{{baseName}}_type_uri{{/lambda.uppercase}},
