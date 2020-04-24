@@ -10,12 +10,12 @@ openapi:
   info:
     description: This is the API of the Wings Ontology
     title: Wings Workflow Catalog
-    version: v1.4.0
+    version: v0.0.1
   externalDocs:
     description: Wings Workflow Catalog
     url: https://w3id.org/okn/o/sdm
   servers:
-    - url: http://localhost:8080
+    - url: http://localhost:8080/v0.0.1
 
 firebase:
   key:
