@@ -1,10 +1,10 @@
-# OBA [![Build Status](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA.svg?branch=master)](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA)
+# Ontology-Based APIs (OBA) [![Build Status](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA.svg?branch=master)](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA)
 [![DOI](https://zenodo.org/badge/184804693.svg)](https://zenodo.org/badge/latestdoi/184804693)
 
 
-OBA project reads ontologies (OWL) and generates the OpenAPI Specification (OAS). Using this definition, it creates a REST API server automatically.
+OBA reads ontologies (OWL) and generates an OpenAPI Specification (OAS). Using this definition, OBA creates a REST API server automatically.
 
-![Diagram](figures/oba.svg) 
+![Diagram](docs/figures/oba.svg) 
 
 ## Quickstart
 
@@ -28,10 +28,12 @@ There are two option to run OBA:
 ## Running
 
 1. Create the OBA config file (config.yaml) from the [sample configuration](config.yaml.sample)
-2. Pass the configuration and run OBA
+2. Use the configuration to run OBA with the following command:
 
 ```bash
 $ java -jar oba-*-jar-with-dependencies.jar -c config.yaml
 ```
 
-For the next steps, go to the [documentation](https://oba.readthedocs.io/en/latest/)
+Congratulations! You have generated an Open Api Specification.
+
+For instructions on using OBA to create your API server, go to the [documentation](https://oba.readthedocs.io/en/latest/)
