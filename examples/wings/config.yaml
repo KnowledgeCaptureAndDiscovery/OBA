@@ -1,0 +1,27 @@
+ontologies:
+  - http://www.wings-workflows.org/ontology/workflow.owl
+  - http://www.wings-workflows.org/ontology/data.owl
+  - http://www.wings-workflows.org/ontology/component.owl
+name: wings
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the Wings Ontology
+    title: Wings Workflow Catalog
+    version: v1.4.0
+  externalDocs:
+    description: Wings Workflow Catalog
+    url: https://w3id.org/okn/o/sdm
+  servers:
+    - url: http://localhost:8080
+
+firebase:
+  key:
+
+endpoint:
+  url: http://localhost:3030/wings
+  prefix: http://www.wings-workflows.org/ontology
+  graph_base: http://localhost:3030/wings/data/
+
