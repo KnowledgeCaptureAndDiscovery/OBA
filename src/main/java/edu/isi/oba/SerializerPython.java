@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static edu.isi.oba.Oba.SERVERS_DIRECTORY;
+import static edu.isi.oba.Oba.logger;
 
 class SerializerPython {
   static final String name = "python";
@@ -71,8 +72,15 @@ class SerializerPython {
       name = (String) pair.getValue();
       try {
         String variable_name = name.toUpperCase().replace("-", "");
-        myWriter.write(variable_name + "_TYPE_URI = \"" + clsIRI + "\"\n");
-        myWriter.write(variable_name + "_TYPE_NAME = \"" + name + "\"\n");
+        //TODO: Catch class name empty
+        String catch_temp = name.replace("<", "").replace(">", "");
+        if (!catch_temp.equals(clsIRI.toString())) {
+          myWriter.write(variable_name + "_TYPE_URI = \"" + clsIRI + "\"\n");
+          myWriter.write(variable_name + "_TYPE_NAME = \"" + name + "\"\n");
+        }
+        else {
+          logger.warning("Ignoring class " + clsIRI);
+        }
       } catch (IOException e) {
         System.out.println("An error occurred.");
         e.printStackTrace();

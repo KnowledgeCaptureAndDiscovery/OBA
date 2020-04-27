@@ -234,6 +234,15 @@ public class ObaUtils {
         }
         if (result != null){
             JSONObject json = new JSONObject(result.toString());
+            //TODO: This is a hack to remove
+            //     "": {"@id": "http://dbpedia.org/ontology/"}
+            //temp_json is a reference to json
+            JSONObject temp_json = (JSONObject) json.get("@context");
+
+            if (!temp_json.isNull("")) {
+                logger.warning("Generating of context.json - Ignoring the class " + temp_json.get("") + ": Name is empty.");
+                temp_json.remove("");
+            }
             return json;
         }
         while ((s = stdError.readLine()) != null) {
