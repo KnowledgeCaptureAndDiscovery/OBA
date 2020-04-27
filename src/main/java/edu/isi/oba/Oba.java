@@ -53,7 +53,6 @@ class Oba {
     }
 
     String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
-    EndpointConfig endpoint_data = config_data.getEndpoint();
     FirebaseConfig firebase_data = config_data.getFirebase();
     AuthConfig authConfig = config_data.getAuth();
     if (authConfig != null) {

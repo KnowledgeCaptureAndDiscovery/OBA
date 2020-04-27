@@ -20,7 +20,7 @@ public class YamlConfig {
   public Boolean enable_put_paths = false;
   public Boolean enable_delete_paths = false;
   public List<String> ontologies;
-  public EndpointConfig endpoint;
+  private EndpointConfig endpoint;
 
   public AuthConfig auth;
   public FirebaseConfig firebase;

@@ -46,7 +46,7 @@ class SerializerPython {
 
     //Create the config.ini
     EndpointConfig endpoint_config = config.getEndpoint();
-    create_settings_file(endpoint_config.url, endpoint_config.prefix, endpoint_config.graph_base, config);
+    create_settings_file(endpoint_config.getUrl(), endpoint_config.getPrefix(), endpoint_config.getGraph_base(), config);
   }
 
   private void create_settings_file(String endpoint, String prefix, String graph_base, YamlConfig config){

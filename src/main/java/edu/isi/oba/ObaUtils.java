@@ -259,4 +259,8 @@ public class ObaUtils {
         return jsonObject;
     }
 
+    public static String check_trailing_slash(String string) {
+        return string.endsWith("/") ? string : string + "/";
+    }
+
 }

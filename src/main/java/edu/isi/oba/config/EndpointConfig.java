@@ -1,9 +1,11 @@
 package edu.isi.oba.config;
 
+import edu.isi.oba.ObaUtils;
+
 public class EndpointConfig {
-  public String url;
-  public String prefix;
-  public String graph_base;
+  private String url;
+  private String prefix;
+  private String graph_base;
 
   public String getUrl() {
     return url;
@@ -18,7 +20,7 @@ public class EndpointConfig {
   }
 
   public void setPrefix(String prefix) {
-    this.prefix = prefix;
+    this.prefix = ObaUtils.check_trailing_slash(prefix);
   }
 
   public String getGraph_base() {
@@ -26,6 +28,6 @@ public class EndpointConfig {
   }
 
   public void setGraph_base(String graph_base) {
-    this.graph_base = graph_base;
+    this.graph_base =  ObaUtils.check_trailing_slash(graph_base);
   }
 }
