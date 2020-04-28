@@ -7,21 +7,22 @@
     <source src="../figures/firebase.mp4" type="video/mp4">
     Your browser does not support the video tag.
     </video>
-4. Go to the OBA configuration file.
+4. Edit the OBA configuration file as follows:
 ```yaml
 auth:
   provider: firebase
 firebase:
   key: YOUR_KEY
 ```
+Where `YOUR_KEY` corresponds to the Web API key you obtained above. 
 
-And re-run oba.
+Finally, re-run OBA.
 
 ### Testing the authentication
 
-OBA added a new path `/user/login`
+Now you can see that OBA added a new path `/user/login`:
 
-```
+
 ```
   /user/login:
     get:
@@ -68,7 +69,7 @@ OBA added a new path `/user/login`
 ```
 
 
-You can test the authentication
+You can test the authentication with the following command:
 
 ```
 $ curl -s -X GET 'https://$SERVER/$VERSION/user/login?username=$USERNAME&password=$PASSWORD' -H 'accept: application/json'
