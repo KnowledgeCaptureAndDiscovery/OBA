@@ -6,6 +6,9 @@ The Ontology-Based API (OBA) project takes as input an ontology or ontology netw
 ![Diagram](figures/oba.svg)
 **Figure 1**: Overview off the capabilities of OBA 
 
+!!! info
+    If you experience any issues when using OBA, or if you would like us to support additional exciting features, please open an issue on our [GitHub repository](https://github.com/KnowledgeCaptureAndDiscovery/OBA/issues).
+
 
 ## Used Technologies and Standards
 

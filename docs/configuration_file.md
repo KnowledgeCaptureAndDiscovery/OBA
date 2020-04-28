@@ -4,35 +4,53 @@ OBA supports configuring your documentation builds with a YAML file.
 
 Below is an example YAML file which may require some changes for your project's configuration:
 
-```yaml
-ontologies:
-  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
-name: modelcatalog
-output_dir: outputs
+You can find examples in the [GitHub](https://github.com/KnowledgeCaptureAndDiscovery/OBA/tree/master/examples)
 
+!!!info
+
+If you experience any issues when using OBA, or if you would like us to support additional exciting features, please open an issue on our [GitHub repository](https://github.com/KnowledgeCaptureAndDiscovery/OBA/issues).
+
+```yaml
+#Name of the project
+name: dbpedia_music
+
+## OpenAPI Section
+### Name, version and URL of the OpenAPI
+### For more information about the section. Go to the official documentation
 openapi:
   openapi: 3.0.1
   info:
-    description: This is the API of the  Software Description Ontology
-      at [https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.3.0/index-en.html](https://w3id.org/okn/o/sdm)
-    title: Model Catalog
+    description: This is the API of the DBpedia Ontology
+    title: DBpedia
     version: v1.3.0
   externalDocs:
-    description: Model Catalog
-    url: https://w3id.org/okn/o/sdm
+    description: DBpedia
+    url:  http://dbpedia.org/
   servers:
-    - url: https://api.models.mint.isi.edu/v1.3.0
-    - url: https://dev.api.models.mint.isi.edu/v1.3.0
+    - url: https://dbpedia.dbpedia.oba.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
 
-endpoint:
-  url: https://endpoint.mint.isi.edu/modelCatalog-1.2.0
-  prefix: https://w3id.org/okn/i/mint/
-  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
+## Ontologies
+### List of ontologies
+ontologies:
+  - https://tinyurl.com/dbpediaoba
 
-firebase:
-  key:
+## SPARQL information
+endpoint:
+  url: http://dbpedia.org/sparql
+  prefix: http://dbpedia.org/resource
+
+## Filter the paths by methods
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+## Select the classes to add in the API
+classes:
+  - http://dbpedia.org/ontology/Genre
+  - http://dbpedia.org/ontology/Band
+follow_references: false
 ```
 
 
@@ -49,7 +67,7 @@ The name of OpenAPI
 Example:
 
 ```yaml
-name: modelcatalog
+name: dbpedia_music
 ```
 
 
@@ -60,7 +78,7 @@ The output directory of the OpenApi specification files, relative to the root of
 | Field | Value |
 |---|---|
 | **Required:** | ``false`` |
-| **Default:** | ``output`` |
+| **Default:** | ``outputs`` |
 
 
 Example:
@@ -87,16 +105,14 @@ Example:
 openapi:
   openapi: 3.0.1
   info:
-    description: This is the API of the  Software Description Ontology
-      at [https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.3.0/index-en.html](https://w3id.org/okn/o/sdm)
-    title: Model Catalog
+    description: This is the API of the DBpedia Ontology
+    title: DBpedia
     version: v1.3.0
   externalDocs:
-    description: Model Catalog
-    url: https://w3id.org/okn/o/sdm
+    description: DBpedia
+    url:  http://dbpedia.org/
   servers:
-    - url: https://api.models.mint.isi.edu/v1.3.0
-    - url: https://dev.api.models.mint.isi.edu/v1.3.0
+    - url: https://dbpedia.dbpedia.oba.isi.edu/v1.3.0
     - url: http://localhost:8080/v1.3.0
 ```
 
@@ -151,9 +167,12 @@ Example
 
 ```yaml
 endpoint:
-  url: https://endpoint.mint.isi.edu/modelCatalog-1.2.0
-  prefix: https://w3id.org/okn/i/mint/
-  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
+  url: http://dbpedia.org/sparql
+  prefix: http://dbpedia.org/resource
+  # Add the GRAPH clause. Enable it when you are using authentication.
+  # OBA uses a graph to store the user contents on a personal namespace. 
+  # For DBpedia, dont use it.
+  graph: http://endpoint.mint.isi.edu/modelCatalog-1.4.0/data/ 
 ```
 
 ### endpoint.url
@@ -169,14 +188,15 @@ The url of the SPARQL Endpoint
 Example:
 
 ```yaml
-  url: https://endpoint.mint.isi.edu/modelCatalog-1.2.0
+  url: http://dbpedia.org/sparql
 ```
 
 
 ### endpoint.prefix
 
 
-The prefix of the SPARQL Endpoint 
+The prefix of the SPARQL Endpoint.
+This is useful when you create a new resource.
 
 | Field | Value |
 |---|---|
@@ -187,7 +207,7 @@ The prefix of the SPARQL Endpoint
 Example:
 
 ```yaml
-  prefix: https://w3id.org/okn/i/mint/
+  prefix: http://dbpedia.org/resource
 ```
 
 
@@ -214,26 +234,80 @@ Example:
 
 ```yaml
 ontologies:
-  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.2.0/ontology.xml
-  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.4.0/ontology.xml
+  - https://tinyurl.com/dbpediaoba
 ```
 | Field | Value |
 |---|---|
 | **Required:** | ``true`` |
 | **Type:** | ``List[string]`` |
 
-## firebase
-
-You can use firebase to login
+## custom_queries_directory
 
 | Field | Value |
 |---|---|
 | **Required:** | ``false`` |
-| **Type:** | ``dict`` |
+| **Type:** | ``List[Path]`` |
+
+[Go to how to add custom queries](adding_custom_queries.md) for more information
+
+## filtering
+
+Some ontologies contain numerous classes. However, you can be interested in a subgroup. OBA can filter the classes.
+
+### classes
+
+| Field | Value |
+|---|---|
+| **Required:** | ``false`` |
+| **Type:** | ``List[URI]`` |
+
+```yaml
+classes:
+  - http://dbpedia.org/ontology/Genre
+  - http://dbpedia.org/ontology/Band
+```
+
+### follow_references
+
+| Field | Value |
+|---|---|
+| **Required:** | ``false`` |
+| **Type:** | ``Boolean`` |
+| **Default:** | ``True`` |
+
+
+For more information, go to [filtering classes](filtering.md#following-references)
+
+```yaml
+follow_references: false
+```
+
+
+## auth
+
+Add login to the API and add security to the following methods: `POST`, `PUT` and `DELETE`
+
+
+### provider
+
+| Field | Value |
+|---|---|
+| **Required:** | ``true`` |
+| **Type:** | ``str`` |
+
+The providers supported:
+
+- Firebase
+
+## Providers
+
+### firebase
+
+You can use firebase to login
 
 ```
 firebase:
-  key: key
+  key: google_key
 ```
 
 ### firebase.key
@@ -249,13 +323,5 @@ To authenticate a service account and authorize it to access Firebase services, 
 
 ```
 firebase:
-  key: key
+  key: google_key
 ```
-
-
-### custom_queries_directory
-
-| Field | Value |
-|---|---|
-| **Required:** | ``true`` |
-| **Type:** | ``str`` |

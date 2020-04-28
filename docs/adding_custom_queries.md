@@ -47,10 +47,10 @@ Next, you have to save the query in the **custom** directory. For example, as *c
 
 ## Defining Custom Query Parameters
 
-Now we have to extend the OpenAPI specification with the custom query:
+We have to extend the OpenAPI specification with the custom query:
 
 !!! info
-   You must be familiar with OpenAPI specitification. Please, read (Describing parameters)[https://swagger.io/docs/specification/describing-parameters/]
+    You must be familiar with OpenAPI specitification. Please, read  [OpenAPI Docs - Describing parameters](https://swagger.io/docs/specification/describing-parameters/)
 
 
 !!! warning
