@@ -220,7 +220,7 @@ public class ObaUtils {
 
     /**
      * Method to execute OWL2JSONLD
-     * @param ontology_file file of the ontology to load
+     * @param ontology_file file path of the ontology to load 
      * @return JSON object with the context of the ontology
      * @throws Exception 
      */
@@ -293,7 +293,9 @@ public class ObaUtils {
     */
     public static void downloadOntology(String uri, String downloadPath) {
         for (String serialization : POSSIBLE_VOCAB_SERIALIZATIONS) {
-            logger.info("Attempting to download vocabulary in " + serialization);
+            System.out.println("Attempting to download vocabulary in " + serialization);
+            //logger is not initialized correctly and fails in tests (to fix)
+            //logger.info("Attempting to download vocabulary in " + serialization);
             try {
                 URL url = new URL(uri);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

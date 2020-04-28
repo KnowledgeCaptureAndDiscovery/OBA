@@ -1,5 +1,7 @@
 package edu.isi.oba;
 
+import com.github.jknack.handlebars.internal.Files;
+import java.io.File;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +44,11 @@ public class ObaUtilsTest {
     public void run() {
         String ontology1 = "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.4.0/ontology.xml";
         String ontology2 = "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.5.0/ontology.xml";
-        String[] ontologies = new String[]{ontology1, ontology2};
+        File ont1 = new File("ontology1");
+        File ont2 = new File("ontology2");
+        ObaUtils.downloadOntology(ontology1, ont1.getPath());
+        ObaUtils.downloadOntology(ontology2, ont2.getPath());
+        String[] ontologies = new String[]{"ontology1", "ontology2"};
         JSONObject context = null;
         try {
             context = ObaUtils.generate_context_file(ontologies);
@@ -54,6 +60,12 @@ public class ObaUtilsTest {
         assertEquals(o.get("type"), "@type");
         assertNotNull(o.get("Entity"));
         assertNotNull(o.get("Model"));
+        try{
+            java.nio.file.Files.delete(ont1.toPath());
+            java.nio.file.Files.delete(ont2.toPath());
+        }catch(Exception e){        
+        }
+        
     }
 
 }
