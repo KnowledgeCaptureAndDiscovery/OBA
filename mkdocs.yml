@@ -9,6 +9,7 @@ nav:
   - Filtering the classes: filtering.md
   - Adding custom queries: adding_custom_queries.md
   - Configuration file: configuration_file.md
+  - Authentication: authentication.md
 theme:
   name: material
 

@@ -6,9 +6,9 @@ Below is an example YAML file which may require some changes for your project's 
 
 You can find examples in the [GitHub](https://github.com/KnowledgeCaptureAndDiscovery/OBA/tree/master/examples)
 
-!!!info
+!!! info
+    If you experience any issues when using OBA, or if you would like us to support additional exciting features, please open an issue on our [GitHub repository](https://github.com/KnowledgeCaptureAndDiscovery/OBA/issues).
 
-If you experience any issues when using OBA, or if you would like us to support additional exciting features, please open an issue on our [GitHub repository](https://github.com/KnowledgeCaptureAndDiscovery/OBA/issues).
 
 ```yaml
 #Name of the project
