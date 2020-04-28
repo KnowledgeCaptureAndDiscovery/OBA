@@ -1,0 +1,36 @@
+ontologies:
+  - examples\modelcatalog_reduced\modelCat.ttl
+name: modelcatalog-reduced
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the Software Description Ontology at [https://w3id.org/okn/o/sdm](https://w3id.org/okn/o/sdm)
+    title: Model Catalog
+    version: v1.5.0
+  externalDocs:
+    description: Model Catalog
+    url: https://w3id.org/okn/o/sdm
+  servers:
+    - url: https://api.models.mint.isi.edu/v1.5.0
+    - url: https://dev.api.models.mint.isi.edu/v1.5.0
+    - url: http://localhost:8080/v1.5.0
+
+firebase:
+  key: "test"
+
+endpoint:
+  url: http://endpoint.mint.isi.edu/modelCatalog-1.4.0
+  prefix: https://w3id.org/okn/i/masd
+  graph_base: http://endpoint.mint.isi.edu/modelCatalog-1.4.0/data/
+
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+auth:
+  provider: firebase
+follow_references: true
+

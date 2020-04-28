@@ -1,0 +1,32 @@
+ontologies:
+  - http://purl.org/net/p-plan
+name: p-plan
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: Example of the P-Plan ontology
+    title: P-Plan
+    version: v1.0.0
+  externalDocs:
+    description: P-Plan
+    url: https://w3id.org/okn/o/sdm
+
+firebase:
+  key: "test"
+
+endpoint:
+  url: http://endpoint.mint.isi.edu/example
+  prefix: https://w3id.org/okn/i/example
+  graph_base: http://endpoint.mint.isi.edu/example
+
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+auth:
+  provider: firebase
+follow_references: true
+
