@@ -1,6 +1,5 @@
 package edu.isi.oba;
 
-import com.github.jknack.handlebars.internal.Files;
 import java.io.File;
 import org.json.JSONObject;
 import org.junit.Assert;
