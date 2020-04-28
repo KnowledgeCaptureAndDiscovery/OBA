@@ -15,8 +15,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static edu.isi.oba.Oba.logger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Paths;
 
 public class ObaUtils {
+    public static final String[] POSSIBLE_VOCAB_SERIALIZATIONS = { "application/rdf+xml", "text/turtle", "text/n3",
+			"application/ld+json" };
 
     public static void write_file(String file_path, String content) {
         BufferedWriter writer = null;
@@ -213,13 +218,20 @@ public class ObaUtils {
         return ObaUtils.concat_json_common_key(jsons, "@context");
     }
 
-    private static JSONObject run_owl_jsonld(String ontology_url) throws Exception {
+    /**
+     * Method to execute OWL2JSONLD
+     * @param ontology_file file of the ontology to load
+     * @return JSON object with the context of the ontology
+     * @throws Exception 
+     */
+    private static JSONObject run_owl_jsonld(String ontology_file) throws Exception {
+        ontology_file = new File(ontology_file).toURI().toString();
         String owl2jsonld = "/owl2jsonld-0.3.0-SNAPSHOT-standalone.jar";
         InputStream owl2_jar = ObaUtils.class.getResourceAsStream(owl2jsonld);
         File tempFile = File.createTempFile("oba", "jar");
         copy(owl2_jar,tempFile);
         Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(new String[]{"java", "-jar", tempFile.getPath(), ontology_url});
+        Process proc = rt.exec(new String[]{"java", "-jar", tempFile.getPath(), ontology_file});
 
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
@@ -270,6 +282,53 @@ public class ObaUtils {
 
     public static String check_trailing_slash(String string) {
         return string.endsWith("/") ? string : string + "/";
+    }
+    
+    /**
+    * Method that will download an ontology given its URI, doing content
+    * negotiation The ontology will be downloaded in the first serialization
+    * available (see Constants.POSSIBLE_VOCAB_SERIALIZATIONS)
+    * @param uri the URI of the ontology
+    * @param downloadPath path where the ontology will be saved locally.
+    */
+    public static void downloadOntology(String uri, String downloadPath) {
+        for (String serialization : POSSIBLE_VOCAB_SERIALIZATIONS) {
+            logger.info("Attempting to download vocabulary in " + serialization);
+            try {
+                URL url = new URL(uri);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setInstanceFollowRedirects(true);
+                connection.setRequestProperty("Accept", serialization);
+                int status = connection.getResponseCode();
+                boolean redirect = false;
+                if (status != HttpURLConnection.HTTP_OK) {
+                    if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
+                            || status == HttpURLConnection.HTTP_SEE_OTHER)
+                        redirect = true;
+                }
+                // there are some vocabularies with multiple redirections:
+                // 301 -> 303 -> owl
+                while (redirect) {
+                    String newUrl = connection.getHeaderField("Location");
+                    connection = (HttpURLConnection) new URL(newUrl).openConnection();
+                    connection.setRequestProperty("Accept", serialization);
+                    status = connection.getResponseCode();
+                    if (status != HttpURLConnection.HTTP_MOVED_TEMP && status != HttpURLConnection.HTTP_MOVED_PERM
+                                    && status != HttpURLConnection.HTTP_SEE_OTHER)
+                        redirect = false;
+                }
+                InputStream in = (InputStream) connection.getInputStream();
+                Files.copy(in, Paths.get(downloadPath), StandardCopyOption.REPLACE_EXISTING);
+                in.close();
+                break; // if the vocabulary is downloaded, then we don't download it for the other
+                                // serializations
+            } catch (Exception e) {
+                final String message = "Failed to download vocabulary in RDF format [" + serialization +"]: ";
+                logger.severe(message + e.toString());
+                throw new RuntimeException(message, e);
+            }
+        }
     }
 
 }

@@ -12,8 +12,15 @@ import org.semanticweb.owlapi.model.*;
 import static edu.isi.oba.Oba.logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
 
 class Mapper {
     public static final String DEFAULT_DIR_QUERY = "_default_";
@@ -38,11 +45,38 @@ class Mapper {
 
         List<String> config_ontologies = config_data.getOntologies();
         String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
-
-        //Load the ontology into the manager
-        for (String ontologyURL : config_ontologies) {
-            this.manager.loadOntology(IRI.create(ontologyURL));
+        File outputDir = new File(destination_dir);
+        if (!outputDir.exists()){
+            outputDir.mkdirs();
         }
+        //Load the ontology into the manager
+        int i = 0;
+        List<String> ontologyPaths = new ArrayList<>();
+        for (String ontologyPath : config_ontologies) {
+            //copy the ontologies used in the destination folder
+            String destinationPath = destination_dir + File.separator +"ontology"+i+".owl";
+            File ontologyFile = new File (destinationPath);
+            //content negotiation + download in case a URI is added
+            if(ontologyPath.startsWith("http://") || ontologyPath.startsWith("https://")){
+                //download ontology to local path
+                ObaUtils.downloadOntology(ontologyPath, destinationPath);
+            }
+            else{
+                try {
+                    //copy to right folder
+                    Files.copy(new File(ontologyPath).toPath(), ontologyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            System.out.println(destinationPath);
+            ontologyPaths.add(destinationPath);
+            //this.manager.loadOntology(IRI.create(ontologyURL));
+            this.manager.loadOntologyFromOntologyDocument(new File(destinationPath));
+            i++;
+        }
+        //set ontology paths in YAML to the ones we have downloaded (for later reference by owl2jsonld)
+        this.config_data.setOntologies(ontologyPaths);
         ontologies = this.manager.ontologies().collect(Collectors.toList());
 
         //Create a temporal Map<IRI, String> schemaNames with the classes
@@ -77,7 +111,8 @@ class Mapper {
         for (OWLOntology ontology : this.ontologies) {
 
             OWLDocumentFormat format = ontology.getFormat();
-            String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+            //String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+            String defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
             Set<OWLClass> classes = ontology.getClassesInSignature();
 
             /**
@@ -130,7 +165,8 @@ class Mapper {
                             this.mapped_classes.add(ref_class);
                             getMapperSchema(query, temp_ontology, ref_class);
                             OWLDocumentFormat format = ontology.getFormat();
-                            String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+                            //String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+                            String temp_defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
                             add_owlclass_to_openapi(query, pathGenerator, temp_ontology, temp_defaultOntologyPrefixIRI, ref_class, false);
                         }
                     }
