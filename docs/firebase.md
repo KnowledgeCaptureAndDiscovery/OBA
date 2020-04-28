@@ -16,3 +16,73 @@ firebase:
 ```
 
 And re-run oba.
+
+### Testing the authentication
+
+OBA added a new path `/user/login`
+
+```
+```
+  /user/login:
+    get:
+      description: Login the user
+      operationId: user_login_get
+      parameters:
+      - description: The user name for login
+        in: query
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: The password for login in clear text
+        in: query
+        name: password
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                format: int32
+                type: integer
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                format: date-time
+                type: string
+        400:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: unsuccessful operation
+      x-openapi-router-controller: openapi_server.controllers.user_controller
+```
+
+
+You can test the authentication
+
+```
+$ curl -s -X GET 'https://$SERVER/$VERSION/user/login?username=$USERNAME&password=$PASSWORD' -H 'accept: application/json'
+{
+  "access_token": "$ACCESS_TOKEN",
+  "expires_in": 60000,
+  "refresh_token": "$REFREST_TOKEN",
+  "scope": "create",
+  "token_type": "bearer"
+}
+```
+
+To use the token, add the token in the header
+
+```
+$ curl -v -X POST "$SERVER/$CLASS" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d "$payload"
+```
