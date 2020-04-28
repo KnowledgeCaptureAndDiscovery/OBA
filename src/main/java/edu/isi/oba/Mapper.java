@@ -52,6 +52,21 @@ class Mapper {
         //Load the ontology into the manager
         int i = 0;
         List<String> ontologyPaths = new ArrayList<>();
+        download_ontologies(config_ontologies, destination_dir, i, ontologyPaths);
+        //set ontology paths in YAML to the ones we have downloaded (for later reference by owl2jsonld)
+        this.config_data.setOntologies(ontologyPaths);
+        ontologies = this.manager.ontologies().collect(Collectors.toList());
+
+        //Create a temporal Map<IRI, String> schemaNames with the classes
+        for (OWLOntology ontology : ontologies) {
+            Set<OWLClass> classes = ontology.getClassesInSignature();
+            setSchemaNames(classes);
+        }
+        if (config_data.getClasses() != null)
+            this.selected_classes = filter_classes();
+    }
+
+    private void download_ontologies(List<String> config_ontologies, String destination_dir, int i, List<String> ontologyPaths) throws OWLOntologyCreationException {
         for (String ontologyPath : config_ontologies) {
             //copy the ontologies used in the destination folder
             String destinationPath = destination_dir + File.separator +"ontology"+i+".owl";
@@ -75,17 +90,6 @@ class Mapper {
             this.manager.loadOntologyFromOntologyDocument(new File(destinationPath));
             i++;
         }
-        //set ontology paths in YAML to the ones we have downloaded (for later reference by owl2jsonld)
-        this.config_data.setOntologies(ontologyPaths);
-        ontologies = this.manager.ontologies().collect(Collectors.toList());
-
-        //Create a temporal Map<IRI, String> schemaNames with the classes
-        for (OWLOntology ontology : ontologies) {
-            Set<OWLClass> classes = ontology.getClassesInSignature();
-            setSchemaNames(classes);
-        }
-        if (config_data.getClasses() != null)
-            this.selected_classes = filter_classes();
     }
 
     /**
