@@ -16,7 +16,7 @@ openapi:
 firebase:
   key: "test"
 
-#endpoint not used for this example.
+#not used for this example.
 endpoint:
   url: http://endpoint.mint.isi.edu/example
   prefix: https://w3id.org/okn/i/example
