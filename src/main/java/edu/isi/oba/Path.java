@@ -33,27 +33,27 @@ class Path {
     this.enable_delete_paths = enable_delete_paths;
   }
 
-  public PathItem generate_singular(String schemaName){
+  public PathItem generate_singular(String schemaName, String schemaURI){
     PathItem path_item = new PathItem();
     if (enable_get_paths)
-      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.SINGULAR, auth).getOperation());
+      path_item.get(new MapperOperation(schemaName, schemaURI, Method.GET, Cardinality.SINGULAR, auth).getOperation());
 
     if (enable_delete_paths)
-      path_item.delete(new MapperOperation(schemaName, Method.DELETE, Cardinality.SINGULAR, auth).getOperation());
+      path_item.delete(new MapperOperation(schemaName, schemaURI, Method.DELETE, Cardinality.SINGULAR, auth).getOperation());
 
     if (enable_put_paths)
-      path_item.put(new MapperOperation(schemaName, Method.PUT, Cardinality.SINGULAR, auth).getOperation());
+      path_item.put(new MapperOperation(schemaName, schemaURI, Method.PUT, Cardinality.SINGULAR, auth).getOperation());
 
     return path_item;
   }
 
 
-  public PathItem generate_plural(String schemaName){
+  public PathItem generate_plural(String schemaName, String schemaURI){
     PathItem path_item = new PathItem();
     if (enable_get_paths)
-      path_item.get(new MapperOperation(schemaName, Method.GET, Cardinality.PLURAL, auth).getOperation());
+      path_item.get(new MapperOperation(schemaName, schemaURI, Method.GET, Cardinality.PLURAL, auth).getOperation());
     if (enable_post_paths)
-      path_item.post(new MapperOperation(schemaName, Method.POST, Cardinality.PLURAL, auth).getOperation());
+      path_item.post(new MapperOperation(schemaName,schemaURI, Method.POST, Cardinality.PLURAL, auth).getOperation());
     return path_item;
   }
 

@@ -1,7 +1,6 @@
 package edu.isi.oba;
 
 import java.io.*;
-import java.net.URL;
 
 class Query {
 

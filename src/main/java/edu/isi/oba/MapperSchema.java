@@ -19,6 +19,7 @@ class MapperSchema {
     private final IRIShortFormProvider sfp = new SimpleIRIShortFormProvider();
     private final String type;
     private final OWLClass cls;
+    private final String cls_description;
     private final List<OWLOntology> ontologies;
     private Map<String, Schema> dataProperties;
     private Map<String, Schema> objectProperties;
@@ -39,10 +40,11 @@ class MapperSchema {
         return schema;
     }
 
-    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, Map<IRI, String> schemaNames, OWLOntology class_ontology, Boolean follow_references) {
+    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, String clsDescription, Map<IRI, String> schemaNames, OWLOntology class_ontology, Boolean follow_references) {
         this.schemaNames = schemaNames;
         this.follow_references = follow_references;
         this.cls = cls;
+        this.cls_description = clsDescription;
         this.type = "object";
         this.ontologies = ontologies;
         this.ontology_cls = class_ontology;
@@ -68,6 +70,7 @@ class MapperSchema {
     private Schema setSchema() {
         Schema schema = new Schema();
         schema.setName(this.name);
+        schema.setDescription(this.cls_description);
         schema.setType(this.type);
         schema.setProperties(this.getProperties());
         return schema;
@@ -134,7 +137,8 @@ class MapperSchema {
 
                     //obtain type using the range
                     List<String> propertyRanges = getCodeGenTypesByRangeData(ranges, odp);
-                    MapperDataProperty mapperProperty = new MapperDataProperty(propertyName, propertyRanges, array, nullable);
+                    String propertyDescription = ObaUtils.getDescription(odp, ontology_cls);
+                    MapperDataProperty mapperProperty = new MapperDataProperty(propertyName, propertyDescription, propertyRanges, array, nullable);
                     try {
                         properties.put(mapperProperty.name, mapperProperty.getSchemaByDataProperty());
                     } catch (Exception e) {
@@ -159,10 +163,10 @@ class MapperSchema {
                 add("string");
             }
         };
-        MapperDataProperty idProperty = new MapperDataProperty("id", defaultProperties, false, false);
-        MapperDataProperty labelProperty = new MapperDataProperty("label", defaultProperties, true, true);
-        MapperDataProperty typeProperty = new MapperDataProperty("type", defaultProperties, true, true);
-        MapperDataProperty descriptionProperty = new MapperDataProperty("description", defaultProperties, true, true);
+        MapperDataProperty idProperty = new MapperDataProperty("id", "identifier", defaultProperties, false, false);
+        MapperDataProperty labelProperty = new MapperDataProperty("label", "short description of the resource",  defaultProperties, true, true);
+        MapperDataProperty typeProperty = new MapperDataProperty("type", "type of the resource", defaultProperties, true, true);
+        MapperDataProperty descriptionProperty = new MapperDataProperty("description", "small description", defaultProperties, true, true);
 
         properties.put(idProperty.name, idProperty.getSchemaByDataProperty());
         properties.put(labelProperty.name, labelProperty.getSchemaByDataProperty());
@@ -204,7 +208,8 @@ class MapperSchema {
                     propertyNameURI.put(propertyURI, propertyName);
 
                     List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing, follow_references);
-                    MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyRanges);
+                    String propertyDescription = ObaUtils.getDescription(odp, ontology_cls);
+                    MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, propertyRanges);
                     try {
                         properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
                     } catch (Exception e) {
@@ -272,4 +277,10 @@ class MapperSchema {
     private String getSchemaName(OWLClass cls) {
         return schemaNames.get(cls.getIRI());
     }
+
+    public OWLClass getCls() {
+        return cls;
+    }
+    
+    
 }

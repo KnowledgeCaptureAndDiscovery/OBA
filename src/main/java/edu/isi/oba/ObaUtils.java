@@ -18,10 +18,32 @@ import static edu.isi.oba.Oba.logger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import uk.ac.manchester.cs.owl.owlapi.OWLAnnotationPropertyImpl;
 
 public class ObaUtils {
     public static final String[] POSSIBLE_VOCAB_SERIALIZATIONS = { "application/rdf+xml", "text/turtle", "text/n3",
 			"application/ld+json" };
+    private static final String RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#";
+    private static final String SKOS_NS = "http://www.w3.org/2004/02/skos/core#";
+    private static final String PROV_NS = "http://www.w3.org/ns/prov#";
+    public static final String RDFS_COMMENT = RDFS_NS+"comment";
+    public static final String SKOS_DEFINITION = SKOS_NS+"definition";
+    public static final String PROV_DEFINITION = PROV_NS+"definition";
+    public static final List<String> DESCRIPTION_PROPERTIES = new ArrayList<>(Arrays.asList(
+      RDFS_COMMENT,
+      SKOS_DEFINITION,
+      PROV_DEFINITION
+      ));
 
     public static void write_file(String file_path, String content) {
         BufferedWriter writer = null;
@@ -332,5 +354,33 @@ public class ObaUtils {
             }
         }
     }
-
+    
+    /**
+     * Method that given a class, property or data property, searches for the best description.
+     * @param entity entity to search.
+     * @param ontology ontology to be used to search descriptions.
+     * @return Description String (prioritizes English language)
+     */
+    public static String getDescription(OWLEntity entity, OWLOntology ontology){
+        String descriptionValue = "Description not available";
+        for(String description:ObaUtils.DESCRIPTION_PROPERTIES){
+               Object[] annotationsObjects = EntitySearcher.getAnnotationObjects(entity, ontology, new OWLAnnotationPropertyImpl(new IRI(description) {
+               })).toArray();
+               if(annotationsObjects.length!=0){
+                   Optional<OWLLiteral> descriptionLiteral;
+                   for(Object annotation: annotationsObjects){
+                       descriptionLiteral = ((OWLAnnotation) annotation).getValue().asLiteral();
+                       if(descriptionLiteral.isPresent()){
+                           if(annotationsObjects.length == 1 || descriptionLiteral.get().getLang().equals("en")){
+                               descriptionValue = descriptionLiteral.get().getLiteral();
+                           }
+                       }
+                   }
+                   break;
+               }
+           }
+        return descriptionValue;
+    }
+    
 }
+

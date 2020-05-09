@@ -2,7 +2,6 @@ package edu.isi.oba;
 
 import io.swagger.v3.oas.models.media.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import static edu.isi.oba.Oba.logger;
@@ -72,15 +71,17 @@ class MapperDataProperty {
   private static final String BOOLEAN_TYPE = "boolean";
 
   final String name;
+  final String description;
   private List<String> type;
   private Boolean array;
   private Boolean nullable;
 
 
-  public MapperDataProperty(String name, List<String> type, Boolean array, Boolean nullable) {
+  public MapperDataProperty(String name, String description, List<String> type, Boolean array, Boolean nullable) {
     this.dataTypes = new HashMap<>();
     this.setDataTypes();
     this.name = name;
+    this.description = description;
     this.type = type;
     this.array = array;
     this.nullable = nullable;
@@ -93,10 +94,10 @@ class MapperDataProperty {
     ////}
 
     if (this.type.size() == 0) {
-      return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
+      return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable).description(description);
     }
     else if (this.type.size() > 1){
-      return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable);
+      return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable).description(description);
     }
 
     String schemaType = getDataType(this.type.get(0));
@@ -105,66 +106,69 @@ class MapperDataProperty {
     }
     switch (schemaType) {
       case STRING_TYPE:
-        return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable);
+        return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable).description(description);
       case NUMBER_TYPE:
-        return (array) ? arraySchema(new NumberSchema(), nullable) : new NumberSchema().nullable(nullable);
+        return (array) ? arraySchema(new NumberSchema(), nullable) : new NumberSchema().nullable(nullable).description(description);
       case INTEGER_TYPE:
-        return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable);
+        return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable).description(description);
       case BOOLEAN_TYPE:
-        return (array) ? arraySchema(new BooleanSchema(), nullable) : new BooleanSchema().nullable(nullable);
+        return (array) ? arraySchema(new BooleanSchema(), nullable) : new BooleanSchema().nullable(nullable).description(description);
      default:
         logger.warning("datatype mapping failed " + this.type.get(0));
-        return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable);
+        return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable).description(description);
     }
   }
 
-  private Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable){
-    Schema object = new ObjectSchema();
-    object.set$ref(ref);
-
-    if (array) {
-      ArraySchema objects = new ArraySchema();
-      objects.setNullable(nullable);
-      objects.setItems(object);
-      return objects;
-    }
-    else {
-      return object;
-    }
-
-
-  }
-  private Schema getComposedSchemaObject(List<String> refs, boolean array, boolean nullable){
-    Schema object = new ObjectSchema();
-    object.setType("object");
-
-    if (array) {
-      ArraySchema objects = new ArraySchema();
-      objects.setNullable(nullable);
-      objects.setItems(object);
-      return objects;
-    }
-    else {
-      return object;
-    }
-
-        /*ComposedSchema composedSchema = new ComposedSchema();
-        List<Schema> items = new ArrayList<>();
-        for (String ref : refs){
-            Schema item = getObjectPropertiesByRef(ref, array, nullable);
-            items.add(item);
-        }
-        composedSchema.setAnyOf(items);
-        return composedSchema;
-        */
-
-  }
+  //Not used
+//  private Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable){
+//    Schema object = new ObjectSchema();
+//    object.set$ref(ref);
+//
+//    if (array) {
+//      ArraySchema objects = new ArraySchema();
+//      objects.setNullable(nullable);
+//      objects.setItems(object);
+//      return objects;
+//    }
+//    else {
+//      return object;
+//    }
+//
+//
+//  }
+//  not used
+//  private Schema getComposedSchemaObject(List<String> refs, boolean array, boolean nullable){
+//    Schema object = new ObjectSchema();
+//    object.setType("object");
+//
+//    if (array) {
+//      ArraySchema objects = new ArraySchema();
+//      objects.setNullable(nullable);
+//      objects.setItems(object);
+//      return objects;
+//    }
+//    else {
+//      return object;
+//    }
+//
+//        /*ComposedSchema composedSchema = new ComposedSchema();
+//        List<Schema> items = new ArrayList<>();
+//        for (String ref : refs){
+//            Schema item = getObjectPropertiesByRef(ref, array, nullable);
+//            items.add(item);
+//        }
+//        composedSchema.setAnyOf(items);
+//        return composedSchema;
+//        */
+//
+//  }
 
 
 
 
   private ArraySchema arraySchema(Schema base, boolean nullable) {
     ArraySchema array = new ArraySchema();
+    array.setDescription(description);
     array.setNullable(nullable);
     array.setItems(base);
     return array;
