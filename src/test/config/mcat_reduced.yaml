@@ -1,5 +1,5 @@
 ontologies:
-  - src\test\resources\modelCat.ttl
+  - src/test/resources/modelCat.ttl
 name: modelcatalog-reduced
 output_dir: outputs
 
