@@ -133,7 +133,7 @@ class MapperOperation {
                 .schema(new StringSchema()));
         parameters.add(new QueryParameter()
                 .name("page")
-                .description("Number of pages")
+                .description("Page number")
                 .required(false)
                 .schema(new IntegerSchema()._default(1)));
         parameters.add(new QueryParameter()
