@@ -1,7 +1,6 @@
 # OBA: Features
 OBA's features are organized on its two main functionalities: the generation of an OpenAPI specification from an ontology and the generation of a server with a given specification:
 
-- [OBA: Features](#oba-features)
   - [Generating an OpenAPI Specification from OWL ontologies](#generating-an-openapi-specification-from-owl-ontologies)
     - [Generating SPARQL query templates](#generating-sparql-query-templates)
     - [Generating JSON-LD contexts](#generating-json-ld-contexts)

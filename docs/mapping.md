@@ -4,6 +4,7 @@ The current mapping supported by OBA can be seen below.
   We are currently working on improving the mapping with complex axiomatization of domains and ranges and other property annotations (minimum and maximum cardinality, etc.)
 
 **Namespaces** used in this document:
+
   - owl: [http://www.w3.org/2002/07/owl#](http://www.w3.org/2002/07/owl#)
   - rdfs: [http://www.w3.org/2000/01/rdf-schema#](http://www.w3.org/2000/01/rdf-schema#)
   - skos: [http://www.w3.org/2004/02/skos/core#](http://www.w3.org/2004/02/skos/core#)
