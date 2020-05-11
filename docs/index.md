@@ -1,6 +1,6 @@
 # Ontology-Based APIs (OBA) [![Build Status](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA.svg?branch=master)](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA)
 
-Authors: Maximiliano Osorio and Daniel Garijo.
+**Authors**: Maximiliano Osorio and Daniel Garijo.
 
 
 The Ontology-Based API (OBA) framework takes as input an ontology or ontology network (specified in OWL) and generates an OpenAPI Specification (OAS). Using this definition, OBA creates a REST API server automatically that can validate the requests from users; deliver JSON objects following the structure described in the ontology; accept custom queries needed by users; and support clients for easing the interaction with the API. Figure 1 shows a snapshot of the different capabilities of OBA: 
