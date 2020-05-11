@@ -6,25 +6,23 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.XML;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 
 import static edu.isi.oba.Oba.logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
 
 class Mapper {
     public static final String DEFAULT_DIR_QUERY = "_default_";
-    public final Map<IRI, String> schemaNames = new HashMap<>();
+    public final Map<IRI, String> schemaNames = new HashMap<>(); //URI-names of the schemas
+    public final Map<IRI, String> schemaDescriptions = new HashMap<>(); //URI-description of the schemas
     public Map<String, Schema> schemas = new HashMap<>();
     final Paths paths = new Paths();
     List<String> selected_paths;
@@ -61,6 +59,7 @@ class Mapper {
         for (OWLOntology ontology : ontologies) {
             Set<OWLClass> classes = ontology.getClassesInSignature();
             setSchemaNames(classes);
+            setSchemaDrescriptions(classes,ontology);
         }
         if (config_data.getClasses() != null)
             this.selected_classes = filter_classes();
@@ -158,7 +157,7 @@ class Mapper {
         List<OWLClass> ref = new ArrayList<>();
         String classPrefixIRI = cls.getIRI().getNamespace();
         if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
-            MapperSchema mapperSchema = getMapperSchema(query, ontology, cls);
+            MapperSchema mapperSchema = getMapperSchema(query, ontology, cls, this.schemaDescriptions.get(cls.getIRI()));
 
             for (OWLClass ref_class : mapperSchema.getProperties_range()) {
                 if (this.mapped_classes.contains(ref_class)){
@@ -167,7 +166,7 @@ class Mapper {
                     for (OWLOntology temp_ontology : this.ontologies) {
                         if ( follow_references ) {
                             this.mapped_classes.add(ref_class);
-                            getMapperSchema(query, temp_ontology, ref_class);
+                            getMapperSchema(query, temp_ontology, ref_class,this.schemaDescriptions.get(ref_class.getIRI()));
                             OWLDocumentFormat format = ontology.getFormat();
                             //String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
                             String temp_defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
@@ -184,9 +183,9 @@ class Mapper {
         return ref;
     }
 
-    private MapperSchema getMapperSchema(Query query, OWLOntology ontology, OWLClass cls) {
+    private MapperSchema getMapperSchema(Query query, OWLOntology ontology, OWLClass cls, String cls_description) {
         //Convert from OWL Class to OpenAPI Schema.
-        MapperSchema mapperSchema = new MapperSchema(this.ontologies, cls, schemaNames, ontology, follow_references);
+        MapperSchema mapperSchema = new MapperSchema(this.ontologies, cls, cls_description, schemaNames, ontology, follow_references);
         //Write queries
         query.write_readme(mapperSchema.name);
         //Create the OpenAPI schema
@@ -207,21 +206,37 @@ class Mapper {
             schemaNames.put(cls.getIRI(), cls.getIRI().getShortForm());
         }
     }
+    
+    /**
+     * Given a set of classes from an ontology, this method initializes
+     * schemaDescriptions with the definitions used to describe an ontology (if provided)
+     * @param classes the classes you want the description for
+     * @param ontology the ontology from where we will extract the descriptions
+     */
+    private void setSchemaDrescriptions(Set<OWLClass> classes,OWLOntology ontology){
+       for (OWLClass cls : classes) {
+           System.out.println(cls);
+           schemaDescriptions.put(cls.getIRI(), ObaUtils.getDescription(cls, ontology));
+       }
+    }
 
     private void add_path(Path pathGenerator, MapperSchema mapperSchema) {
         String singular_name = "/" + mapperSchema.name.toLowerCase() + "s/{id}";
         String plural_name = "/" + mapperSchema.name.toLowerCase() + "s";
         //Create the plural paths: for example: /models/
-        this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name));
+        this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name,
+                mapperSchema.getCls().getIRI().getIRIString()));
         //Create the plural paths: for example: /models/id
-        this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name));
+        this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name,
+                mapperSchema.getCls().getIRI().getIRIString()));
     }
 
-    private void add_path_relation(Path pathGenerator, String schema_name, String predicate, String path) {
-        String relation = "/" + schema_name.toLowerCase() + "s/{id}/" + path;
-        this.paths.addPathItem(relation, pathGenerator.generate_plural(schema_name));
-
-    }
+// Method not used
+//    private void add_path_relation(Path pathGenerator, String schema_name, String predicate, String path) {
+//        String relation = "/" + schema_name.toLowerCase() + "s/{id}/" + path;
+//        this.paths.addPathItem(relation, pathGenerator.generate_plural(schema_name));
+//
+//    }
 
     public List<OWLClass> filter_classes() {
         List<String> selected_classes_iri = this.config_data.getClasses();

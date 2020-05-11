@@ -1,5 +1,7 @@
 package edu.isi.oba;
 
+import static edu.isi.oba.ObaUtils.get_yaml_data;
+import edu.isi.oba.config.YamlConfig;
 import java.io.File;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -8,6 +10,12 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 
 public class ObaUtilsTest {
 
@@ -37,6 +45,16 @@ public class ObaUtilsTest {
         assertNotNull(o.get("Entity"));
         assertNotNull(o.get("Model"));
         assertNotNull(o.get("Setup"));
+    }
+    
+    @Test
+    public void getDescription () throws OWLOntologyCreationException{
+        String example_remote = "src/test/config/pplan.yaml";
+        YamlConfig config_data = get_yaml_data(example_remote);
+        Mapper mapper = new Mapper(config_data);
+        OWLClass planClass = mapper.manager.getOWLDataFactory().getOWLClass("http://purl.org/net/p-plan#Plan");
+        String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0));
+        assertNotEquals(desc, "");
     }
 
     @Test

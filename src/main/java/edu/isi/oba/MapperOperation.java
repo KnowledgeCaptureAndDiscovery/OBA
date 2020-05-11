@@ -11,7 +11,6 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -25,6 +24,7 @@ class MapperOperation {
   private String summary;
   private String description;
   private final String schemaName;
+  private final String schemaURI;
   private final List<Parameter> parameters = new ArrayList<>();
   private final RequestBody requestBody = new RequestBody();
   private final ApiResponses apiResponses = new ApiResponses();
@@ -38,10 +38,11 @@ class MapperOperation {
   private final Operation operation;
 
 
-  public MapperOperation(String schemaName, Method method, Cardinality cardinality, Boolean auth) {
+  public MapperOperation(String schemaName, String schemaURI, Method method, Cardinality cardinality, Boolean auth) {
     this.auth = auth;
     this.cardinality = cardinality;
     this.schemaName = schemaName;
+    this.schemaURI = schemaURI;
     String ref_text = "#/components/schemas/" + schemaName;
     schema = new Schema().$ref(ref_text);
 
@@ -63,7 +64,7 @@ class MapperOperation {
 
     if (cardinality == Cardinality.SINGULAR){
       parameters.add(new PathParameter()
-              .description("The ID of the resource")
+              .description("The ID of the "+schemaName+" to be retrieved")
               .name("id")
               .required(true)
               .schema(new StringSchema()));
@@ -104,15 +105,16 @@ class MapperOperation {
     if (this.auth)
       parameters.add(new QueryParameter()
               .name("username")
-              .description("Username to query")
+              .description("Name of the user graph to query")
               .required(false)
               .schema(new StringSchema()));
 
     switch (cardinality) {
       case PLURAL:
-        summary = "List all " + this.schemaName + " entities";
-        description = "Gets a list of all " + this.schemaName + " entities";
-        responseDescriptionOk = "Successful response - returns an array of " + schemaName + " entities.";
+        summary = "List all instances of " + this.schemaName;
+        description = "Gets a list of all instances of " + this.schemaName +
+                " (more information in " +this.schemaURI+")";
+        responseDescriptionOk = "Successful response - returns an array with the instances of " + schemaName + ".";
 
         //Set response
         ArraySchema schema = new ArraySchema();
@@ -131,7 +133,7 @@ class MapperOperation {
                 .schema(new StringSchema()));
         parameters.add(new QueryParameter()
                 .name("page")
-                .description("The page number")
+                .description("Page number")
                 .required(false)
                 .schema(new IntegerSchema()._default(1)));
         parameters.add(new QueryParameter()
@@ -141,9 +143,10 @@ class MapperOperation {
                 .schema(new IntegerSchema()._default(100).maximum(BigDecimal.valueOf(200)).minimum(BigDecimal.valueOf(1))));
         break;
       case SINGULAR:
-        summary = "Get a " + this.schemaName;
-        description = "Gets the details of a single instance of a " + this.schemaName;
-        responseDescriptionOk = "Gets the details of a single instance of  " + schemaName;
+        summary = "Get a single " + this.schemaName +" by its id";
+        description = "Gets the details of a given " + this.schemaName+
+                " (more information in " +this.schemaURI+")";
+        responseDescriptionOk = "Gets the details of a given " + schemaName;
 
         //Set request
         responseOk = new ApiResponse()
@@ -157,11 +160,12 @@ class MapperOperation {
   }
 
   private void setOperationPost() {
-    String requestDescription = "A new " + this.schemaName + "to be created";
+    String requestDescription = "Information about the " + this.schemaName + "to be created";
 
     //Edit global fields
-    summary = "Create a " + this.schemaName;
-    description = "Create a new instance of a " + this.schemaName;
+    summary = "Create one " + this.schemaName;
+    description = "Create a new instance of " + this.schemaName+
+                " (more information in " +this.schemaURI+")";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
@@ -180,8 +184,9 @@ class MapperOperation {
   private void setOperationPut() {
     String requestDescription = "An old " + this.schemaName + "to be updated";
 
-    summary = "Update a " + this.schemaName;
-    description = "Updates an existing " + this.schemaName;
+    summary = "Update an existing " + this.schemaName;
+    description = "Updates an existing " + this.schemaName+
+                " (more information in " +this.schemaURI+")";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
@@ -202,8 +207,9 @@ class MapperOperation {
 
 
   private void setOperationDelete() {
-    summary = "Delete a " + this.schemaName;
-    description = "Delete an existing " + this.schemaName;
+    summary = "Delete an existing " + this.schemaName;
+    description = "Delete an existing " + this.schemaName+
+                " (more information in " +this.schemaURI+")";
 
     //Set the response
     apiResponses

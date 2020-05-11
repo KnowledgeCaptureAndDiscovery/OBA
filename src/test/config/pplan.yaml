@@ -13,10 +13,7 @@ openapi:
     description: P-Plan
     url: http://purl.org/net/p-plan
 
-firebase:
-  key: "test"
-
-#endpoint not used for this example.
+#not used for this example.
 endpoint:
   url: http://endpoint.mint.isi.edu/example
   prefix: https://w3id.org/okn/i/example
@@ -27,7 +24,5 @@ enable_post_paths: false
 enable_delete_paths: false
 enable_put_paths: false
 
-auth:
-  provider: firebase
 follow_references: true
 
