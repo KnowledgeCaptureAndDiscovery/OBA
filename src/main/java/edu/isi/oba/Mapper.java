@@ -157,28 +157,32 @@ class Mapper {
         List<OWLClass> ref = new ArrayList<>();
         String classPrefixIRI = cls.getIRI().getNamespace();
         if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
-            MapperSchema mapperSchema = getMapperSchema(query, ontology, cls, this.schemaDescriptions.get(cls.getIRI()));
+            try{
+                MapperSchema mapperSchema = getMapperSchema(query, ontology, cls, this.schemaDescriptions.get(cls.getIRI()));
 
-            for (OWLClass ref_class : mapperSchema.getProperties_range()) {
-                if (this.mapped_classes.contains(ref_class)){
-                    logger.info("The class " + ref_class + " exists ");
-                } else {
-                    for (OWLOntology temp_ontology : this.ontologies) {
-                        if ( follow_references ) {
-                            this.mapped_classes.add(ref_class);
-                            getMapperSchema(query, temp_ontology, ref_class,this.schemaDescriptions.get(ref_class.getIRI()));
-                            OWLDocumentFormat format = ontology.getFormat();
-                            //String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
-                            String temp_defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
-                            add_owlclass_to_openapi(query, pathGenerator, temp_ontology, temp_defaultOntologyPrefixIRI, ref_class, false);
+                for (OWLClass ref_class : mapperSchema.getProperties_range()) {
+                    if (this.mapped_classes.contains(ref_class)){
+                        logger.info("The class " + ref_class + " exists ");
+                    } else {
+                        for (OWLOntology temp_ontology : this.ontologies) {
+                            if ( follow_references ) {
+                                this.mapped_classes.add(ref_class);
+                                getMapperSchema(query, temp_ontology, ref_class,this.schemaDescriptions.get(ref_class.getIRI()));
+                                OWLDocumentFormat format = ontology.getFormat();
+                                //String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
+                                String temp_defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
+                                add_owlclass_to_openapi(query, pathGenerator, temp_ontology, temp_defaultOntologyPrefixIRI, ref_class, false);
+                            }
                         }
                     }
                 }
-            }
 
-            //Add the OpenAPI paths
-            if (topLevel)
-                addOpenAPIPaths(pathGenerator, mapperSchema, cls);
+                //Add the OpenAPI paths
+                if (topLevel)
+                    addOpenAPIPaths(pathGenerator, mapperSchema, cls);
+            }catch(Exception e){
+                logger.log(Level.SEVERE,"Could not parse class "+cls.getIRI().toString());
+            }
         }
         return ref;
     }

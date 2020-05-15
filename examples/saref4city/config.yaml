@@ -1,22 +1,22 @@
 ontologies:
-  - http://purl.org/net/p-plan
-name: p-plan
+  - https://raw.githubusercontent.com/mariapoveda/saref-ext/master/SAREF4CITY/ontology/saref4city.ttl
+  #Test using directly a raw file URL
+name: saref4city
 output_dir: outputs
 
 openapi:
   openapi: 3.0.1
   info:
-    description: Example of the P-Plan ontology
-    title: P-Plan
+    description: Example with the Saref4city ontology
+    title: Saref4city
     version: v1.0.0
   externalDocs:
-    description: P-Plan
-    url: http://purl.org/net/p-plan
+    description: Saref4city
+    url: https://w3id.org/def/saref4city
 
 firebase:
   key: 
-
-#endpoint not used for this example.
+  
 endpoint:
   url: http://endpoint.mint.isi.edu/example
   prefix: https://w3id.org/okn/i/example

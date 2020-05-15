@@ -1,26 +1,27 @@
 ontologies:
-  - http://purl.org/net/p-plan
-name: p-plan
+  - https://w3id.org/def/saref4agri
+  #test using w3id
+name: saref4agri
 output_dir: outputs
 
 openapi:
   openapi: 3.0.1
   info:
-    description: Example of the P-Plan ontology
-    title: P-Plan
+    description: Example with the Saref4agri ontology (generating a specifciation draft)
+    title: Saref4agri
     version: v1.0.0
   externalDocs:
-    description: P-Plan
-    url: http://purl.org/net/p-plan
-
+    description: Saref4agri ontology
+    url: https://w3id.org/def/saref4city
+    
 firebase:
   key: 
-
-#endpoint not used for this example.
+  
 endpoint:
   url: http://endpoint.mint.isi.edu/example
   prefix: https://w3id.org/okn/i/example
   graph_base: http://endpoint.mint.isi.edu/example
+
 
 enable_get_paths: true
 enable_post_paths: false

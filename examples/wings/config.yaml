@@ -17,8 +17,6 @@ openapi:
   servers:
     - url: http://localhost:8080/v0.0.1
 
-firebase:
-  key:
 
 endpoint:
   url: http://localhost:3030/wings

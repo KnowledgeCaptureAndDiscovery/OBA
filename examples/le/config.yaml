@@ -1,0 +1,24 @@
+ontologies:
+  - http://linked.earth/ontology#
+  # Example with an ontology that aggregates several ontologies (big)
+name: LinkedEarth
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the Linked Earth Ontology
+    title: LinkedEarth
+    version: v0.0.1
+  externalDocs:
+    description: Linked Earth Ontology
+    url: http://linked.earth/ontology#
+  servers:
+    - url: http://localhost:8080/v0.0.1
+
+
+endpoint:
+  url: http://localhost:3030/
+  prefix: http://linked.earth/data
+  graph_base: http://localhost:3030/wings/data/
+

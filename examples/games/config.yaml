@@ -1,0 +1,23 @@
+ontologies:
+  - examples\games\vgo.owl
+name: Videogame
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the videogame ontology
+    title: Videogame
+    version: v0.0.1
+  externalDocs:
+    description: Videogame ontology
+    url: http://purl.org/net/VideoGameOntology#
+  servers:
+    - url: http://localhost:8080/v0.0.1
+
+
+endpoint:
+  url: http://localhost:3030/
+  prefix: http://example.org/game
+  graph_base: http://localhost:3030/game/data/
+

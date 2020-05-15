@@ -1,17 +1,19 @@
 ontologies:
-  - http://purl.org/net/p-plan
-name: p-plan
+  - examples\opmw\opmw.owl
+  #- http://www.opmw.org/ontology/
+  #Example with a slash ontology
+name: opmw
 output_dir: outputs
 
 openapi:
   openapi: 3.0.1
   info:
-    description: Example of the P-Plan ontology
-    title: P-Plan
+    description: Example of the opmw ontology
+    title: opmw
     version: v1.0.0
   externalDocs:
-    description: P-Plan
-    url: http://purl.org/net/p-plan
+    description: open provenance ontology for workflows
+    url: http://datos.opmw.es/def/
 
 firebase:
   key: 
