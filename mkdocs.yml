@@ -10,6 +10,7 @@ nav:
   - 'Generate the server':
       - 'Quickstart...': 'server.md'  
       - 'Running the server': 'running_server.md'
+      - 'Testing your API': 'test.md'
       - 'Adding custom queries': 'adding_custom_queries.md'
       - 'Authentication': 'authentication.md'
   - Configuration file: 'configuration_file.md'
