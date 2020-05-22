@@ -1,11 +1,25 @@
 import logging
-
+from pathlib import Path
 import connexion
 from flask_testing import TestCase
 from {{packageName}}.cached import CachedSpecification
 from {{packageName}}.encoder import JSONEncoder
+from {{packageName}}.settings import *
+from connexion.spec import Specification
 
 import logging.config
+from obasparql import QueryManager
+
+
+query_manager = QueryManager(queries_dir=QUERY_DIRECTORY,
+                            context_dir=CONTEXT_DIRECTORY,
+                            queries_types=QUERIES_TYPES,
+                            endpoint=ENDPOINT,
+                            endpoint_username=ENDPOINT_USERNAME,
+                            endpoint_password=ENDPOINT_PASSWORD,
+                            graph_base=ENDPOINT_GRAPH_BASE,
+                            prefix=ENDPOINT_RESOURCE_PREFIX)
+
 
 
 class BaseTestCase(TestCase):
@@ -21,8 +35,7 @@ class BaseTestCase(TestCase):
         Specification.from_file = CachedSpecification.from_file
         app = connexion.App(__name__, specification_dir='../openapi/')
         app.app.json_encoder = JSONEncoder
-        app.add_api('openapi.yaml', 
-                    pythonic_params=True,
+        app.add_api('openapi.yaml',
                     pythonic_params=False,
                     validate_responses=True)
         return app.app
