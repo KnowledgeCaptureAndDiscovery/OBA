@@ -119,11 +119,8 @@ class MapperOperation {
         //Set response
         ArraySchema schema = new ArraySchema();
         schema.setItems(this.schema);
-        Map<String, Header> headers =  new HashMap<>();
-        headers.put("link", new Header().schema(new StringSchema()).description("Information about pagination"));
         responseOk = new ApiResponse()
                 .description(responseDescriptionOk)
-                .headers(headers)
                 .content(new Content().addMediaType("application/json", new MediaType().schema(schema)));
         apiResponses.addApiResponse("200", responseOk);
         parameters.add(new QueryParameter()

@@ -1,23 +1,17 @@
 #+ summary: Given a rdf type, returns all the resources related to the type
-
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
 CONSTRUCT {
-?item ?predicate ?prop .
-?prop a ?type
+    ?item ?predicate ?prop .
+    ?prop a ?type
 }
 WHERE {
     {
         SELECT DISTINCT ?item where {
             ?item a ?_type_iri .
-            ?item ?prop ?desc .
-            VALUES ?property { rdfs:label }
-            filter regex(str(?desc),?_text,"i")
         }
-         LIMIT 100
-         OFFSET 0
+        LIMIT 100
+        OFFSET 0
     }
-    ?item ?property ?desc.
+    ?item ?predicate ?prop
     OPTIONAL {
         ?prop a ?type
     }
