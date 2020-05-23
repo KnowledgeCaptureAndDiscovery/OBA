@@ -25,17 +25,21 @@ The tests located at `server/openapi_server/test/`. You can read the following [
 ### Configure
 
 
-There are two useful option to test your API and Knowledge Graph.
-
-```
-        :param validate_responses: True enables validation. Validation errors generate HTTP 500 responses.
-        :type validate_responses: bool
-        :param strict_validation: True enables validation on invalid request parameters
-        :type strict_validation: bool
-```
+There are two useful option to test your API and Knowledge Graph:
 
 - validate_responses can be useful to detect invalid properties or types on your Knowledge Graph.
 - strict_validation can be helpful to see an invalid request.
+
+```
+        :param validate_responses: True enables validation. 
+        Validation errors generate HTTP 500 responses.
+        :type validate_responses: bool
+        :param strict_validation: 
+        True enables validation on invalid request parameters
+        :type strict_validation: bool
+```
+
+
 
 You can edit these option at `server/openapi_server/test/__init__.py`
 
