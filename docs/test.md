@@ -1,6 +1,6 @@
 # Running API tests
 
-The resultant server code contains the tests to evaluate the status of your API and Knowledge Graph.
+The resultant server code contains the tests to evaluate the status of your API against a knowledge graph.
 
 ## Usage
 
@@ -16,18 +16,18 @@ And run it:
 $ tox 
 ```
 
-You can modify the test requirements at `src/test-requirements.txt`.
+You can modify the test requirements in `src/test-requirements.txt`.
 
 ## Editing
 
-The tests located at `server/openapi_server/test/`. You can read the following [docuentation](https://nose.readthedocs.io/en/latest/testing.html) to understand how to edit them
+The tests are located in `server/openapi_server/test/`. You can read the following [documentation](https://nose.readthedocs.io/en/latest/testing.html) to understand how to edit them.
 
 ### Configure
 
 
-There are two useful option to test your API and Knowledge Graph:
+There are two useful options to test your API against a knowledge graph:
 
-- validate_responses can be useful to detect invalid properties or types on your Knowledge Graph.
+- validate_responses can be useful to detect invalid properties or types on your knowledge graph.
 - strict_validation can be helpful to see an invalid request.
 
 ```
@@ -41,7 +41,7 @@ There are two useful option to test your API and Knowledge Graph:
 
 
 
-You can edit these option at `server/openapi_server/test/__init__.py`
+You can edit these option in `server/openapi_server/test/__init__.py`
 
 ```python
     def create_app(self):
