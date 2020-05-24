@@ -1,7 +1,7 @@
 The current mapping between OWL and OpenAPI specification (OAS) supported by OBA can be seen below.
 
 !!! warning
-    We are currently working on improving the mapping with complex axiomatization of domains and ranges and other property annotations (minimum and maximum cardinality, etc.)
+    We are currently working on improving the mapping with complex axiomatization of domains and ranges and other property annotations (minimum and maximum cardinality, etc.). The new version can be seen in the following URL: https://github.com/oeg-upm/OWL-To-OAS-Specification
 
 **Namespaces** used in this document:
 
