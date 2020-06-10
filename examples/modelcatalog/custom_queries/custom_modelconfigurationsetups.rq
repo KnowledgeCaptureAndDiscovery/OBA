@@ -67,6 +67,8 @@ WHERE {
             ?region ?region_p ?region_o .
             OPTIONAL {
                 ?region_o ?sub_region_p ?sub_region_o
+                FILTER (?sub_region_p != <https://w3id.org/okn/o/sdm#geo>) .
+
             }
             FILTER (?region_p != <https://w3id.org/okn/o/sdm#geo>)
        }

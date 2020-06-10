@@ -56,11 +56,13 @@ class Path {
   }
 
 
-  public PathItem user_login(Schema schema) {
-    List<Parameter> parameters = new ArrayList<>();
+  public PathItem user_login(String schema_name) {
     ApiResponses apiResponses = new ApiResponses();
 
     final RequestBody requestBody = new RequestBody();
+
+    String ref_text = "#/components/schemas/" + schema_name;
+    Schema schema = new Schema().$ref(ref_text);
 
     MediaType mediaType = new MediaType().schema(schema);
     Content content = new Content().addMediaType("application/json", mediaType);
@@ -84,11 +86,10 @@ class Path {
             .content(new Content().addMediaType("application/json", new MediaType().schema(new StringSchema()))));
 
     Map<String,Object> extensions = new HashMap<String, Object>();
-    extensions.put("x-openapi-router-controller", "openapi_server.controllers.default_controller");
+    extensions.put("x-openapi-router-controller", "openapi_server.controllers.user_controller");
     Operation operation = new Operation()
             .description("Login the user")
             .extensions(extensions)
-            .operationId("user_login_get")
             .requestBody(requestBody)
             .responses(apiResponses);
     return new PathItem().post(operation);

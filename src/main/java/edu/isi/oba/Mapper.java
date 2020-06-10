@@ -143,13 +143,12 @@ class Mapper {
         userProperties.put("password", password);
 
         Schema userSchema = new Schema();
-        userSchema.setName("ObaUser");
+        userSchema.setName("User");
         userSchema.setType("object");
         userSchema.setProperties(userProperties);
-        userSchema.setXml(new XML().name("User"));
         schemas.put("User", userSchema);
 
-        this.paths.addPathItem("/user/login", pathGenerator.user_login(userSchema));
+        this.paths.addPathItem("/user/login", pathGenerator.user_login(userSchema.getName()));
     }
 
     private List<OWLClass> add_owlclass_to_openapi(Query query, Path pathGenerator, OWLOntology ontology,
