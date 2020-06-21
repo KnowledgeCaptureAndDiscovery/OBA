@@ -75,9 +75,10 @@ class MapperDataProperty {
   private List<String> type;
   private Boolean array;
   private Boolean nullable;
+  final Boolean isFunctional;
 
 
-  public MapperDataProperty(String name, String description, List<String> type, Boolean array, Boolean nullable) {
+  public MapperDataProperty(String name, String description, Boolean isFunctional, List<String> type, Boolean array, Boolean nullable) {
     this.dataTypes = new HashMap<>();
     this.setDataTypes();
     this.name = name;
@@ -85,6 +86,7 @@ class MapperDataProperty {
     this.type = type;
     this.array = array;
     this.nullable = nullable;
+    this.isFunctional=isFunctional;
   }
 
   public Schema getSchemaByDataProperty(){
@@ -171,6 +173,8 @@ class MapperDataProperty {
     array.setDescription(description);
     array.setNullable(nullable);
     array.setItems(base);
+    if (isFunctional)
+        array.setMaxItems(1);
     return array;
   }
 
