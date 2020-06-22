@@ -10,21 +10,24 @@ class MapperObjectProperty {
   private List<String> ref;
   private Boolean array;
   private Boolean nullable;
+  final Boolean isFunctional;
 
-  public MapperObjectProperty(String name, String description, List<String> ref) {
+  public MapperObjectProperty(String name, String description, Boolean isFunctional, List<String> ref) {
     this.name = name;
     this.description = description;
     this.ref = ref;
     this.array = true;
     this.nullable = true;
+    this.isFunctional=isFunctional;
   }
 
-  public MapperObjectProperty(String name, String description, List<String> ref, Boolean array, Boolean nullable) {
+  public MapperObjectProperty(String name, String description,  Boolean isFunctional, List<String> ref, Boolean array, Boolean nullable) {
     this.name = name;
     this.description = description;
     this.ref = ref;
     this.array = array;
     this.nullable = nullable;
+    this.isFunctional=isFunctional;
   }
 
   public Schema getSchemaByObjectProperty(){
@@ -50,6 +53,8 @@ class MapperObjectProperty {
       objects.setDescription(description);
       objects.setNullable(nullable);
       objects.setItems(object);
+      if (isFunctional)
+          objects.setMaxItems(1);
       return objects;
     }
     else {
@@ -68,6 +73,8 @@ class MapperObjectProperty {
       objects.setDescription(description);
       objects.setNullable(nullable);
       objects.setItems(object);
+      if (isFunctional)
+          objects.setMaxItems(1);
       return objects;
     }
     else {
@@ -79,6 +86,8 @@ class MapperObjectProperty {
     ArraySchema array = new ArraySchema();
     array.setNullable(nullable);
     array.setItems(base);
+    if (isFunctional)
+        array.setMaxItems(1);
     return array;
   }
 

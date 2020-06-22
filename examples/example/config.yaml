@@ -1,0 +1,33 @@
+ontologies:
+  - examples/example/example.owl
+name: example
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API for the example ontology
+    title: Example ontology
+    version: v1.5.0
+  externalDocs:
+    description: Example ontology
+    url: https://w3id.org/example
+  servers:
+    - url: http://localhost:8080/v1.5.0
+
+firebase:
+  key: "test"
+
+endpoint:
+  url: http://localhost:8080/example-1.5.0
+  prefix: https://w3id.org/example
+  graph_base: http://localhost:8080/example-1.5.0/data/
+
+enable_get_paths: true
+enable_post_paths: true
+enable_delete_paths: true
+enable_put_paths: true
+
+auth:
+  provider: firebase
+follow_references: true

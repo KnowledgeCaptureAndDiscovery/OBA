@@ -8,7 +8,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.IRIShortFormProvider;
 import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
-import org.semanticweb.owlapi.model.OWLDataFactory;
+
 import java.util.*;
 
 import static edu.isi.oba.Oba.logger;
@@ -116,6 +116,7 @@ class MapperSchema {
         HashMap<String, String> propertyNameURI = new HashMap<>();
         Map<String, Schema> properties = new HashMap<>();
         Set<OWLDataPropertyDomainAxiom> properties_class = new HashSet<>();
+        Set<OWLFunctionalDataPropertyAxiom> functional;
         for (OWLOntology ontology : ontologies)
             properties_class.addAll(ontology.getAxioms(AxiomType.DATA_PROPERTY_DOMAIN));
 
@@ -124,10 +125,18 @@ class MapperSchema {
                 for (OWLDataProperty odp : dp.getDataPropertiesInSignature()) {
                     Boolean array = true;
                     Boolean nullable = true;
-
                     Set<OWLDataPropertyRangeAxiom> ranges = new HashSet<>();
-                    for (OWLOntology ontology : ontologies)
+                    
+                    Boolean isFunctional=false;
+                    for (OWLOntology ontology : ontologies) {
                         ranges.addAll(ontology.getDataPropertyRangeAxioms(odp));
+                        
+                        functional = ontology.getAxioms(AxiomType.FUNCTIONAL_DATA_PROPERTY);
+                        for (OWLFunctionalDataPropertyAxiom functionalAxiom:functional) {
+                        	if (functionalAxiom.getProperty().equals(odp))                         		
+                        		isFunctional = true;      	
+                        }
+                    }
                     if (ranges.size() == 0)
                         logger.warning("Property " + odp.getIRI() + " has range equals zero");
 
@@ -138,7 +147,7 @@ class MapperSchema {
                     //obtain type using the range
                     List<String> propertyRanges = getCodeGenTypesByRangeData(ranges, odp);
                     String propertyDescription = ObaUtils.getDescription(odp, ontology_cls);
-                    MapperDataProperty mapperProperty = new MapperDataProperty(propertyName, propertyDescription, propertyRanges, array, nullable);
+                    MapperDataProperty mapperProperty = new MapperDataProperty(propertyName, propertyDescription, isFunctional, propertyRanges, array, nullable);
                     try {
                         properties.put(mapperProperty.name, mapperProperty.getSchemaByDataProperty());
                     } catch (Exception e) {
@@ -163,10 +172,10 @@ class MapperSchema {
                 add("string");
             }
         };
-        MapperDataProperty idProperty = new MapperDataProperty("id", "identifier", defaultProperties, false, false);
-        MapperDataProperty labelProperty = new MapperDataProperty("label", "short description of the resource",  defaultProperties, true, true);
-        MapperDataProperty typeProperty = new MapperDataProperty("type", "type of the resource", defaultProperties, true, true);
-        MapperDataProperty descriptionProperty = new MapperDataProperty("description", "small description", defaultProperties, true, true);
+        MapperDataProperty idProperty = new MapperDataProperty("id", "identifier", true, defaultProperties, false, false);
+        MapperDataProperty labelProperty = new MapperDataProperty("label", "short description of the resource", false, defaultProperties, true, true);
+        MapperDataProperty typeProperty = new MapperDataProperty("type", "type of the resource", false, defaultProperties, true, true);
+        MapperDataProperty descriptionProperty = new MapperDataProperty("description", "small description", false, defaultProperties, true, true);
 
         properties.put(idProperty.name, idProperty.getSchemaByDataProperty());
         properties.put(labelProperty.name, labelProperty.getSchemaByDataProperty());
@@ -185,6 +194,7 @@ class MapperSchema {
         OWLClass owlThing = dataFactory.getOWLThing();
 
         Set<OWLObjectPropertyDomainAxiom> properties_class = new HashSet<>();
+        Set<OWLFunctionalObjectPropertyAxiom> functional;
         for (OWLOntology ontology : ontologies)
             properties_class.addAll(ontology.getAxioms(AxiomType.OBJECT_PROPERTY_DOMAIN));
 
@@ -197,10 +207,19 @@ class MapperSchema {
                 logger.info( "Parsing property " + dp.toString());
                 for (OWLObjectProperty odp : dp.getObjectPropertiesInSignature()) {
                     String propertyName = this.sfp.getShortForm(odp.getIRI());
-
+                    
+                    Boolean isFunctional=false;
                     Set<OWLObjectPropertyRangeAxiom> ranges = new HashSet<>();
-                    for (OWLOntology ontology : ontologies)
+                    for (OWLOntology ontology : ontologies) {
                         ranges.addAll(ontology.getObjectPropertyRangeAxioms(odp));
+                        
+                        functional = ontology.getAxioms(AxiomType.FUNCTIONAL_OBJECT_PROPERTY);
+                        for (OWLFunctionalObjectPropertyAxiom functionalAxiom:functional) {
+                        	if (functionalAxiom.getProperty().equals(odp)) {
+                        		isFunctional = true;
+                        	}
+                        }
+                    }
                     if (ranges.size() == 0)
                         logger.warning("Property " + odp.getIRI() + " has range equals zero");
 
@@ -209,7 +228,7 @@ class MapperSchema {
 
                     List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing, follow_references);
                     String propertyDescription = ObaUtils.getDescription(odp, ontology_cls);
-                    MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, propertyRanges);
+                    MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, isFunctional, propertyRanges);
                     try {
                         properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
                     } catch (Exception e) {
