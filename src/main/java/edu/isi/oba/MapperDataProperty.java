@@ -28,8 +28,8 @@ class MapperDataProperty {
     this.dataTypes.put("boolean", "boolean");
     this.dataTypes.put("byte", "integer");
     this.dataTypes.put("date", "string");
-    this.dataTypes.put("dateTime", "string");
-    this.dataTypes.put("dateTimeStamp", "string");
+    this.dataTypes.put("dateTime", "dateTime");
+    this.dataTypes.put("dateTimeStamp", "dateTime");
     this.dataTypes.put("decimal", "number");
     this.dataTypes.put("double", "number");
     this.dataTypes.put("duration", "string");
@@ -69,6 +69,7 @@ class MapperDataProperty {
   private static final String NUMBER_TYPE = "number";
   private static final String INTEGER_TYPE = "integer";
   private static final String BOOLEAN_TYPE = "boolean";
+  private static final String DATETIME_TYPE = "dateTime";
 
   final String name;
   final String description;
@@ -115,7 +116,9 @@ class MapperDataProperty {
         return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable).description(description);
       case BOOLEAN_TYPE:
         return (array) ? arraySchema(new BooleanSchema(), nullable) : new BooleanSchema().nullable(nullable).description(description);
-     default:
+      case DATETIME_TYPE:
+          return (array) ? arraySchema(new DateTimeSchema() , nullable) : new DateTimeSchema().nullable(nullable).description(description);
+      default:
         logger.warning("datatype mapping failed " + this.type.get(0));
         return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable).description(description);
     }

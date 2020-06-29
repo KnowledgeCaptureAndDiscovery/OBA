@@ -238,6 +238,47 @@
     
 
 
+    <!-- https://w3id.org/example#testObjectIntersectionOf -->
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#testObjectIntersectionOf">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Person"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/example#StudentRecord"/>
+                    <rdf:Description rdf:about="https://w3id.org/example#StudyProgram"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:range>
+        <terms:description xml:lang="en">This is a property to test a complex ObjectIntersectionOf. (Note that range values are added only for test purposes).</terms:description>
+        <rdfs:label xml:lang="en">test ObjectIntersectionOf</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/example#testObjectUnionOf -->
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#testObjectUnionOf">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Person"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/example#Course"/>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="https://w3id.org/example#Department"/>
+                            <rdf:Description rdf:about="https://w3id.org/example#StudyProgram"/>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <terms:description xml:lang="en">This is a property to test a complex ObjectUnionOf restriction that includes a ObjectIntersectionOf. (Note that range values are added only for test purposes).</terms:description>
+        <rdfs:label xml:lang="en">test ObjectUnionOf</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
     <!-- https://w3id.org/example#worksIn -->
 
     <owl:ObjectProperty rdf:about="https://w3id.org/example#worksIn">
@@ -586,9 +627,9 @@
     
 
 
-    <!-- https://w3id.org/example#ProfessorInArtificalIntelligence -->
+    <!-- https://w3id.org/example#ProfessorInArtificialIntelligence -->
 
-    <owl:Class rdf:about="https://w3id.org/example#ProfessorInArtificalIntelligence">
+    <owl:Class rdf:about="https://w3id.org/example#ProfessorInArtificialIntelligence">
         <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
@@ -611,7 +652,7 @@
     <owl:Class rdf:about="https://w3id.org/example#ProfessorInOtherDepartment">
         <rdfs:subClassOf>
             <owl:Class>
-                <owl:complementOf rdf:resource="https://w3id.org/example#ProfessorInArtificalIntelligence"/>
+                <owl:complementOf rdf:resource="https://w3id.org/example#ProfessorInArtificialIntelligence"/>
             </owl:Class>
         </rdfs:subClassOf>
         <terms:description xml:lang="en">All professors who doesn&apos;t belong to the Artificial Intelligence Department.</terms:description>

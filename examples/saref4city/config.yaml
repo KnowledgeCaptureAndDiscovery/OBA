@@ -15,8 +15,8 @@ openapi:
     url: https://w3id.org/def/saref4city
 
 firebase:
-  key: 
-  
+  key:
+
 endpoint:
   url: http://endpoint.mint.isi.edu/example
   prefix: https://w3id.org/okn/i/example
@@ -28,4 +28,3 @@ enable_delete_paths: false
 enable_put_paths: false
 
 follow_references: true
-
