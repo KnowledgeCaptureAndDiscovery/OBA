@@ -1,5 +1,7 @@
 package edu.isi.oba;
 
+
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Schema;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -73,6 +75,11 @@ class MapperSchema {
         schema.setDescription(this.cls_description);
         schema.setType(this.type);
         schema.setProperties(this.getProperties());
+        HashMap<String, String> exampleMap = new HashMap<>();
+        exampleMap.put("id", "some_id");
+        Example example = new Example();
+        example.setValue(exampleMap);
+        schema.setExample(example);
         return schema;
     }
 
