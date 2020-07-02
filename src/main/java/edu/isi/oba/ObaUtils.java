@@ -226,11 +226,11 @@ public class ObaUtils {
         return mergedJSON;
     }
 
-    public static JSONObject generate_context_file(String[] ontologies) throws Exception {
+    public static JSONObject generate_context_file(String[] ontologies, Boolean only_classes) throws Exception {
         JSONObject[] jsons = new JSONObject[ontologies.length];
         for (int i = 0; i < ontologies.length; i++) {
             try {
-                jsons[i] = run_owl_jsonld(ontologies[i]);
+                jsons[i] = run_owl_jsonld(ontologies[i], only_classes);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -242,18 +242,28 @@ public class ObaUtils {
 
     /**
      * Method to execute OWL2JSONLD
-     * @param ontology_file file path of the ontology to load 
+     * @param ontology_file file path of the ontology to load
+     * @param only_classes
      * @return JSON object with the context of the ontology
      * @throws Exception 
      */
-    private static JSONObject run_owl_jsonld(String ontology_file) throws Exception {
+    private static JSONObject run_owl_jsonld(String ontology_file, Boolean only_classes) throws Exception {
         ontology_file = new File(ontology_file).toURI().toString();
         String owl2jsonld = "/owl2jsonld-0.3.0-SNAPSHOT-standalone.jar";
         InputStream owl2_jar = ObaUtils.class.getResourceAsStream(owl2jsonld);
         File tempFile = File.createTempFile("oba", "jar");
         copy(owl2_jar,tempFile);
         Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(new String[]{"java", "-jar", tempFile.getPath(), ontology_file});
+        String[] cmdarray = new String[0];
+
+        if (only_classes) {
+            cmdarray = new String[]{"java", "-jar", tempFile.getPath(), "-c", ontology_file};
+        }
+        else {
+            cmdarray = new String[]{"java", "-jar", tempFile.getPath(), ontology_file};
+
+        }
+        Process proc = rt.exec(cmdarray);
 
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));

@@ -84,13 +84,18 @@ class Oba {
   private static void generate_context(YamlConfig config_data, String destination_dir) {
     List<String> ontologies = config_data.getOntologies();
     JSONObject context_json_object = null;
+    JSONObject context_json_object_class = null;
     try {
-      context_json_object = ObaUtils.generate_context_file(ontologies.toArray(new String[0]));
+      context_json_object = ObaUtils.generate_context_file(ontologies.toArray(new String[0]), false);
+      context_json_object_class = ObaUtils.generate_context_file(ontologies.toArray(new String[0]), true);
     } catch (Exception e) {
       e.printStackTrace();
     }
     String file_path = destination_dir + File.separator + "servers" + File.separator + "context.json";
+    String file_path_class = destination_dir + File.separator + "servers" + File.separator + "context_class.json";
+
     ObaUtils.write_file(file_path, context_json_object.toString(4));
+    ObaUtils.write_file(file_path_class, context_json_object_class.toString(4));
   }
 
   private static void copy_custom_queries(String source, String destination){

@@ -34,6 +34,7 @@ mkdir -p ${PWD}/$SERVER_DIR/contexts/
 echo "Copying query files"
 cp -r ../../queries ${PWD}/$SERVER_DIR/queries
 cp -r ../context.json ${PWD}/$SERVER_DIR/contexts/
+cp -r ../context_class.json ${PWD}/$SERVER_DIR/contexts/
 if [ "$?" == "0" ]; then
         echo -e "${GREEN}SUCCESS${RESET}"
 fi
