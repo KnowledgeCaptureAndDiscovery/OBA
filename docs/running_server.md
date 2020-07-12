@@ -6,16 +6,20 @@ To run the server on a Docker container, execute the following command from the 
 
 ```bash
 # building the image
-docker build -t openapi_server .
+$ docker build -t openapi_server .
 
 # starting up a container
-docker run -p 8080:8080 openapi_server
+$  docker run -v $PWD/openapi_server/openapi/:/usr/src/app/openapi_server/openapi/ <docker_image>
 ```
+
+!!!info
+    OBA uses a [cache system](cached.md)
 
 and open the following URL in your browser:
 
+
 ```
-http://localhost:8080/v1.3.0/ui/
+http://localhost:8080/<API_VERSION>/ui/
 ```
 
 !!! warning
@@ -26,7 +30,7 @@ http://localhost:8080/v1.3.0/ui/
 Your OpenAPI definition lives here:
 
 ```
-http://localhost:8080/v1.3.0/openapi.json
+http://localhost:8080/<API_VERSION>/openapi.json
 ```
 
 To launch the integration tests, install and execute [tox](https://pypi.org/project/tox/):

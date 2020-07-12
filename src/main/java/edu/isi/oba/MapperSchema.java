@@ -1,6 +1,7 @@
 package edu.isi.oba;
 
-import io.swagger.v3.oas.models.media.ObjectSchema;
+
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Schema;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -32,10 +33,10 @@ class MapperSchema {
     private OWLReasonerFactory reasonerFactory;
     public List<OWLClass> properties_range;
     private boolean follow_references;
-    
+
     public List<OWLObjectProperty> propertiesFromObjectRestrictions;
     public Map<String, List<String>> propertiesFromObjectRestrictions_ranges;
-    public String complementOf; 
+    public String complementOf;
 
     public List<OWLClass> getProperties_range() {
         return properties_range;
@@ -63,7 +64,7 @@ class MapperSchema {
         properties = new HashMap<>();
         this.complementOf="";
         this.getClassRestrictions(cls);
-        
+
         this.name = getSchemaName(cls);
        // this.properties = setProperties();
         this.schema = setSchema();
@@ -89,8 +90,13 @@ class MapperSchema {
             complement.set$ref(complementOf);
         	schema.not(complement);
         }
-        
+
         schema.setProperties(this.getProperties());
+        HashMap<String, String> exampleMap = new HashMap<>();
+        exampleMap.put("id", "some_id");
+        Example example = new Example();
+        example.setValue(exampleMap);
+        schema.setExample(example);
         return schema;
     }
 
@@ -144,15 +150,15 @@ class MapperSchema {
                     Boolean array = true;
                     Boolean nullable = true;
                     Set<OWLDataPropertyRangeAxiom> ranges = new HashSet<>();
-                    
+
                     Boolean isFunctional=false;
                     for (OWLOntology ontology : ontologies) {
                         ranges.addAll(ontology.getDataPropertyRangeAxioms(odp));
-                        
+
                         functional = ontology.getAxioms(AxiomType.FUNCTIONAL_DATA_PROPERTY);
                         for (OWLFunctionalDataPropertyAxiom functionalAxiom:functional) {
-                        	if (functionalAxiom.getProperty().equals(odp))                         		
-                        		isFunctional = true;      	
+                        	if (functionalAxiom.getProperty().equals(odp))
+                        		isFunctional = true;
                         }
                     }
                     if (ranges.size() == 0)
@@ -227,16 +233,16 @@ class MapperSchema {
         			String propertyName = this.sfp.getShortForm(odp.getIRI());
 
         			Boolean inspect = true;
-        			// If there are property restrictions from the Class we need to check if 
+        			// If there are property restrictions from the Class we need to check if
         			// the object property has been previously analyzed on the getClassRestrictions method.
-        			// If the property was analyzed, we will change the value of inspect to false, otherwise 
+        			// If the property was analyzed, we will change the value of inspect to false, otherwise
         			// the property will be inspected.
         			if (propertiesFromObjectRestrictions.size() != 0) {
-        				if (propertiesFromObjectRestrictions.contains(odp)) {           				
+        				if (propertiesFromObjectRestrictions.contains(odp)) {
         					inspect=false;
-        				} 
-        					   
-        			} 
+        				}
+
+        			}
         			if (inspect) {
 
         				Boolean isFunctional=false;
@@ -268,18 +274,18 @@ class MapperSchema {
         						ce.accept(restrictionVisitor);
         					}
         					Map<String, Map<String,String>> restrictionsValuesFromClass = restrictionVisitor.getRestrictionsValuesFromClass();
-        					for (String j :  restrictionsValuesFromClass.keySet()) {     						
+        					for (String j :  restrictionsValuesFromClass.keySet()) {
         						if (j==propertyName) {
         							restrictionValues=restrictionsValuesFromClass.get(j);
         						}
-        					}          		
+        					}
         					if (restrictionsValuesFromClass.isEmpty())
-        						propertyRanges.clear();	
+        						propertyRanges.clear();
         				}
 
         				String propertyDescription = ObaUtils.getDescription(odp, ontology_cls);
-        				MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, isFunctional, restrictionValues, propertyRanges);                
-        				try {                      
+        				MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, isFunctional, restrictionValues, propertyRanges);
+        				try {
         					this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
         				} catch (Exception e) {
         					e.printStackTrace();
@@ -326,13 +332,13 @@ class MapperSchema {
     			if (rangeClass instanceof OWLClassExpression) {
     				if (!rangeClass.containsEntityInSignature(odp)) {
     					if (rangeClass.asOWLClass().equals(owlThing)) {
-    						logger.info("Ignoring owl:Thing" + odp);                       
+    						logger.info("Ignoring owl:Thing" + odp);
     					}
-    					else {                    	
+    					else {
     						this.properties_range.add(rangeClass.asOWLClass());
     						if (follow_references)
         						objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
-    					}                       					
+    					}
     				}
 
     			}
@@ -342,8 +348,8 @@ class MapperSchema {
     	return objectProperty;
     }
 
-    /**  
-     * Read the Ontology and gets all the Class restrictions on object or data properties and 
+    /**
+     * Read the Ontology and gets all the Class restrictions on object or data properties and
      * generate SchemaProperties.
      * @param clas Class that will be analyzed in order to get its restrictions
      */
@@ -356,37 +362,37 @@ class MapperSchema {
     	for (OWLOntology ontology : ontologies) {
     		restrictionVisitor = new RestrictionVisitor(clas,ontology,owlThing, "");
     		for (OWLSubClassOfAxiom ax : ontology.getSubClassAxiomsForSubClass(clas)) {
-    			OWLClassExpression superCls = ax.getSuperClass();    			
+    			OWLClassExpression superCls = ax.getSuperClass();
     			// Ask our superclass to accept a visit from the RestrictionVisitor
     			// - e.g. if it is an existential restiction then the restriction visitor
     			// will answer it - if not the visitor will ignore it
-    			superCls.accept(restrictionVisitor);     			
+    			superCls.accept(restrictionVisitor);
     		}
     		propertiesFromObjectRestrictions = restrictionVisitor.getPropertiesFromObjectRestrictions();
 			propertiesFromObjectRestrictions_ranges  = restrictionVisitor.getPropertiesFromObjectRestrictions_ranges();
-			
+
 			Map<String, Map<String,String>> restrictionsValuesFromClass = restrictionVisitor.getRestrictionsValuesFromClass();
-			
+
 			if (restrictionsValuesFromClass.size()!=0) {
-    			// When the restriction is a ObjectComplementOf it doesn't have a object property, 
+    			// When the restriction is a ObjectComplementOf it doesn't have a object property,
 				// thus we need to set its value at the setSchema function
-    			if (restrictionsValuesFromClass.containsKey("complementOf") && restrictionsValuesFromClass.size()==1) {  				
-    				for (String j :  restrictionsValuesFromClass.keySet()) { 
+    			if (restrictionsValuesFromClass.containsKey("complementOf") && restrictionsValuesFromClass.size()==1) {
+    				for (String j :  restrictionsValuesFromClass.keySet()) {
 						Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);
-						for (String restriction:  restrictionValues.keySet()) { 
+						for (String restriction:  restrictionValues.keySet()) {
 					    	  complementOf = restrictionValues.get(restriction);
 						}
 					}
-    				
+
     			} else {
-    			
-    			for (int i = 0; i < propertiesFromObjectRestrictions.size(); i++) {  	
-    				OWLObjectProperty OP = propertiesFromObjectRestrictions.get(i); 
-    				String propertyDescription = ObaUtils.getDescription(OP, ontology_cls);   				
-    				if (propertiesFromObjectRestrictions_ranges.size() != 0) {  
-    					List<String> rangesOP = propertiesFromObjectRestrictions_ranges.get(sfp.getShortForm(OP.getIRI())); 	
-    					for (String j :  restrictionsValuesFromClass.keySet()) { 
-    						Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);    					
+
+    			for (int i = 0; i < propertiesFromObjectRestrictions.size(); i++) {
+    				OWLObjectProperty OP = propertiesFromObjectRestrictions.get(i);
+    				String propertyDescription = ObaUtils.getDescription(OP, ontology_cls);
+    				if (propertiesFromObjectRestrictions_ranges.size() != 0) {
+    					List<String> rangesOP = propertiesFromObjectRestrictions_ranges.get(sfp.getShortForm(OP.getIRI()));
+    					for (String j :  restrictionsValuesFromClass.keySet()) {
+    						Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);
     						if (j==sfp.getShortForm(OP.getIRI())) {
     							MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(OP.getIRI()), propertyDescription, false, restrictionValues, rangesOP);
     							try {
@@ -405,12 +411,12 @@ class MapperSchema {
     			this.properties = setProperties();
     		}
     	}
-    	addDefaultProperties(this.properties);   
+    	addDefaultProperties(this.properties);
     }
 
 
-    
-    
+
+
     private Map<String, Schema> getProperties() {
         return properties;
     }
@@ -422,6 +428,6 @@ class MapperSchema {
     public OWLClass getCls() {
         return cls;
     }
-    
-    
+
+
 }

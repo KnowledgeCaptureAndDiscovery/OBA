@@ -10,12 +10,9 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
-import org.semanticweb.owlapi.model.IRI;
+
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.search.EntitySearcher;
-import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 
 public class ObaUtilsTest {
 
@@ -68,7 +65,7 @@ public class ObaUtilsTest {
         String[] ontologies = new String[]{"ontology1", "ontology2"};
         JSONObject context = null;
         try {
-            context = ObaUtils.generate_context_file(ontologies);
+            context = ObaUtils.generate_context_file(ontologies, false);
         } catch (Exception e) {
             e.printStackTrace();
         }

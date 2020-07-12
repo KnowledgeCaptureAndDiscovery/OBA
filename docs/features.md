@@ -33,7 +33,10 @@ For each of these paths, OBA generates the SPARQL queries that are necessary to 
 
 ### Generating JSON-LD contexts
 
-OBA converts the format of the responses from JSON/LD to plain JSON, which is a widely format used by Web developers. In order to achieve this, OBA requires a file with the context of the ontologies used. The context is used to map simple terms to IRIs. OBA generates these context file automatically.
+OBA converts the format of the responses from JSON/LD to plain JSON, which is a widely format used by Web developers. In order to achieve this, OBA requires two files with the context of the ontologies used. The context is used to map simple terms to IRIs. OBA generates these context file automatically.
+
+!!! note
+    Since OBA 3.3.0, OBA uses two files `context.json` and `context_class.json`. The first file contains all the mappings (classes and properties) and the second file contains the classes mapping. OBAsparql uses the `context.json` for `POST` and `PUT` method and uses the `context_class.json` for `GET` method.
 
 !!! info
     OBA reuses and extends [owl2jsonld](https://github.com/stain/owl2jsonld), developed by [Stain Soiland-Reyes](https://github.com/stain).

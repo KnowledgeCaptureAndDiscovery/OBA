@@ -1,9 +1,8 @@
 ontologies:
-  - https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.4.0/ontology.xml
-  - https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.5.0/ontology.xml
+  - https://w3id.org/okn/o/sdm/1.6.0-nm
+  - https://w3id.org/okn/o/sd/1.7.0-nm
 name: modelcatalog
 output_dir: outputs
-
 openapi:
   openapi: 3.0.1
   info:
@@ -22,8 +21,8 @@ firebase:
   key: "test"
 
 endpoint:
-  url: http://endpoint.mint.isi.edu/modelCatalog-1.4.0
-  prefix: https://w3id.org/okn/i/masd
+  url: https://endpoint.mint.isi.edu/modelCatalog-1.4.0
+  prefix: https://w3id.org/okn/i/mint
   graph_base: http://endpoint.mint.isi.edu/modelCatalog-1.4.0/data/
 
 custom_queries_directory: examples/modelcatalog/custom_queries

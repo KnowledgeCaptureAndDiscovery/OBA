@@ -4,8 +4,10 @@ import time
 import json
 import requests
 from werkzeug.exceptions import Unauthorized
-
+import connexion
 from openapi_server.settings import FIREBASE_KEY
+from openapi_server.models.user import User
+
 JWT_ISSUER = 'com.zalando.connexion'
 JWT_SECRET = 'change_this'
 JWT_LIFETIME_SECONDS = 60000000
@@ -39,7 +41,7 @@ def auth_with_password(email, password):
 
     return response.ok
 
-def user_login_get(username, password):  # noqa: E501
+def user_login_post():  # noqa: E501
     """Logs user into the system
 
      # noqa: E501
@@ -51,7 +53,9 @@ def user_login_get(username, password):  # noqa: E501
 
     :rtype: str
     """
-    if not auth_with_password(username, password):
+    if connexion.request.is_json:
+        user = User.from_dict(connexion.request.get_json())  # noqa: E501
+    if not auth_with_password(user.username, user.password):
         return "Invalid User or Password", 401, {}
 
 
@@ -60,16 +64,14 @@ def user_login_get(username, password):  # noqa: E501
         "iss": JWT_ISSUER,
         "iat": int(timestamp),
         "exp": int(timestamp + JWT_LIFETIME_SECONDS),
-        "sub": str(username),
+        "sub": str(user.username),
     }
 
     access_token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "expires_in": JWT_LIFETIME_SECONDS,
-        "refresh_token": "IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk",
-        "scope": "create"
-    }, 200, {'X-Expires-After': JWT_LIFETIME_SECONDS, 'X-Rate-Limit': 1000}
-
-
+               "access_token": access_token,
+               "token_type": "bearer",
+               "expires_in": JWT_LIFETIME_SECONDS,
+               "refresh_token": "IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk",
+               "scope": "create"
+           }, 200, {'X-Expires-After': JWT_LIFETIME_SECONDS, 'X-Rate-Limit': 1000}
