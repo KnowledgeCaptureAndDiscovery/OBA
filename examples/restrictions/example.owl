@@ -293,24 +293,6 @@
     
 
 
-    <!-- https://w3id.org/example#testObjectIntersectionOf -->
-
-    <owl:ObjectProperty rdf:about="https://w3id.org/example#testObjectIntersectionOf">
-        <rdfs:domain rdf:resource="https://w3id.org/example#Person"/>
-        <rdfs:range>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="https://w3id.org/example#StudentRecord"/>
-                    <rdf:Description rdf:about="https://w3id.org/example#StudyProgram"/>
-                </owl:intersectionOf>
-            </owl:Class>
-        </rdfs:range>
-        <terms:description xml:lang="en">This is a property to test an ObjectIntersectionOf. (Note that range values are added only for test purposes).</terms:description>
-        <rdfs:label xml:lang="en">test ObjectIntersectionOf</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://w3id.org/example#testObjectUnionOf -->
 
     <owl:ObjectProperty rdf:about="https://w3id.org/example#testObjectUnionOf">
