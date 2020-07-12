@@ -26,8 +26,8 @@ class Oba {
     /*
     TODO: we are supporting one language. Issue #42
     */
-
-    InputStream stream = Oba.class.getClassLoader().getResourceAsStream("logging.properties");
+	
+   InputStream stream = Oba.class.getClassLoader().getResourceAsStream("logging.properties");
     try {
       LogManager.getLogManager().readConfiguration(stream);
       logger = Logger.getLogger(Oba.class.getName());
@@ -39,7 +39,7 @@ class Oba {
     LANGUAGE selected_language = LANGUAGE.PYTHON_FLASK;
     logger.setLevel(Level.FINE);
     logger.addHandler(new ConsoleHandler());
-
+	  
     //parse command line
     String config_yaml = ObaUtils.get_config_yaml(args);
     //read the config yaml from command line
@@ -81,6 +81,8 @@ class Oba {
     copy_custom_queries(custom_queries_dir, destination_dir);
   }
 
+ 
+  
   private static void generate_context(YamlConfig config_data, String destination_dir) {
     List<String> ontologies = config_data.getOntologies();
     JSONObject context_json_object = null;

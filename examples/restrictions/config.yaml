@@ -1,16 +1,16 @@
 ontologies:
-  - examples/example/example.owl
-name: example
+  - examples/restrictions/example.owl
+name: Restrictions example
 output_dir: outputs
 
 openapi:
   openapi: 3.0.1
   info:
-    description: This is the API for the example ontology
-    title: Example ontology
+    description: This is the API for the restrictions example ontology
+    title: Restrictions example ontology
     version: v1.5.0
   externalDocs:
-    description: Example ontology
+    description: Restrictions example ontology
     url: https://w3id.org/example
   servers:
     - url: http://localhost:8080/v1.5.0

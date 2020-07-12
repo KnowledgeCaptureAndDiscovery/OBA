@@ -52,10 +52,10 @@ class MapperObjectProperty {
 
   private Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable){
     Schema object = new ObjectSchema();
-    object.set$ref(ref);
     object.setDescription(description);
 
     if (array) {
+      object.set$ref(ref);
       ArraySchema objects = new ArraySchema();
       objects.setDescription(description);
       if (isFunctional)
@@ -80,22 +80,28 @@ class MapperObjectProperty {
       case "allValuesFrom":      	  
     	  //nothing to do in the Schema
       	break ;   
-      case "objectHasValue":
-    	  break ; 
       default:
     	  break ; 
     	} 
       }     
-      
       objects.setNullable(nullable);
       objects.setItems(object);      
       return objects;
     }
     else {
-      return object;
+    	for (String restriction:  restrictions.keySet()) { 
+    		String value = restrictions.get(restriction);
+    		if (restriction=="objectHasValue") {      		
+    			object.setDefault(value);
+    			object.type("string");
+    			object.format("uri");
+    			return object;
+    		}
+    	}
+    	return object;
     }
 
-
+    
   }
   private Schema getComposedSchemaObject(List<String> refs, boolean array, boolean nullable){
     Schema object = new ObjectSchema();
@@ -107,7 +113,7 @@ class MapperObjectProperty {
     if (array) {
     	ArraySchema objects = new ArraySchema();
     	objects.setDescription(description);
-    	objects.setNullable(nullable);
+    	
     	if (isFunctional)
     		objects.setMaxItems(1);
 
@@ -137,6 +143,14 @@ class MapperObjectProperty {
     			case "allValuesFrom":      	  
     				//nothing to do in the Schema
     				break ;  
+    	        case "oneOf":  
+    	        	if (value=="someValuesFrom")
+    	        		nullable=false;	
+    	        	composedSchema.addEnumItemObject(item);
+    	            composedSchema.setType("string");
+    	            composedSchema.setFormat("uri");
+    	        	objects.setItems(composedSchema);
+    	        	break;
     			default:
     				//if the property range is complex it will be omitted   
     				logger.warning("omitted complex restriction");	 
@@ -146,6 +160,7 @@ class MapperObjectProperty {
     	}     
     	if (refs.size() == 0)
     		objects.setItems(object);
+    		objects.setNullable(nullable);
     	return objects;
     }
     else {

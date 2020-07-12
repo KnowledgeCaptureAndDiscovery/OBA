@@ -97,6 +97,23 @@
     
 
 
+    <!-- https://w3id.org/example#author -->
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#author">
+        <rdfs:domain rdf:resource="https://w3id.org/example#StudyMaterial"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/example#Organization"/>
+                    <rdf:Description rdf:about="https://w3id.org/example#Person"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:label xml:lang="en">author</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
     <!-- https://w3id.org/example#belongsTo -->
 
     <owl:ObjectProperty rdf:about="https://w3id.org/example#belongsTo">
@@ -127,12 +144,39 @@
     
 
 
-    <!-- https://w3id.org/example#hasDeparment -->
+    <!-- https://w3id.org/example#hasDegree -->
 
-    <owl:ObjectProperty rdf:about="https://w3id.org/example#hasDeparment">
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#hasDegree">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Person"/>
+        <rdfs:range rdf:resource="https://w3id.org/example#Degree"/>
+        <rdfs:label xml:lang="en">has degree</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/example#hasDepartment -->
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#hasDepartment">
         <rdfs:domain rdf:resource="https://w3id.org/example#University"/>
         <rdfs:range rdf:resource="https://w3id.org/example#Department"/>
         <rdfs:label xml:lang="en">has department</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/example#hasEvaluationMethod -->
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#hasEvaluationMethod">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Course"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="https://w3id.org/example#Assignment"/>
+                    <rdf:Description rdf:about="https://w3id.org/example#Exam"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:label xml:lang="en">has evaluation method</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -161,6 +205,7 @@
     <!-- https://w3id.org/example#hasRector -->
 
     <owl:ObjectProperty rdf:about="https://w3id.org/example#hasRector">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://w3id.org/example#University"/>
         <rdfs:range rdf:resource="https://w3id.org/example#Professor"/>
         <rdfs:label xml:lang="en">has rector</rdfs:label>
@@ -184,6 +229,16 @@
         <rdfs:domain rdf:resource="https://w3id.org/example#Course"/>
         <rdfs:range rdf:resource="https://w3id.org/example#Student"/>
         <rdfs:label xml:lang="en">has student enrolled</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/example#hasStudyMaterial -->
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/example#hasStudyMaterial">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Course"/>
+        <rdfs:range rdf:resource="https://w3id.org/example#StudyMaterial"/>
+        <rdfs:label xml:lang="en">has study material</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -250,7 +305,7 @@
                 </owl:intersectionOf>
             </owl:Class>
         </rdfs:range>
-        <terms:description xml:lang="en">This is a property to test a complex ObjectIntersectionOf. (Note that range values are added only for test purposes).</terms:description>
+        <terms:description xml:lang="en">This is a property to test an ObjectIntersectionOf. (Note that range values are added only for test purposes).</terms:description>
         <rdfs:label xml:lang="en">test ObjectIntersectionOf</rdfs:label>
     </owl:ObjectProperty>
     
@@ -365,8 +420,8 @@
         <rdfs:range>
             <rdfs:Datatype>
                 <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.w3.org/2001/XMLSchema#double"/>
                     <rdf:Description rdf:about="http://www.w3.org/2001/XMLSchema#integer"/>
-                    <rdf:Description rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
                 </owl:unionOf>
             </rdfs:Datatype>
         </rdfs:range>
@@ -423,6 +478,16 @@
     
 
 
+    <!-- https://w3id.org/example#memberOfOtherDepartments -->
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/example#memberOfOtherDepartments">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Professor"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label xml:lang="en">member of other departments</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- https://w3id.org/example#name -->
 
     <owl:DatatypeProperty rdf:about="https://w3id.org/example#name">
@@ -439,6 +504,20 @@
         <rdfs:domain rdf:resource="https://w3id.org/example#Person"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en">nationality</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://w3id.org/example#numberOfProfessors -->
+
+    <owl:DatatypeProperty rdf:about="https://w3id.org/example#numberOfProfessors">
+        <rdfs:domain rdf:resource="https://w3id.org/example#Department"/>
+        <rdfs:range>
+            <rdfs:Datatype>
+                <owl:datatypeComplementOf rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+            </rdfs:Datatype>
+        </rdfs:range>
+        <rdfs:label xml:lang="en">number of professors</rdfs:label>
     </owl:DatatypeProperty>
     
 
@@ -511,6 +590,15 @@
     
 
 
+    <!-- https://w3id.org/example#Assignment -->
+
+    <owl:Class rdf:about="https://w3id.org/example#Assignment">
+        <rdfs:subClassOf rdf:resource="https://w3id.org/example#EvaluationMethod"/>
+        <rdfs:label xml:lang="en">Assignment</rdfs:label>
+    </owl:Class>
+    
+
+
     <!-- https://w3id.org/example#BachelorProgram -->
 
     <owl:Class rdf:about="https://w3id.org/example#BachelorProgram">
@@ -528,15 +616,14 @@
     <owl:Class rdf:about="https://w3id.org/example#Course">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://w3id.org/example#isTaughtBy"/>
-                <owl:someValuesFrom rdf:resource="https://w3id.org/example#Professor"/>
+                <owl:onProperty rdf:resource="https://w3id.org/example#hasStudyMaterial"/>
+                <owl:someValuesFrom rdf:resource="https://w3id.org/example#StudyMaterial"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://w3id.org/example#hasStudentEnrolled"/>
-                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">5</owl:minQualifiedCardinality>
-                <owl:onClass rdf:resource="https://w3id.org/example#Student"/>
+                <owl:onProperty rdf:resource="https://w3id.org/example#isTaughtBy"/>
+                <owl:someValuesFrom rdf:resource="https://w3id.org/example#Professor"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -552,11 +639,36 @@
     
 
 
+    <!-- https://w3id.org/example#Degree -->
+
+    <owl:Class rdf:about="https://w3id.org/example#Degree">
+        <rdfs:label xml:lang="en">Degree</rdfs:label>
+    </owl:Class>
+    
+
+
     <!-- https://w3id.org/example#Department -->
 
     <owl:Class rdf:about="https://w3id.org/example#Department">
         <terms:description xml:lang="en">Department of the University</terms:description>
         <rdfs:label xml:lang="en">Department</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/example#EvaluationMethod -->
+
+    <owl:Class rdf:about="https://w3id.org/example#EvaluationMethod">
+        <rdfs:label xml:lang="en">Evaluation Method</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/example#Exam -->
+
+    <owl:Class rdf:about="https://w3id.org/example#Exam">
+        <rdfs:subClassOf rdf:resource="https://w3id.org/example#EvaluationMethod"/>
+        <rdfs:label xml:lang="en">Exam</rdfs:label>
     </owl:Class>
     
 
@@ -572,9 +684,24 @@
     
 
 
+    <!-- https://w3id.org/example#Organization -->
+
+    <owl:Class rdf:about="https://w3id.org/example#Organization">
+        <rdfs:label xml:lang="en">Organization</rdfs:label>
+    </owl:Class>
+    
+
+
     <!-- https://w3id.org/example#Person -->
 
     <owl:Class rdf:about="https://w3id.org/example#Person">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#address"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:maxQualifiedCardinality>
+                <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <terms:description xml:lang="en">A human being regarded as an individual.</terms:description>
         <rdfs:label xml:lang="en">Person</rdfs:label>
     </owl:Class>
@@ -597,6 +724,19 @@
         <rdfs:subClassOf rdf:resource="https://w3id.org/example#Person"/>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#hasDegree"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:oneOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="https://w3id.org/example/resource/Degree/MS"/>
+                            <rdf:Description rdf:about="https://w3id.org/example/resource/Degree/PhD"/>
+                        </owl:oneOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="https://w3id.org/example#teachesCourse"/>
                 <owl:someValuesFrom rdf:resource="https://w3id.org/example#Course"/>
             </owl:Restriction>
@@ -615,9 +755,9 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://w3id.org/example#belongsTo"/>
-                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="https://w3id.org/example#Department"/>
+                <owl:onProperty rdf:resource="https://w3id.org/example#researchField"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <owl:disjointWith rdf:resource="https://w3id.org/example#Student"/>
@@ -630,16 +770,25 @@
     <!-- https://w3id.org/example#ProfessorInArtificialIntelligence -->
 
     <owl:Class rdf:about="https://w3id.org/example#ProfessorInArtificialIntelligence">
+        <rdfs:subClassOf rdf:resource="https://w3id.org/example#Professor"/>
         <rdfs:subClassOf>
-            <owl:Class>
-                <owl:intersectionOf rdf:parseType="Collection">
-                    <rdf:Description rdf:about="https://w3id.org/example#Professor"/>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://w3id.org/example#belongsTo"/>
-                        <owl:hasValue rdf:resource="https://w3id.org/example/resource/Deparment/ArtificialIntelligenceDepartment"/>
-                    </owl:Restriction>
-                </owl:intersectionOf>
-            </owl:Class>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#belongsTo"/>
+                <owl:hasValue rdf:resource="https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#memberOfOtherDepartments"/>
+                <owl:someValuesFrom>
+                    <rdfs:Datatype>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+                            <rdf:Description rdf:about="http://www.w3.org/2001/XMLSchema#nonPositiveInteger"/>
+                        </owl:intersectionOf>
+                    </rdfs:Datatype>
+                </owl:someValuesFrom>
+            </owl:Restriction>
         </rdfs:subClassOf>
         <terms:description xml:lang="en">Professor who belongs to the Artificial Intelligence Deparment</terms:description>
         <rdfs:label xml:lang="en">Professor in Artificial Intelligence</rdfs:label>
@@ -708,6 +857,14 @@
     
 
 
+    <!-- https://w3id.org/example#StudyMaterial -->
+
+    <owl:Class rdf:about="https://w3id.org/example#StudyMaterial">
+        <rdfs:label xml:lang="en">Study Material</rdfs:label>
+    </owl:Class>
+    
+
+
     <!-- https://w3id.org/example#StudyProgram -->
 
     <owl:Class rdf:about="https://w3id.org/example#StudyProgram">
@@ -715,6 +872,12 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="https://w3id.org/example#hasCourse"/>
                 <owl:someValuesFrom rdf:resource="https://w3id.org/example#Course"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#studyProgramName"/>
+                <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <terms:description xml:lang="en">Study program which the course is part of.</terms:description>
@@ -728,7 +891,7 @@
     <owl:Class rdf:about="https://w3id.org/example#University">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://w3id.org/example#hasDeparment"/>
+                <owl:onProperty rdf:resource="https://w3id.org/example#hasDepartment"/>
                 <owl:someValuesFrom rdf:resource="https://w3id.org/example#Department"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -750,6 +913,13 @@
                 <owl:someValuesFrom rdf:resource="https://w3id.org/example#StudyProgram"/>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#universityName"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <terms:description xml:lang="en">A high-level educational institution in which students study for degrees and academic research is done.</terms:description>
         <rdfs:label xml:lang="en">University</rdfs:label>
     </owl:Class>
@@ -767,11 +937,30 @@
     
 
 
-    <!-- https://w3id.org/example/resource/Deparment/ArtificialIntelligenceDepartment -->
+    <!-- https://w3id.org/example/resource/Degree/MS -->
 
-    <owl:NamedIndividual rdf:about="https://w3id.org/example/resource/Deparment/ArtificialIntelligenceDepartment">
+    <owl:NamedIndividual rdf:about="https://w3id.org/example/resource/Degree/MS">
+        <rdf:type rdf:resource="https://w3id.org/example#Degree"/>
+        <rdfs:label xml:lang="en">Master degree</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/example/resource/Degree/PhD -->
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/example/resource/Degree/PhD">
+        <rdf:type rdf:resource="https://w3id.org/example#Degree"/>
+        <rdfs:label xml:lang="en">PhD degree</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment -->
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment">
         <rdf:type rdf:resource="https://w3id.org/example#Department"/>
-        <departmentName xml:lang="en">Artificial Intelligence</departmentName>
+        <departmentName>Artificial Intelligence</departmentName>
+        <rdfs:label xml:lang="en">Department of Artificial Intelligence</rdfs:label>
     </owl:NamedIndividual>
 </rdf:RDF>
 

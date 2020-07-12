@@ -2,6 +2,7 @@ package edu.isi.oba;
 
 
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -262,11 +263,9 @@ class MapperSchema {
 
         				String propertyURI = odp.getIRI().toString();
         				propertyNameURI.put(propertyURI, propertyName);
-
         				List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing, follow_references);
 
         				Map<String,String> restrictionValues = new HashMap<String, String>() ;
-        				String restrictions ="";
         				for (OWLOntology ontology : ontologies) {
         					RestrictionVisitor restrictionVisitor = new RestrictionVisitor(cls,ontology,owlThing,propertyName);
         					for (OWLObjectPropertyRangeAxiom propertyRangeAxiom : ranges) {
@@ -279,8 +278,8 @@ class MapperSchema {
         							restrictionValues=restrictionsValuesFromClass.get(j);
         						}
         					}
-        					if (restrictionsValuesFromClass.isEmpty())
-        						propertyRanges.clear();
+        					if (restrictionsValuesFromClass.isEmpty() && propertyRanges.size()>1)
+                        		propertyRanges.clear();
         				}
 
         				String propertyDescription = ObaUtils.getDescription(odp, ontology_cls);
@@ -387,6 +386,7 @@ class MapperSchema {
     			} else {
 
     			for (int i = 0; i < propertiesFromObjectRestrictions.size(); i++) {
+    				MapperObjectProperty mapperObjectProperty;
     				OWLObjectProperty OP = propertiesFromObjectRestrictions.get(i);
     				String propertyDescription = ObaUtils.getDescription(OP, ontology_cls);
     				if (propertiesFromObjectRestrictions_ranges.size() != 0) {
@@ -394,7 +394,10 @@ class MapperSchema {
     					for (String j :  restrictionsValuesFromClass.keySet()) {
     						Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);
     						if (j==sfp.getShortForm(OP.getIRI())) {
-    							MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(OP.getIRI()), propertyDescription, false, restrictionValues, rangesOP);
+    							if (rangesOP.get(0)=="defaultValue")
+    								mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(OP.getIRI()), propertyDescription, false, restrictionValues, rangesOP, false, true);
+    							else
+    								mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(OP.getIRI()), propertyDescription, false, restrictionValues, rangesOP);
     							try {
     								this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
     							} catch (Exception e) {
