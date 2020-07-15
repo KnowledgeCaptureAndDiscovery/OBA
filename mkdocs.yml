@@ -15,6 +15,7 @@ nav:
       - 'Authentication': 'authentication.md'
   - Configuration file: 'configuration_file.md'
   - Examples: examples.md
+  - Benchmark and production recommendation: benchmarking.md
 theme:
   name: material
 
