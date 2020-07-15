@@ -15,7 +15,7 @@ Methods:
 
 If you use a Reverse Proxy with Caching, you can use OBA to production environment. We recommend to use NGINX and follow the guide [NGINX Content Caching](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/)
 
-The following figures show the latency by percentile distribution in a test scenario, the client sent 60 requests per second over 60 seconds.
+The following figures show the latency by percentile distribution in a test scenario, the client sent 60 requests per second over 600 seconds.
 
 ![Diagram](figures/api_cached.png)
 **Figure 1**: 60 requests per second using Reverse Proxy with Caching
