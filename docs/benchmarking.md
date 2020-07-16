@@ -174,7 +174,7 @@ Bucket           #    %
 [200ms,  300ms]  1    0.17%
 ```
 
-##### Endpoint
+##### SPARQL Endpoint(Fuseki)
 
 
 ```
@@ -248,7 +248,7 @@ Bucket           #     %
 [100ms,  200ms]  1     0.11%
 ```
 
-##### Endpoint
+##### SPARQL Endpoint (Fuseki)
 
 ```
 Requests      [total, rate, throughput]         3600, 60.02, 60.00
