@@ -6,7 +6,7 @@ In this page, we illustrate two performance tests of OBA:
 1. The overhead introduced by framing SPARQL results into JSON; and
 2. The performance of the API when retrieving results when multiple requests are received at the same time.
 
-The tests have been performed on the [model catalog OBA-Generated API](https://api.models.mint.isi.edu/v1.5.0/ui/#/), which uses a Fuseki tiple store as SPARQL endpoint. 
+The tests have been performed on the [model catalog OBA-Generated API](https://api.models.mint.isi.edu/v1.5.0/ui/#/), which uses a Fuseki triple store as SPARQL endpoint. 
 
 ## Overhead analysis
 In order to perform this test, we retrieved a series of results from a SPARQL endpoint (Fuseki server) doing regular SPARQL queries; and we compared them against doing an equivalent query through an OBA-generated API (GET queries, without cache enabled). The results show that OBA adds a slight overhead below 150ms for the majority of the queries with respect to the SPARQL endpoint (below 50ms); and between 150 and 200ms for 8% of the queries.
