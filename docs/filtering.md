@@ -24,7 +24,7 @@ openapi:
 ## Ontologies
 ### List of ontologies
 ontologies:
-  - https://gist.githubusercontent.com/sirspock/cec147b24bd241295584dfcc21c21b93/raw/b6fa41ddf93212d967f35da20278f54d2ae2d40d/gistfile1.txt
+  - https://gist.githubusercontent.com/mosoriob/cec147b24bd241295584dfcc21c21b93/raw/b6fa41ddf93212d967f35da20278f54d2ae2d40d/gistfile1.txt
 
 ## SPARQL information
 endpoint:
@@ -45,7 +45,7 @@ classes:
 follow_references: false
 ```
 
-The result is available at: [DBPedia Music](https://app.swaggerhub.com/apis/sirspock/dbpedia-music/v1.3.0)
+The result is available at: [DBPedia Music](https://app.swaggerhub.com/apis/mosoriob/dbpedia-music/v1.3.0)
 
 
 ### Following references
