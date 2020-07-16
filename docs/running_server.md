@@ -39,3 +39,26 @@ sudo pip install tox
 tox
 ```
 
+### Enabling CORS
+
+!!! info
+We recommend to enable CORS in the WebServer and not in the application. [https://enable-cors.org/server.html](https://enable-cors.org/server.html)
+
+
+We can enable CORS in the Python server.
+
+```python
+import connexion
+from flask_cors import CORS
+
+app = connexion.FlaskApp(__name__)
+app.add_api('swagger.yaml')
+
+# add CORS support
+CORS(app.app)
+
+app.run(port=8080)
+```
+
+You can see a [example](https://github.com/sirspock/dbpedia_api/blob/master/server/openapi_server/__main__.py)
+
