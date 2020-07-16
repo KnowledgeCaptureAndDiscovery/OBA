@@ -31,7 +31,7 @@ Bucket           #   %       Histogram
 [250ms,  350ms]  0   0.00%
 [350ms,  +Inf]   0   0.00%
 ```
-
+Since we use pagination, we expect these results to be applicable for other APIs and knowledge graphs. The only case where the overhead may increase is when a resource has hundreds of properties, as the framing into JSON-LD will be delayed. This may be circumvented with a custom query; or by simplifying the API schema of the target class. 
 
 ## Result retrieval performance
 
