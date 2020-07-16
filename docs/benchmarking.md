@@ -2,14 +2,16 @@
     We recommend using a Reverse Proxy with Caching when deploying OBA in production.
 
 
-In this page, we illustrate two performance tests of OBA: 
+In this page, we describe two performance tests of OBA: 
 1. The overhead introduced by framing SPARQL results into JSON; and
 2. The performance of the API when retrieving results when multiple requests are received at the same time.
 
-The tests have been performed on the [model catalog OBA-Generated API](https://api.models.mint.isi.edu/v1.5.0/ui/#/), which uses a Fuseki triple store as SPARQL endpoint. 
+The tests have been performed on the [model catalog OBA-Generated API](https://api.models.mint.isi.edu/v1.5.0/ui/#/), which uses a Fuseki triple store as SPARQL endpoint. The tests have been performed in 2 machines (1 with the API, another one with the SPARQL endpoint) with the same conditions: 8 GB of RAM and 2 CPUs.
 
 ## Overhead analysis
-In order to perform this test, we retrieved a series of results from a SPARQL endpoint (Fuseki server) doing regular SPARQL queries; and we compared them against doing an equivalent query through an OBA-generated API (GET queries, without cache enabled). The results show that OBA adds a slight overhead below 150ms for the majority of the queries with respect to the SPARQL endpoint (below 50ms); and between 150 and 200ms for 8% of the queries.
+In order to perform this test, we retrieved a series of results from a SPARQL endpoint (Fuseki server) doing SPARQL queries and we compared them against doing an equivalent query through an OBA-generated API (GET queries, without cache enabled). The queries attempt to retrieve the individuals of various classes (e.g., GET all datasets, get all persons) and not single individuals. The corresponding queries in SPARQL use CONSTRUCTs. 
+
+The results show that OBA adds a slight overhead below 150ms for the majority of the queries with respect to the SPARQL endpoint (below 50ms); and between 150 and 200ms for 8% of the queries.
 
 ```
 cat endpoint.json  | ./../vegeta report -type="hist[0,50ms,100ms,150ms,200ms,250ms, 350ms]"
@@ -35,7 +37,7 @@ Since we use pagination, we expect these results to be applicable for other APIs
 
 ## Result retrieval performance
 
-We evaluate three ways to obtain 100 resources from a SPARQL endpoint (we used Fuseki server in this analysis)
+We evaluate three ways to obtain 100 resources from a SPARQL endpoint (we used Fuseki server in this analysis). 
 
 **Methods**:
 
