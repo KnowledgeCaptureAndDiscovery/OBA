@@ -2,7 +2,8 @@
     We recommend using a Reverse Proxy with Caching when deploying OBA in production.
 
 
-In this page, we describe two performance tests of OBA: 
+In this page, we describe two performance tests of OBA:
+ 
 1. The overhead introduced by framing SPARQL results into JSON; and
 2. The performance of the API when retrieving results when multiple requests are received at the same time.
 
@@ -33,7 +34,7 @@ Bucket           #   %       Histogram
 [250ms,  350ms]  0   0.00%
 [350ms,  +Inf]   0   0.00%
 ```
-Since we use pagination, we expect these results to be applicable for other APIs and knowledge graphs. The only case where the overhead may increase is when a resource has hundreds of properties, as the framing into JSON-LD will be delayed. This may be circumvented with a custom query; or by simplifying the API schema of the target class. 
+Since we use pagination, we expect these results to be applicable for other APIs and knowledge graphs. The only case where the overhead may increase is when a resource has hundreds of properties, as the framing into JSON-LD will be delayed. This may be circumvented with a custom query; or by simplifying the API schema of the target class. So far, we have not experienced any delay of this kind.
 
 ## Result retrieval performance
 
