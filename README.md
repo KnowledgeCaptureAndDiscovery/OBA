@@ -27,7 +27,7 @@ There are two option to run OBA:
 
 ## Running
 
-1. Create the OBA config file (config.yaml) from the [sample configuration](config.yaml.sample)
+1. Create the OBA config file (config.yaml) from one of the [sample configuration files in the examples folder](examples/modelcatalog_reduced/config.yaml)
 2. Use the configuration to run OBA with the following command:
 
 ```bash
