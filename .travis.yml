@@ -1,7 +1,10 @@
 language: java
-script:
-- mvn package
-- bash .ci/dbpedia_music.sh
+install:
+  - mvn package
+jobs:
+  include:
+    - script: bash .ci/dbpedia_music.sh
+    - script: bash .ci/model_catalog.sh
 before_deploy:
 - ls -lR
 deploy:
