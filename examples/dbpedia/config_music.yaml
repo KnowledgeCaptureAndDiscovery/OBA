@@ -20,19 +20,18 @@ openapi:
 ## Ontologies
 ### List of ontologies
 ontologies:
-  - https://gist.githubusercontent.com/mosoriob/cec147b24bd241295584dfcc21c21b93/raw/b6fa41ddf93212d967f35da20278f54d2ae2d40d/gistfile1.txt
+  - examples/dbpedia/ontology.xml
 
 ## SPARQL information
 endpoint:
   url: http://dbpedia.org/sparql
   prefix: http://dbpedia.org/resource
-  graph_base: http://ontosoft.isi.edu:3030/modelCatalog-1.2.0/data/
 
 ## Filter the paths by methods
 enable_get_paths: true
-enable_post_paths: true
-enable_delete_paths: true
-enable_put_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
 
 ## Select the classes to add in the API
 classes:

@@ -18,7 +18,11 @@ dir=${PWD}
 cp ../openapi.yaml ${PWD}
 
 SERVER_DIR=server
-docker run -ti --rm -v ${PWD}:/local openapitools/openapi-generator-cli:v4.1.2 \
+
+
+docker run -ti --rm -v ${PWD}:/local \
+     -u "$(id -u):$(id -u)" \
+     openapitools/openapi-generator-cli:v4.1.2 \
      generate  \
      -i /local/openapi.yaml\
      -g python-flask  \
