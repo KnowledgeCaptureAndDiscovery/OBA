@@ -1,6 +1,7 @@
 language: java
 script:
 - mvn package
+- bash .ci/dbpedia_music.sh
 before_deploy:
 - ls -lR
 deploy:
