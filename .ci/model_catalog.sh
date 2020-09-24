@@ -2,7 +2,7 @@ set -xe
 
 java -jar target/oba-*-jar-with-dependencies.jar -c examples/modelcatalog/config.yaml
 pushd outputs/modelcatalog/servers/python
-bash generate-server.sh
+bash generate-server.sh > /dev/null
 pushd server
 docker build -t modelcatalog .
 docker run --name modelcatalog -d -p 8080:8080 modelcatalog
