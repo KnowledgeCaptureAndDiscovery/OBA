@@ -20,7 +20,7 @@ openapi:
 ## Ontologies
 ### List of ontologies
 ontologies:
-  - https://gist.githubusercontent.com/mosoriob/cec147b24bd241295584dfcc21c21b93/raw/b6fa41ddf93212d967f35da20278f54d2ae2d40d/gistfile1.txt
+  - examples/dbpedia/ontology.xml
 
 ## SPARQL information
 endpoint:
