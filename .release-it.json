@@ -1,6 +1,6 @@
 {
   "git": {
-    "changelog": "git log --pretty=format:\"* %s (%h)\" ${latestTag}...HEAD",
+    "changelog": "auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs",
     "requireCleanWorkingDir": false,
     "requireUpstream": true,
     "addUntrackedFiles": true,
@@ -19,7 +19,7 @@
     "release": true
   },
   "hooks": {
-    "after:bump": "mvn --settings pom.xml org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion=${version} 1>/dev/null 2>/dev/null"
+    "after:bump": "mvn --settings pom.xml org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion=${version} 1>/dev/null 2>/dev/null && auto-changelog -v ${version}"
   }
 }
 
