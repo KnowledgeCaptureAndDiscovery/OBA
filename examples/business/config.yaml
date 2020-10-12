@@ -15,7 +15,7 @@ openapi:
     url:  https://www.semanticarts.com/gist/previous-versions/
   servers:
     - url: http://localhost:8080/v1
-    - description: localhost server
+      description: localhost server
 
 ## Ontologies
 ### List of ontologies
