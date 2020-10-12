@@ -71,7 +71,7 @@ class SerializerPython {
       clsIRI = (IRI) pair.getKey();
       name = (String) pair.getValue();
       try {
-        String variable_name = name.toUpperCase().replace("-", "");
+        String variable_name = name.toUpperCase().replace("-", "").replace("_", "");
         //TODO: Catch class name empty
         String catch_temp = name.replace("<", "").replace(">", "");
         if (!catch_temp.equals(clsIRI.toString())) {
