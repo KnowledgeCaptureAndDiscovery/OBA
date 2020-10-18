@@ -42,7 +42,7 @@ tox
 ### Enabling CORS
 
 !!! info
-We recommend to enable CORS in the WebServer and not in the application. [https://enable-cors.org/server.html](https://enable-cors.org/server.html)
+    We recommend to enable CORS in the WebServer and not in the application. [https://enable-cors.org/server.html](https://enable-cors.org/server.html)
 
 
 You can enable CORS in the Python server as follows:
