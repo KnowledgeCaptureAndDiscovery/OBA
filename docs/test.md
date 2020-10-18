@@ -2,7 +2,7 @@
 
 The resultant server code contains the tests to evaluate the status of your API against a knowledge graph.
 
-## Usage
+## Installation
 
 To use the tests, you must install `tox`:
 
@@ -10,7 +10,29 @@ To use the tests, you must install `tox`:
 $ pip install tox
 ```
 
-And run it:
+## Before you run the tests
+OBA creates tests for all the paths in your API, including specific instances. However, since the instances to test are unknown beforehand, OBA uses a placeholder `id_example` which has to be modified with the instance id you want to test. For example, for the `dbpedia_music` example, the files `servers/python/server/openapi_server/test/test_band_controller.py` and `python/server/openapi_server/test/test_genre_controller.py` will need to be modified with a band name and a music genre of your choice. You can choose an id by running your API, e.g., for bands:
+
+```
+curl -X GET "http://localhost:8080/v1.3.0/bands?page=1&per_page=10" -H  "accept: application/json"
+```
+
+And then selecting one to change in the test file. For example, in test_band_controller.py  we can ask for the Black_Sabbath, changing 
+```
+        response = self.client.open(
+            '/v1.3.0/bands/{id}'.format(id='id_example'),
+```
+into
+```
+        response = self.client.open(
+            '/v1.3.0/bands/{id}'.format(id='Black_Sabbath'),
+```
+
+You will need to provide a sample id to test for all the paths of the API that test individual instances, or the tests will fail.
+
+## Running the tests
+
+And run the tests with:
 
 ```bash
 $ tox 
