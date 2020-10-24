@@ -77,9 +77,9 @@ public class ObaUtilsTest {
         try{
             java.nio.file.Files.delete(ont1.toPath());
             java.nio.file.Files.delete(ont2.toPath());
-        }catch(Exception e){        
+        }catch(Exception e){
         }
-        
+
     }
 
 }

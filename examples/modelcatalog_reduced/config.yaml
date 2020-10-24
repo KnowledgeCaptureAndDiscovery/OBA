@@ -1,6 +1,6 @@
 ontologies:
   - examples\modelcatalog_reduced\modelCat.ttl
-name: modelcatalog-reduced
+name: modelcatalog_reduced
 output_dir: outputs
 
 openapi:
