@@ -71,7 +71,7 @@ class MapperOperation {
     }
 
     if (auth && (method == Method.PUT || method == Method.POST  || method == Method.DELETE )) {
-      parameters.add(new PathParameter()
+      parameters.add(new QueryParameter()
               .description("Username")
               .name("user")
               .required(false)
