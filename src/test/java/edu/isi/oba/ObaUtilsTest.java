@@ -48,10 +48,31 @@ public class ObaUtilsTest {
     public void getDescription () throws OWLOntologyCreationException{
         String example_remote = "src/test/config/pplan.yaml";
         YamlConfig config_data = get_yaml_data(example_remote);
-        Mapper mapper = new Mapper(config_data);
-        OWLClass planClass = mapper.manager.getOWLDataFactory().getOWLClass("http://purl.org/net/p-plan#Plan");
-        String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0));
-        assertNotEquals(desc, "");
+        try {
+            Mapper mapper = new Mapper(config_data);
+            OWLClass planClass = mapper.manager.getOWLDataFactory().getOWLClass("http://purl.org/net/p-plan#Plan");
+            String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0));
+            assertNotEquals(desc, "");
+        }catch(Exception e){
+            fail();
+        }
+    }
+
+    /**
+     * This test will try to load a file that does not exits. The exception is captured and reported.
+     * @throws OWLOntologyCreationException
+     */
+    @Test
+    public void missing_file () throws OWLOntologyCreationException{
+        String missing_file = "src/test/config/missing_file.yaml";
+        YamlConfig config_data = get_yaml_data(missing_file);
+        try {
+            Mapper mapper = new Mapper(config_data);
+            //if no exception is launched, fail test
+            fail();
+        }catch(Exception e){
+            //pass test if there is an exception
+        }
     }
 
     @Test

@@ -33,7 +33,7 @@ class Mapper {
     public OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
     private Boolean follow_references;
 
-    public Mapper(YamlConfig config_data) throws OWLOntologyCreationException {
+    public Mapper(YamlConfig config_data) throws OWLOntologyCreationException, IOException {
         this.config_data = config_data;
         List<String> paths = config_data.getPaths();
         this.selected_paths = paths;
@@ -64,7 +64,7 @@ class Mapper {
             this.selected_classes = filter_classes();
     }
 
-    private void download_ontologies(List<String> config_ontologies, String destination_dir, int i, List<String> ontologyPaths) throws OWLOntologyCreationException {
+    private void download_ontologies(List<String> config_ontologies, String destination_dir, int i, List<String> ontologyPaths) throws OWLOntologyCreationException, IOException {
         for (String ontologyPath : config_ontologies) {
             //copy the ontologies used in the destination folder
             String destinationPath = destination_dir + File.separator +"ontology"+i+".owl";
@@ -79,7 +79,8 @@ class Mapper {
                     //copy to right folder
                     Files.copy(new File(ontologyPath).toPath(), ontologyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ex) {
-                    Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, "ERROR while loading file: "+ontologyPath, ex);
+                    throw ex;
                 }
             }
             System.out.println(destinationPath);

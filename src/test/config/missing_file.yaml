@@ -1,6 +1,6 @@
 ontologies:
-  - examples\modelcatalog_reduced\modelCat.ttl
-name: modelcatalog_reduced
+  - src/test/resources/non_existent_file.ttl
+name: modelcatalog-reduced
 output_dir: outputs
 
 openapi:
@@ -17,8 +17,6 @@ openapi:
     - url: https://dev.api.models.mint.isi.edu/v1.5.0
     - url: http://localhost:8080/v1.5.0
 
-firebase:
-  key: "test"
 
 endpoint:
   url: http://endpoint.mint.isi.edu/modelCatalog-1.4.0
@@ -30,7 +28,5 @@ enable_post_paths: false
 enable_delete_paths: false
 enable_put_paths: false
 
-auth:
-  provider: firebase
 follow_references: true
 

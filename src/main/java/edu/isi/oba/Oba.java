@@ -48,7 +48,7 @@ class Oba {
     try {
       config_data = ObaUtils.get_yaml_data(config_yaml);
     } catch (Exception e){
-      logger.severe("Error in the configuration file. Please review it \n " + e);
+      logger.severe("Error parsing the configuration file. Please make sure it is valid \n " + e);
       System.exit(1);
     }
 
@@ -59,26 +59,31 @@ class Oba {
 
       Provider provider = authConfig.getProvider_obj();
       if (provider.equals(Provider.FIREBASE) && firebase_data.getKey() == null) {
-        logger.severe("Must set up the firebase key");
+        logger.severe("You must set up the firebase key");
         System.exit(1);
       }
     } else {
       config_data.setAuth(new AuthConfig());
     }
-    Mapper mapper = new Mapper(config_data);
-    mapper.createSchemas(destination_dir, config_data);
+    try {
+        Mapper mapper = new Mapper(config_data);
+        mapper.createSchemas(destination_dir, config_data);
 
-    LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
-    OpenAPI openapi_base = config_data.getOpenapi();
-    String custom_queries_dir = config_data.getCustom_queries_directory();
+        LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
+        OpenAPI openapi_base = config_data.getOpenapi();
+        String custom_queries_dir = config_data.getCustom_queries_directory();
 
-    //copy base project
-    ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
-    //get schema and paths
-    generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
-    generate_openapi_template(mapper, destination_dir, config_data, selected_language);
-    generate_context(config_data, destination_dir);
-    copy_custom_queries(custom_queries_dir, destination_dir);
+        //copy base project
+        ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
+        //get schema and paths
+        generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
+        generate_openapi_template(mapper, destination_dir, config_data, selected_language);
+        generate_context(config_data, destination_dir);
+        copy_custom_queries(custom_queries_dir, destination_dir);
+    }catch (Exception e){
+        logger.severe("Error while creating the API specification: "+e.getLocalizedMessage());
+        System.exit(1);
+    }
   }
 
  
@@ -119,7 +124,7 @@ class Oba {
         new SerializerPython(mapper, destination_directory, config);
         break;
       default:
-        logger.severe("Language is not supported");
+        logger.severe("The language selected is not supported");
     }
 
   }
