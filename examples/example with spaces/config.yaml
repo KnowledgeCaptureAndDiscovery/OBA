@@ -1,6 +1,6 @@
 ontologies:
-  - examples/modelcatalog/sdm-reduced.ttl
-  - examples/modelcatalog/sd-reduced.ttl
+  - examples/example with spaces/sdm-reduced.ttl
+  - examples/example with spaces/sd-reduced.ttl
 name: modelcatalog
 output_dir: outputs
 

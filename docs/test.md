@@ -4,11 +4,13 @@ The resultant server code contains the tests to evaluate the status of your API 
 
 ## Installation
 
-To use the tests, you must install `tox`:
+To use the tests, you must install `tox` (we recommend to use a [virtual environment](https://docs.python.org/3/library/venv.html)):
 
 ```bash
 $ pip install tox
 ```
+
+The tests are in the `servers/python/server/openapi_server/test/` folder. 
 
 ## Before you run the tests
 OBA creates tests for all the paths in your API, including specific instances. However, since the instances to test are unknown beforehand, OBA uses a placeholder `id_example` which has to be modified with the instance id you want to test. For example, for the `dbpedia_music` example, the files `servers/python/server/openapi_server/test/test_band_controller.py` and `python/server/openapi_server/test/test_genre_controller.py` will need to be modified with a band name and a music genre of your choice. You can choose an id by running your API, e.g., for bands:
@@ -32,7 +34,7 @@ You will need to provide a sample id to test for all the paths of the API that t
 
 ## Running the tests
 
-And run the tests with:
+Just access the server folder `servers/python/server/openapi_server/` and run:
 
 ```bash
 $ tox 
@@ -42,7 +44,7 @@ You can modify the test requirements in `src/test-requirements.txt`.
 
 ## Editing
 
-The tests are located in `server/openapi_server/test/`. You can read the following [documentation](https://nose.readthedocs.io/en/latest/testing.html) to understand how to edit them.
+The following [documentation](https://nose.readthedocs.io/en/latest/testing.html) indicates how to edit the tests.
 
 ### Configure
 
@@ -78,7 +80,7 @@ You can edit these option in `server/openapi_server/test/__init__.py`
 
 ## Examples
 
-The following OpenAPI Operation (`/bands`) is going to generate a test with the parameters and request formats required.
+The following OpenAPI Operation (`/bands`) will generate a test with the parameters and request formats required.
 
 ```yaml
   /bands:

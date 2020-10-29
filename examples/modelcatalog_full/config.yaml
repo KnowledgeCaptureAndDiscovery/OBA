@@ -1,7 +1,7 @@
 ontologies:
   - https://w3id.org/okn/o/sdm/1.6.0-nm
   - https://w3id.org/okn/o/sd/1.7.0-nm
-name: modelcatalog
+name: modelcatalog-full
 output_dir: outputs
 openapi:
   openapi: 3.0.1

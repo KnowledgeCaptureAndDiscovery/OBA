@@ -40,6 +40,18 @@ public class MapperTest {
         Mapper mapper = new Mapper(config_data);
         Assert.assertEquals(false, mapper.ontologies.isEmpty());
     }
+
+    /**
+     * This test attempts to load a config in a folder with spaces.
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testSpacesInPath() throws Exception{
+        String local_ontology = "examples/example with spaces/config.yaml";
+        YamlConfig config_data = get_yaml_data(local_ontology);
+        Mapper mapper = new Mapper(config_data);
+        Assert.assertEquals(false, mapper.ontologies.isEmpty());
+    }
     
     /**
      * This test attempts to run OBA with an online ontology through a URI.

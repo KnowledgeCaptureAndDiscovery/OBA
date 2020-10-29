@@ -60,6 +60,7 @@ public class ObaUtilsTest {
 
     /**
      * This test will try to load a file that does not exits. The exception is captured and reported.
+     * This test will pass IF you see an error on the output terminal
      * @throws OWLOntologyCreationException
      */
     @Test

@@ -36,7 +36,7 @@ $ cd python
 ```
 
  
-Run the OpenAPI generator script to generate the server:
+Run the OpenAPI generator script to generate the server. If you are in Unix, you may have to change the permission of the file with `chmod +x generate-server.sh`:
 
 ```bash
 $ bash generate-server.sh

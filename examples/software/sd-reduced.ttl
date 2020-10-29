@@ -88,7 +88,11 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/okn/o/sd#author
 :author rdf:type owl:ObjectProperty ;
         rdfs:domain :Software ;
-        rdfs:range :Person ;
+        rdfs:range [ rdf:type owl:Class ;
+                     owl:unionOf ( :Organization
+                                   :Person
+                                 )
+                   ] ;
         rdfs:comment "The creator of a software component"@en ;
         rdfs:label "author"@en .
 
@@ -113,7 +117,11 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/okn/o/sd#hasContactPerson
 :hasContactPerson rdf:type owl:ObjectProperty ;
                   rdfs:domain :Software ;
-                  rdfs:range :Person ;
+                  rdfs:range [ rdf:type owl:Class ;
+                               owl:unionOf ( :Organization
+                                             :Person
+                                           )
+                             ] ;
                   rdfs:comment "Contact person responsible for a software component"@en ;
                   rdfs:label "has contact person"@en .
 
@@ -306,6 +314,20 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/okn/o/sd#description
 :description rdf:type owl:DatatypeProperty ;
+             rdfs:domain [ rdf:type owl:Class ;
+                           owl:unionOf ( owl:Thing
+                                         :NumericalIndex
+                                         :Organization
+                                         :Parameter
+                                         :Person
+                                         :SampleExecution
+                                         :SampleResource
+                                         :Software
+                                         :SourceCode
+                                         :Variable
+                                         :Visualization
+                                       )
+                         ] ;
              rdfs:range xsd:string ;
              rdfs:comment "A description of a resource"@en ;
              rdfs:label "description"@en .
@@ -395,7 +417,15 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
                                              :VariablePresentation
                                            )
                              ] ;
-                 rdfs:range xsd:string ;
+                 rdfs:range [ rdf:type rdfs:Datatype ;
+                              owl:unionOf ( xsd:anyURI
+                                            xsd:boolean
+                                            xsd:dateTime
+                                            xsd:float
+                                            xsd:integer
+                                            xsd:string
+                                          )
+                            ] ;
                  rdfs:comment "Default accepted value of a variable presentation (or a parameter)"@en ;
                  rdfs:label "has default value"@en .
 
@@ -480,13 +510,26 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/okn/o/sd#hasFixedValue
 :hasFixedValue rdf:type owl:DatatypeProperty ;
                rdfs:domain :Parameter ;
-               rdfs:range xsd:string ;
+               rdfs:range [ rdf:type rdfs:Datatype ;
+                            owl:unionOf ( xsd:anyURI
+                                          xsd:boolean
+                                          xsd:dateTime
+                                          xsd:float
+                                          xsd:integer
+                                          xsd:string
+                                        )
+                          ] ;
                rdfs:comment "Value of a parameter in a software setup."@en ;
                rdfs:label "has fixed value"@en .
 
 
 ###  https://w3id.org/okn/o/sd#hasFormat
 :hasFormat rdf:type owl:DatatypeProperty ;
+           rdfs:domain [ rdf:type owl:Class ;
+                         owl:unionOf ( :DatasetSpecification
+                                       :Visualization
+                                     )
+                       ] ;
            rdfs:range xsd:string ;
            rdfs:comment "Format followed by a file. For example, txt, nc, etc."@en ;
            rdfs:label "has format"@en .
@@ -523,7 +566,12 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
                                                      :VariablePresentation
                                                    )
                                      ] ;
-                         rdfs:range xsd:string ;
+                         rdfs:range [ rdf:type rdfs:Datatype ;
+                                      owl:unionOf ( xsd:dateTime
+                                                    xsd:float
+                                                    xsd:integer
+                                                  )
+                                    ] ;
                          rdfs:comment "Maximum accepted value of a variable presentation (or a parameter)"@en ;
                          rdfs:label "has maximum accepted value"@en .
 
@@ -535,7 +583,12 @@ owl:priorVersion rdf:type owl:AnnotationProperty .
                                                      :VariablePresentation
                                                    )
                                      ] ;
-                         rdfs:range xsd:string ;
+                         rdfs:range [ rdf:type rdfs:Datatype ;
+                                      owl:unionOf ( xsd:dateTime
+                                                    xsd:float
+                                                    xsd:integer
+                                                  )
+                                    ] ;
                          rdfs:comment "Minimum accepted value of a variable presentation (or a parameter)"@en ;
                          rdfs:label "has minimum accepted value"@en .
 
@@ -776,6 +829,21 @@ In this case the property would capture this as follows:
      rdfs:label "tag"@en .
 
 
+###  https://w3id.org/okn/o/sd#value
+:value rdf:type owl:DatatypeProperty ;
+       rdfs:range [ rdf:type rdfs:Datatype ;
+                    owl:unionOf ( xsd:anyURI
+                                  xsd:boolean
+                                  xsd:dateTime
+                                  xsd:float
+                                  xsd:integer
+                                  xsd:string
+                                )
+                  ] ;
+       rdfs:comment "Value associated to the described entity"@en ;
+       rdfs:label "value"@en .
+
+
 ###  https://w3id.org/okn/o/sd#website
 :website rdf:type owl:DatatypeProperty ;
          rdfs:domain [ rdf:type owl:Class ;
@@ -792,6 +860,13 @@ In this case the property would capture this as follows:
 #################################################################
 #    Classes
 #################################################################
+
+###  https://w3id.org/okn/o/sd#CatalogIdentifier
+:CatalogIdentifier rdf:type owl:Class ;
+                   rdfs:subClassOf :Parameter ;
+                   rdfs:comment "Class to identify that a parameter is a catalog identifier. The rationale for this type of parameter is that in some cases datasets may be downloaded in the software component itself, rather than exposed as an input"@en ;
+                   rdfs:label "Catalog identifier"@en .
+
 
 ###  https://w3id.org/okn/o/sd#ConfigurationSetup
 :ConfigurationSetup rdf:type owl:Class ;
@@ -928,6 +1003,12 @@ In this case the property would capture this as follows:
                       rdfs:subClassOf :Variable ;
                       rdfs:comment "Concept used to represent an instantiation of a variable in an input/output dataset. For example, a model A may use an input file with temperature expressed in Farenheit (variablePresentation1), while a model B may produce an output with temperature in Celsius (variablePresentation2). Both variable presentations refer to the concept of temperature."@en ;
                       rdfs:label "Variable presentation"@en .
+
+
+###  https://w3id.org/okn/o/sd#Visualization
+:Visualization rdf:type owl:Class ;
+               rdfs:comment "Class to represent any type of visualization related to a software. For example, a dynamic HTML page, a video, etc."@en ;
+               rdfs:label "Visualization"@en .
 
 
 ###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

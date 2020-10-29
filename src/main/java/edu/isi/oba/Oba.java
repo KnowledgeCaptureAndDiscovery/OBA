@@ -31,6 +31,7 @@ class Oba {
     try {
       LogManager.getLogManager().readConfiguration(stream);
       logger = Logger.getLogger(Oba.class.getName());
+      logger.setUseParentHandlers(false);//remove double logging
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -80,6 +81,7 @@ class Oba {
         generate_openapi_template(mapper, destination_dir, config_data, selected_language);
         generate_context(config_data, destination_dir);
         copy_custom_queries(custom_queries_dir, destination_dir);
+        logger.info("OBA finished successfully. Output can be found at: "+destination_dir);
     }catch (Exception e){
         logger.severe("Error while creating the API specification: "+e.getLocalizedMessage());
         System.exit(1);
