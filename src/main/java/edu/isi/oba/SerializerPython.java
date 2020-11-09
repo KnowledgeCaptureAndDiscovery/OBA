@@ -27,7 +27,7 @@ class SerializerPython {
   String base;
   public SerializerPython(Mapper mapper,
                           String base,
-                          YamlConfig config) throws IOException {
+                          YamlConfig config) throws Exception {
 
     this.base = base;
     this.utils_dir = base + File.separator + UTILS_DIR;
@@ -46,8 +46,15 @@ class SerializerPython {
 
 
     //Create the config.ini
-    EndpointConfig endpoint_config = config.getEndpoint();
-    create_settings_file(endpoint_config.getUrl(), endpoint_config.getPrefix(), endpoint_config.getGraph_base(), config);
+    try {
+      EndpointConfig endpoint_config = config.getEndpoint();
+      create_settings_file(endpoint_config.getUrl(), endpoint_config.getPrefix(), endpoint_config.getGraph_base(), config);
+    }catch(Exception e){
+      throw new Exception("Cannot create the endpoint configuration.\n" +
+              "Please check that an endpoint is included in your config.yaml file\n" +
+              "If you don't have an endpoint, you can use a placeholder");
+    }
+
   }
 
   private void create_settings_file(String endpoint, String prefix, String graph_base, YamlConfig config){

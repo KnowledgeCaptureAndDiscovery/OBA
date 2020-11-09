@@ -120,7 +120,7 @@ class Oba {
   private static void generate_openapi_template(Mapper mapper,
                                                 String destination_directory,
                                                 YamlConfig config,
-                                                LANGUAGE language) throws IOException {
+                                                LANGUAGE language) throws Exception {
     switch (language) {
       case PYTHON_FLASK:
         new SerializerPython(mapper, destination_directory, config);

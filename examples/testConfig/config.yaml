@@ -1,0 +1,35 @@
+ontologies:
+  - examples/modelcatalog/sd-reduced.ttl
+name: test
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is a test.
+    title: Test
+    version: v1.5.0
+  externalDocs:
+    description: Test
+    url: https://w3id.org/okn/o/sd
+  servers:
+    - url: http://localhost:8080/v1.5.0
+
+firebase:
+  key: "test"
+
+endpoint:
+  url: http://endpoint.mint.isi.edu/modelCatalog-1.5.0
+  prefix: https://w3id.org/okn/i/example
+  graph_base: http://endpoint.mint.isi.edu/modelCatalog-1.5.0/data/
+
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+auth:
+  provider: firebase
+  
+follow_references: true
+
