@@ -386,7 +386,6 @@ class MapperSchema {
      * @param clas Class that will be analyzed in order to get its restrictions
      */
     private void getClassRestrictions(OWLClass clas){
-    	//test
     	OWLOntologyManager m = OWLManager.createOWLOntologyManager();
     	OWLDataFactory dataFactory = m.getOWLDataFactory();
     	OWLClass owlThing = dataFactory.getOWLThing();
