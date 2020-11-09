@@ -1,5 +1,5 @@
 ontologies:
-  - examples/modelcatalog/sd-reduced.ttl
+  - examples/testConfig/ontology.ttl
 name: test
 output_dir: outputs
 

@@ -135,7 +135,7 @@ class Oba {
                                             Mapper mapper,
                                             String dir,
                                             LinkedHashMap<String, PathItem> custom_paths
-                                            ) throws IOException {
+                                            ) throws Exception {
     String destinationProjectDirectory = dir + File.separator + SERVERS_DIRECTORY;
     Path destinationProject = Paths.get(destinationProjectDirectory);
     new Serializer(mapper, destinationProject, openapi_base, custom_paths);

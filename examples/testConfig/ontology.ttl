@@ -1,0 +1,617 @@
+@prefix : <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> .
+
+<http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> rdf:type owl:Ontology ;
+                                                                  owl:versionIRI <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                                                                  <http://purl.org/dc/elements/1.1/contributor> "Honorio Enrique Crespo Díaz-Alejo - Ayuntamiento de Madrid"@es ,
+                                                                                                                "María Carmen Ruiz Moreno - Ayuntamiento de Madrid"@es ,
+                                                                                                                "María Jesús Fernández Ruiz  - Ayuntamiento de Zaragoza"@es ,
+                                                                                                                "María Jesús Gallego San Miguel - Ayuntamiento de Madrid"@es ,
+                                                                                                                "María del Mar Arribas de Andrés - Ayuntamiento de Madrid"@es ,
+                                                                                                                "Red.es"@es ,
+                                                                                                                "Servicio de Informática - Ayuntamiento de Santiago de Compostela"@es ,
+                                                                                                                "Servicio de Innovación y Desarrollo Tecnológico - Ayuntamiento de A Coruña"@es ,
+                                                                                                                "Víctor Morlán Plo - Ayuntamiento de Zaragoza"@es ;
+                                                                  <http://purl.org/dc/elements/1.1/creator> "Paola Espinoza Arias (Ontology Engineering Group - Universidad Politécnica de Madrid)"@es ,
+                                                                                                            "Oscar Corcho (Ontology Engineering Group - Universidad Politécnica de Madrid, LocaliData)" ;
+                                                                  <http://purl.org/dc/elements/1.1/rights> "Creative Commons Attribution 4.0 International (CC BY 4.0)" ;
+                                                                  <http://purl.org/dc/terms/description> "This vocabulary aims to represent data from the census of local businesses, together with their economic activities and opening licenses. It also includes terraces associated to restaurants, cafés, etc."@en ,
+                                                                                                         "Vocabulario para la representación de los datos que provienen del censo de locales, actividades, terrazas de hostelería y restauración y licencias de apertura."@es ;
+                                                                  <http://purl.org/dc/terms/hasFormat> <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ,
+                                                                                                       <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial.owl> ;
+                                                                  <http://purl.org/dc/terms/issued> "2018-11-02"@es ;
+                                                                  <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0> ;
+                                                                  <http://purl.org/dc/terms/title> "Vocabulario para la representación de datos sobre el censo de locales y terrazas, así como sus actividades económicas y licencias de apertura asociadas."@es ,
+                                                                                                   "Vocabulary for the representation of the census of local business premises and terraces, as well as their associated economic activities and opening licenses."@en ;
+                                                                  <http://purl.org/vocab/vann/preferredNamespacePrefix> "escom" ;
+                                                                  <http://purl.org/vocab/vann/preferredNamespaceUri> : ;
+                                                                  rdfs:comment """Esta versión ha sido generada dentro del contexto del proyecto \"Plataforma de gobierno abierto, colaborativa e interoperable\" en el que participan los ayuntamientos de Madrid, Zaragoza, Santiago de Compostela y A Coruña.
+
+En esta versión se han agregado metadatos en inglés y se han eliminado los conceptos que fueron descartados en la versión previa:
+- ZonaComercial
+- areaInfluencia
+- medioTransporte
+- sfContains
+- tipoAccesibilidad
+- tipoComercio
+- accesible
+- afluenciaPublico"""@es ;
+                                                                  owl:priorVersion "0.2.0"@es ;
+                                                                  owl:versionInfo "1.0.0"@es .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/contributor
+<http://purl.org/dc/elements/1.1/contributor> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/rights
+<http://purl.org/dc/elements/1.1/rights> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/description
+<http://purl.org/dc/terms/description> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/hasFormat
+<http://purl.org/dc/terms/hasFormat> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/issued
+<http://purl.org/dc/terms/issued> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/modified
+<http://purl.org/dc/terms/modified> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/title
+<http://purl.org/dc/terms/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespaceUri
+<http://purl.org/vocab/vann/preferredNamespaceUri> rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#comment
+rdfs:comment rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#isDefinedBy
+rdfs:isDefinedBy rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#label
+rdfs:label rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#historyNote
+<http://www.w3.org/2004/02/skos/core#historyNote> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#agrupacionComercial
+:agrupacionComercial rdf:type owl:ObjectProperty ;
+                     rdfs:range :AgrupacionComercial ;
+                     rdfs:comment "Any entity (for instance, a local business premise) may belong to a shopping area"@en ,
+                                  "Cualquier entidad (por ejemplo, un local comercial) puede pertenecer a una agrupación comercial."@es ;
+                     rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                     rdfs:label "belongs to shopping area"@en ,
+                                "pertenece a agrupación comercial"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#asociadaA
+:asociadaA rdf:type owl:ObjectProperty ;
+           owl:inverseOf :tieneLicenciaApertura ;
+           rdfs:domain :LicenciaApertura ;
+           rdfs:range [ rdf:type owl:Class ;
+                        owl:unionOf ( :LocalComercial
+                                      :Terraza
+                                    )
+                      ] ;
+           rdfs:comment "An opening license is associated to a local business or terrace."@en ,
+                        "Una licencia de apertura está asociada a un local comercial o a una terraza."@es ;
+           rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+           rdfs:label "asociada a"@es ,
+                      "associated to"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#autorizaActividadEconomica
+:autorizaActividadEconomica rdf:type owl:ObjectProperty ;
+                            rdfs:domain :LicenciaApertura ;
+                            rdfs:range <http://www.w3.org/2004/02/skos/core#Concept> ;
+                            rdfs:comment """A license authorizes one or several economic activities. The economic activity type is represented by some SKOS classification, preferably one of the following:
+http://vocab.linkeddata.es/datosabiertos/kos/comercio/cnae
+http://vocab.linkeddata.es/datosabiertos/kos/comercio/iae"""@en ,
+                                         """Una licencia autoriza la realización de una o varias actividades económicas. El tipo de actividad económica que se autoriza se representa de acuerdo con alguna clasificación SKOS, preferentemente alguna de las siguientes:
+http://vocab.linkeddata.es/datosabiertos/kos/comercio/cnae
+http://vocab.linkeddata.es/datosabiertos/kos/comercio/iae"""@es ;
+                            rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                            rdfs:label "authorizes economic activity"@en ,
+                                       "autoriza actividad económica"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#contieneLocalComercial
+:contieneLocalComercial rdf:type owl:ObjectProperty ;
+                        rdfs:range :LocalComercial ;
+                        rdfs:comment "An area (for instance, a shopping area) contains local business premises."@en ,
+                                     "Una agrupación (por ejemplo, una agrupación comercial) contiene locales comerciales."@es ;
+                        rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                        rdfs:label "contains local business premise"@en ,
+                                   "contiene local comercial"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#estadoTramitacion
+:estadoTramitacion rdf:type owl:ObjectProperty ;
+                   rdfs:domain :LicenciaApertura ;
+                   rdfs:range [ owl:intersectionOf ( <http://www.w3.org/2004/02/skos/core#Concept>
+                                                     [ rdf:type owl:Restriction ;
+                                                       owl:onProperty <http://www.w3.org/2004/02/skos/core#inScheme> ;
+                                                       owl:hasValue <http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-estado-tramite-licencia>
+                                                     ]
+                                                   ) ;
+                                rdf:type owl:Class
+                              ] ;
+                   rdfs:comment "Estado de tramitación de la licencia, se representa con la lista de conceptos SKOS http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-estado-tramite-licencia."@es ,
+                                "License processing status, it is represented by the SKOS concept list http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-estado-tramite-licencia."@en ;
+                   rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                   rdfs:label "estado de tramitación"@es ,
+                              "processing status"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#periodoFuncionamiento
+:periodoFuncionamiento rdf:type owl:ObjectProperty ;
+                       rdfs:domain :Terraza ;
+                       rdfs:range [ owl:intersectionOf ( <http://www.w3.org/2004/02/skos/core#Concept>
+                                                         [ rdf:type owl:Restriction ;
+                                                           owl:onProperty <http://www.w3.org/2004/02/skos/core#inScheme> ;
+                                                           owl:hasValue <http://vocab.linkeddata.es/datosabiertos/kos/comercio/periodo-funcionamiento>
+                                                         ]
+                                                       ) ;
+                                    rdf:type owl:Class
+                                  ] ;
+                       rdfs:comment "Periodo de funcionamiento de la terraza, que puede ser anual o estacional. Los periodos se representan mediante la lista de conceptos http://vocab.linkeddata.es/datosabiertos/kos/comercio/periodo-funcionamiento."@es ,
+                                    "Terrace operational period, which can be: annual or seasonal. Periods are represented by the concept list http://vocab.linkeddata.es/datosabiertos/kos/comercio/periodo-funcionamiento."@en ;
+                       rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                       rdfs:label "operational time period"@en ,
+                                  "periodo de funcionamiento"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#perteneceALocal
+:perteneceALocal rdf:type owl:ObjectProperty ;
+                 owl:inverseOf :tieneTerraza ;
+                 rdfs:domain :Terraza ;
+                 rdfs:range :LocalComercial ;
+                 rdfs:comment "A terrace belongs to a local business premise."@en ,
+                              "Una terraza pertenece a un local comercial."@es ;
+                 rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                 rdfs:label "belongs to local"@en ,
+                            "pertenece a local"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#seOtorgaA
+:seOtorgaA rdf:type owl:ObjectProperty ;
+           rdfs:domain :LicenciaApertura ;
+           rdfs:range <http://xmlns.com/foaf/0.1/Agent> ;
+           rdfs:comment "A license is granted to a holder."@en ,
+                        "Una licencia se otorga a un titular."@es ;
+           rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+           rdfs:label "is granted to"@en ,
+                      "se otorga a"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#tieneLicenciaApertura
+:tieneLicenciaApertura rdf:type owl:ObjectProperty ;
+                       rdfs:domain [ rdf:type owl:Class ;
+                                     owl:unionOf ( :LocalComercial
+                                                   :Terraza
+                                                 )
+                                   ] ;
+                       rdfs:range :LicenciaApertura ;
+                       rdfs:comment "A local business premise may have one or several opening licenses in its history."@en ,
+                                    "El local comercial puede tener una o varias licencias de funcionamiento a lo largo de su historia."@es ;
+                       rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                       rdfs:label "has opening license"@en ,
+                                  "tiene licencia de apertura"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#tieneTerraza
+:tieneTerraza rdf:type owl:ObjectProperty ;
+              rdfs:domain :LocalComercial ;
+              rdfs:range :Terraza ;
+              rdfs:comment "A local business premise may have a terrace."@en ,
+                           "Un local comercial puede tener una terraza asociada."@es ;
+              rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+              rdfs:label "has terrace"@en ,
+                         "tiene terraza"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#tipoAcceso
+:tipoAcceso rdf:type owl:ObjectProperty ;
+            rdfs:domain :LocalComercial ;
+            rdfs:range [ owl:intersectionOf ( <http://www.w3.org/2004/02/skos/core#Concept>
+                                              [ rdf:type owl:Restriction ;
+                                                owl:onProperty <http://www.w3.org/2004/02/skos/core#inScheme> ;
+                                                owl:hasValue <http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-acceso>
+                                              ]
+                                            ) ;
+                         rdf:type owl:Class
+                       ] ;
+            rdfs:comment "A local business may have the following access types: street door, interior, or floor. These access types are represented by a list of URI concepts http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-acceso."@en ,
+                         "Un local comercial puede tener los siguientes tipos de acceso: puerta de calle, interior, o piso. Estos tipos de acceso se representan mediante una lista de conceptos de URI http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-acceso."@es ;
+            rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+            rdfs:label "access type"@en ,
+                       "tipo de acceso"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#tipoActividadEconomica
+:tipoActividadEconomica rdf:type owl:ObjectProperty ;
+                        rdfs:domain :LocalComercial ;
+                        rdfs:range <http://www.w3.org/2004/02/skos/core#Concept> ;
+                        rdfs:comment "Economic activity type that takes place in a local business premise, according to some SKOS classification."@en ,
+                                     "Tipo de actividad económica que se realiza en un local comercial, de acuerdo con alguna clasificación SKOS."@es ;
+                        rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                        rdfs:label "economic activity type"@en ,
+                                   "tipo de actividad económica"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#tipoAgrupacionComercial
+:tipoAgrupacionComercial rdf:type owl:ObjectProperty ;
+                         rdfs:domain :AgrupacionComercial ;
+                         rdfs:range [ owl:intersectionOf ( <http://www.w3.org/2004/02/skos/core#Concept>
+                                                           [ rdf:type owl:Restriction ;
+                                                             owl:onProperty <http://www.w3.org/2004/02/skos/core#inScheme> ;
+                                                             owl:hasValue <http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-agrupacion>
+                                                           ]
+                                                         ) ;
+                                      rdf:type owl:Class
+                                    ] ;
+                         rdfs:comment "Type of shopping area, from the concept list http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-agrupacion."@en ,
+                                      "Tipo de agrupación comercial, de acuerdo con la lista de conceptos http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-agrupacion." ;
+                         rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                         rdfs:label "tipo de agrupación comercial"@es ,
+                                    "type of shopping area"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#tipoSituacion
+:tipoSituacion rdf:type owl:ObjectProperty ;
+               rdfs:domain :LocalComercial ;
+               rdfs:range [ owl:intersectionOf ( <http://www.w3.org/2004/02/skos/core#Concept>
+                                                 [ rdf:type owl:Restriction ;
+                                                   owl:onProperty <http://www.w3.org/2004/02/skos/core#inScheme> ;
+                                                   owl:hasValue <http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-situacion>
+                                                 ]
+                                               ) ;
+                            rdf:type owl:Class
+                          ] ;
+               rdfs:comment "A local business may be in any of the following situations: active, closed, closed down, or under construction. These types of situations are represented by a concept list with URI http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-situacion ."@en ,
+                            "Un local comercial puede estar en una de las siguientes situaciones: activo, cerrado, clausurado, o en obras. Estos tipos de situaciones se representan mediante una lista de conceptos de URI http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-situacion."@es ;
+               rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+               rdfs:label "situation type"@en ,
+                          "tipo situación"@es .
+
+
+###  http://www.w3.org/2004/02/skos/core#inScheme
+<http://www.w3.org/2004/02/skos/core#inScheme> rdf:type owl:ObjectProperty .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/identifier
+<http://purl.org/dc/elements/1.1/identifier> rdf:type owl:DatatypeProperty .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#aforo
+:aforo rdf:type owl:DatatypeProperty ;
+       rdfs:domain :LocalComercial ;
+       rdfs:range xsd:int ;
+       rdfs:comment "Capacidad del local, expresada como el número de personas que caben en él."@es ,
+                    "Local business premise capacity, defined as the number of people that fit in it."@en ;
+       rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+       rdfs:label "aforo"@es ,
+                  "capacity"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#fechaAlta
+:fechaAlta rdf:type owl:DatatypeProperty ;
+           rdfs:domain :LicenciaApertura ;
+           rdfs:range xsd:dateTime ;
+           rdfs:comment "Date when the license request has been solved."@en ,
+                        "Fecha en la que se ha resuelto la solicitud de la licencia."@es ;
+           rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+           rdfs:label "fecha de alta"@es ,
+                      "release date"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#fechaCese
+:fechaCese rdf:type owl:DatatypeProperty ;
+           rdfs:domain :LicenciaApertura ;
+           rdfs:range xsd:dateTime ;
+           rdfs:comment "Fecha en la que se ha notificado el cese de la actividad económica."@es ,
+                        "Notification date for the closing of the economic activity."@en ;
+           rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+           rdfs:label "closing date"@en ,
+                      "fecha de cese"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#fechaSolicitud
+:fechaSolicitud rdf:type owl:DatatypeProperty ;
+                rdfs:domain :LicenciaApertura ;
+                rdfs:range xsd:dateTime ;
+                rdfs:comment "Date of the license request."@en ,
+                             "Fecha en la que se ha solicitado la licencia."@es ;
+                rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                rdfs:label "fecha de solicitud"@es ,
+                           "request date"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#nombreComercial
+:nombreComercial rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :LocalComercial ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "El nombre comercial es todo aquel signo que puede ser representado gráficamente y, que identifica a una empresa en el tráfico mercantil distinguiéndola de las demás empresas que van a desarrollar actividades idénticas o similares."@es ,
+                              "The business name is any type of sign that may be represented graphically and which identifies the business in a business registry."@en ;
+                 rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                 rdfs:label "business name"@en ,
+                            "nombre comercial"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#numeroMesasAutorizadas
+:numeroMesasAutorizadas rdf:type owl:DatatypeProperty ;
+                        rdfs:domain :Terraza ;
+                        rdfs:range xsd:int ;
+                        rdfs:comment "Number of tables authorized for the terrace."@en ,
+                                     "Número de mesas autorizadas para la terraza."@es ;
+                        rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                        rdfs:label "número de mesas autorizadas"@es ,
+                                   "table number"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#numeroSillasAutorizadas
+:numeroSillasAutorizadas rdf:type owl:DatatypeProperty ;
+                         rdfs:domain :Terraza ;
+                         rdfs:range xsd:int ;
+                         rdfs:comment "Number of chairs authorized for the terrace."@en ,
+                                      "Número de sillas autorizadas para la terraza."@es ;
+                         rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                         rdfs:label "number of chairs authorised"@en ,
+                                    "número de sillas autorizadas"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#referenciaCatastral
+:referenciaCatastral rdf:type owl:DatatypeProperty ;
+                     rdfs:domain :LocalComercial ;
+                     rdfs:range xsd:string ;
+                     rdfs:comment "La referencia catastral es el identificador oficial y obligatorio de los bienes inmuebles. Consiste en un código alfanumérico que es asignado por el Catastro de manera que todo inmueble debe tener una única referencia catastral que permita situarlo inequívocamente en la cartografía catastral."@es ,
+                                  "The cadastral reference is the official and mandatory identifier of properties. It consists of an alphanumeric code assigned by the Cadastre to provide a unique cadastral reference to each property in order to place it unequivocally in the cadastral cartography."@en ;
+                     rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                     rdfs:label "cadastral reference"@en ,
+                                "referencia catastral"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#rotulo
+:rotulo rdf:type owl:DatatypeProperty ;
+        rdfs:domain :LocalComercial ;
+        rdfs:range xsd:string ;
+        rdfs:comment "Sign or denomination used to make a commercial establishment known to an audience, and to distinguish it from others used for identical or similar activities."@en ,
+                     "Signo o denominación que sirve para dar a conocer al público un establecimiento comercial y para distinguirlo de otros destinados a actividades idénticas o similares."@es ;
+        rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+        rdfs:label "rótulo"@es ,
+                   "sign"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#superficie
+:superficie rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Terraza ;
+            rdfs:range xsd:float ;
+            rdfs:comment "Superficie en metros cuadrados ocupada por la terraza."@es ,
+                         "The surface in square meters filled by the terrace."@en ;
+            rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+            rdfs:label "area"@en ,
+                       "superficie"@es .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://schema.org/LocalBusiness
+<http://schema.org/LocalBusiness> rdf:type owl:Class ;
+                                  rdfs:subClassOf <http://schema.org/Place> .
+
+
+###  http://schema.org/Place
+<http://schema.org/Place> rdf:type owl:Class .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#AgrupacionComercial
+:AgrupacionComercial rdf:type owl:Class ;
+                     rdfs:subClassOf <http://schema.org/Place> ,
+                                     [ rdf:type owl:Restriction ;
+                                       owl:onProperty :contieneLocalComercial ;
+                                       owl:someValuesFrom :LocalComercial
+                                     ] ,
+                                     [ rdf:type owl:Restriction ;
+                                       owl:onProperty :tipoAgrupacionComercial ;
+                                       owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                       owl:onClass <http://www.w3.org/2004/02/skos/core#Concept>
+                                     ] ;
+                     owl:disjointWith :Terraza ;
+                     rdfs:comment """Conjunto de locales situados en uno o en diversos edificios de un mismo espacio comercial, en el cual se pueden llevar a cabo diferentes actividades económicas. Este concepto incluye centros comerciales, mercados, estaciones de tren y metro, etc.
+Es más genérico que el concepto schema:ShoppingCenter, puesto que puede abordar otros tipos de agrupaciones comerciales (por ejemplo, una calle comercial)"""@es ,
+                                  """Set of premises placed in one or several buildings of the same business space, where different economic activities may be carried out. This includes shopping centres, markets, train and metro stations, etc.
+This concept is more general than schema:ShoppingCenter, since it may cover other types of commercial areas, such as a commercial street"""@en ;
+                     rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                     rdfs:label "Agrupación Comercial"@es ,
+                                "Shopping area"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#LicenciaApertura
+:LicenciaApertura rdf:type owl:Class ;
+                  rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                    owl:onProperty :seOtorgaA ;
+                                    owl:someValuesFrom <http://xmlns.com/foaf/0.1/Agent>
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :asociadaA ;
+                                    owl:allValuesFrom [ rdf:type owl:Class ;
+                                                        owl:unionOf ( :LocalComercial
+                                                                      :Terraza
+                                                                    )
+                                                      ]
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :autorizaActividadEconomica ;
+                                    owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                    owl:onClass <http://www.w3.org/2004/02/skos/core#Concept>
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :estadoTramitacion ;
+                                    owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                    owl:onClass <http://www.w3.org/2004/02/skos/core#Concept>
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :asociadaA ;
+                                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                    owl:onClass [ rdf:type owl:Class ;
+                                                  owl:unionOf ( :LocalComercial
+                                                                :Terraza
+                                                              )
+                                                ]
+                                  ] ;
+                  rdfs:comment "Acto reglado mediante el cual el Ayuntamiento, previa comprobación del cumplimiento de las condiciones establecidas por la normativa aplicable, autoriza la implantación de la actividad."@es ,
+                               "Regulated act where the City Council, after checking compliance with the established conditions by the applicable regulations, authorizes carrying out the activity."@en ;
+                  rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                  rdfs:label "Licencia de apertura"@es ,
+                             "Opening License"@en .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#LocalComercial
+:LocalComercial rdf:type owl:Class ;
+                rdfs:subClassOf <http://schema.org/LocalBusiness> ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :agrupacionComercial ;
+                                  owl:allValuesFrom :AgrupacionComercial
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :tieneLicenciaApertura ;
+                                  owl:allValuesFrom :LicenciaApertura
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :tieneTerraza ;
+                                  owl:allValuesFrom :Terraza
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :tipoAcceso ;
+                                  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onClass <http://www.w3.org/2004/02/skos/core#Concept>
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :tipoSituacion ;
+                                  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onClass <http://www.w3.org/2004/02/skos/core#Concept>
+                                ] ;
+                rdfs:comment "Local donde se puede realizar algún tipo de actividad comercial"@es ,
+                             "Premises where an economic activity can take place. Also referred to as local business in vocabularies like schema.org"@en ;
+                rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+                rdfs:label "Local Business"@en ,
+                           "Local Comercial"@es .
+
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial#Terraza
+:Terraza rdf:type owl:Class ;
+         rdfs:subClassOf <http://schema.org/Place> ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :tieneLicenciaApertura ;
+                           owl:someValuesFrom :LicenciaApertura
+                         ] ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :periodoFuncionamiento ;
+                           owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass <http://www.w3.org/2004/02/skos/core#Concept>
+                         ] ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :perteneceALocal ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :LocalComercial
+                         ] ;
+         rdfs:comment "El uso de una zona de suelo de dominio público o privado afecto al uso público, susceptible de aprovechamientos relacionados con actividades propias de la hostelería, mediante la colocación de mesas, sillas y sombrillas, como zona de extensión o ampliación de la actividad que se ejerce dentro de dichos establecimientos. Dichas instalaciones tienen en todo caso carácter temporal."@es ,
+                      "The use of a public or private land area affected by public use, to be used in catering activities, through the placement of tables, chairs, and umbrellas, as an extension zone of the activity that takes place within those premises. These facilities are usually temporary."@en ;
+         rdfs:isDefinedBy <http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> ;
+         rdfs:label "Terrace"@en ,
+                    "Terraza"@es .
+
+
+###  http://www.w3.org/2004/02/skos/core#Concept
+<http://www.w3.org/2004/02/skos/core#Concept> rdf:type owl:Class .
+
+
+###  http://xmlns.com/foaf/0.1/Agent
+<http://xmlns.com/foaf/0.1/Agent> rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial
+<http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial> rdf:type owl:NamedIndividual ;
+                                                                 <http://purl.org/dc/elements/1.1/identifier> "http://vocab.ciudadesabiertas.es/def/comercio/tejido-comercial" .
+
+
+###  http://vocab.linkeddata.es/datosabiertos/kos/comercio/periodo-funcionamiento
+<http://vocab.linkeddata.es/datosabiertos/kos/comercio/periodo-funcionamiento> rdf:type owl:NamedIndividual ,
+                                                                                        <http://www.w3.org/2004/02/skos/core#Concept> .
+
+
+###  http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-acceso
+<http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-acceso> rdf:type owl:NamedIndividual ,
+                                                                             <http://www.w3.org/2004/02/skos/core#Concept> .
+
+
+###  http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-agrupacion
+<http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-agrupacion> rdf:type owl:NamedIndividual ,
+                                                                                 <http://www.w3.org/2004/02/skos/core#Concept> .
+
+
+###  http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-estado-tramite-licencia
+<http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-estado-tramite-licencia> rdf:type owl:NamedIndividual ,
+                                                                                              <http://www.w3.org/2004/02/skos/core#Concept> .
+
+
+###  http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-situacion
+<http://vocab.linkeddata.es/datosabiertos/kos/comercio/tipo-situacion> rdf:type owl:NamedIndividual ,
+                                                                                <http://www.w3.org/2004/02/skos/core#Concept> .
+
+
+[ rdfs:label "HTML"
+] .
+
+[ rdfs:label "RDF"
+ ] .
+
+###  Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/
