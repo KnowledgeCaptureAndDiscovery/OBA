@@ -419,47 +419,45 @@ class MapperSchema {
 
     			} else {
 
-    				for (int i = 0; i < propertiesFromObjectRestrictions.size(); i++) {
-    					MapperObjectProperty mapperObjectProperty;
-    					OWLObjectProperty OP = propertiesFromObjectRestrictions.get(i);
-    					String propertyDescription = ObaUtils.getDescription(OP, ontology_cls);
-    					if (propertiesFromObjectRestrictions_ranges.size() != 0) {
-    						List<String> rangesOP = propertiesFromObjectRestrictions_ranges.get(sfp.getShortForm(OP.getIRI()));
-    						for (String j :  restrictionsValuesFromClass.keySet()) {
-    							Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);
-    							if (j==sfp.getShortForm(OP.getIRI())) {
-    								if (rangesOP.get(0)=="defaultValue")
-    									mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(OP.getIRI()), propertyDescription, false, restrictionValues, rangesOP, false, true);
-    								else
-    									mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(OP.getIRI()), propertyDescription, false, restrictionValues, rangesOP);
-    								try {
-    									this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
-    								} catch (Exception e) {
-    									e.printStackTrace();
-    								}
-    							}
-    						}
-    					}
-    				}
-    				for (int i = 0; i < propertiesFromDataRestrictions.size(); i++) {  
-    					List<String> valuesFromDataRestrictions_ranges = new ArrayList<String>();
-    					OWLDataProperty DP = propertiesFromDataRestrictions.get(i);     				
-    					String propertyDescription = ObaUtils.getDescription(DP, ontology_cls);   				
-    					if (propertiesFromDataRestrictions_ranges.size() != 0) {  
-    						List<String> rangesDP = propertiesFromDataRestrictions_ranges.get(sfp.getShortForm(DP.getIRI())); 	
-    						for (String j :  restrictionsValuesFromClass.keySet()) { 
-    							Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);    					 
-    							if (j==sfp.getShortForm(DP.getIRI())) {   							 
-    								MapperDataProperty mapperDataProperty = new MapperDataProperty(sfp.getShortForm(DP.getIRI()), propertyDescription, false, restrictionValues, valuesFromDataRestrictions_ranges, rangesDP, true, true);    							
-    								try {
-    									this.properties.put(mapperDataProperty.name, mapperDataProperty.getSchemaByDataProperty());
-    								} catch (Exception e) {
-    									e.printStackTrace();
-    								}
-    							}
-    						}
-    					}
-    				}
+					for (OWLObjectProperty op : propertiesFromObjectRestrictions) {
+						MapperObjectProperty mapperObjectProperty;
+						String propertyDescription = ObaUtils.getDescription(op, ontology_cls);
+						if (propertiesFromObjectRestrictions_ranges.size() != 0) {
+							List<String> rangesOP = propertiesFromObjectRestrictions_ranges.get(sfp.getShortForm(op.getIRI()));
+							for (String j : restrictionsValuesFromClass.keySet()) {
+								Map<String, String> restrictionValues = restrictionsValuesFromClass.get(j);
+								if (j.equals(sfp.getShortForm(op.getIRI()))) {
+									if (rangesOP.get(0).equals("defaultValue"))
+										mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(op.getIRI()), propertyDescription, false, restrictionValues, rangesOP, false, true);
+									else
+										mapperObjectProperty = new MapperObjectProperty(sfp.getShortForm(op.getIRI()), propertyDescription, false, restrictionValues, rangesOP);
+									try {
+										this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
+									} catch (Exception e) {
+										logger.warning("Error when parsing object property "+mapperObjectProperty.name);
+									}
+								}
+							}
+						}
+					}
+					for (OWLDataProperty dp : propertiesFromDataRestrictions) {
+						List<String> valuesFromDataRestrictions_ranges = new ArrayList<String>();
+						String propertyDescription = ObaUtils.getDescription(dp, ontology_cls);
+						if (propertiesFromDataRestrictions_ranges.size() != 0) {
+							List<String> rangesDP = propertiesFromDataRestrictions_ranges.get(sfp.getShortForm(dp.getIRI()));
+							for (String j : restrictionsValuesFromClass.keySet()) {
+								Map<String, String> restrictionValues = restrictionsValuesFromClass.get(j);
+								if (j.equals(sfp.getShortForm(dp.getIRI()))) {
+									MapperDataProperty mapperDataProperty = new MapperDataProperty(sfp.getShortForm(dp.getIRI()), propertyDescription, false, restrictionValues, valuesFromDataRestrictions_ranges, rangesDP, true, true);
+									try {
+										this.properties.put(mapperDataProperty.name, mapperDataProperty.getSchemaByDataProperty());
+									} catch (Exception e) {
+										logger.warning("Error when processing data proeprty " + mapperDataProperty.name);
+									}
+								}
+							}
+						}
+					}
     			}
     			this.properties = setProperties();
     		}

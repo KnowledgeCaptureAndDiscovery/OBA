@@ -175,7 +175,6 @@ class Mapper {
                         }
                     }
                 }
-
                 //Add the OpenAPI paths
                 if (topLevel)
                     addOpenAPIPaths(pathGenerator, mapperSchema, cls);
