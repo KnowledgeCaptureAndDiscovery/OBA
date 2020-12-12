@@ -1,29 +1,29 @@
 ontologies:
-  - https://w3id.org/okn/o/sdm/1.6.0-nm
-  - https://w3id.org/okn/o/sd/1.7.0-nm
-name: modelcatalog-full
+  - https://w3id.org/okn/o/sdm/1.7.0-nm
+  - https://w3id.org/okn/o/sd/1.8.0-nm
+name: modelcatalog
 output_dir: outputs
 openapi:
   openapi: 3.0.1
   info:
     description: This is the API of the Software Description Ontology at [https://w3id.org/okn/o/sdm](https://w3id.org/okn/o/sdm)
     title: Model Catalog
-    version: v1.5.0
+    version: v1.6.0
   externalDocs:
     description: Model Catalog
     url: https://w3id.org/okn/o/sdm
   servers:
-    - url: https://api.models.mint.isi.edu/v1.5.0
-    - url: https://dev.api.models.mint.isi.edu/v1.5.0
-    - url: http://localhost:8080/v1.5.0
+    - url: https://api.models.mint.isi.edu/v1.6.0
+    - url: https://dev.api.models.mint.isi.edu/v1.6.0
+    - url: http://localhost:8080/v1.6.0
 
 firebase:
   key: "test"
 
 endpoint:
-  url: https://endpoint.mint.isi.edu/modelCatalog-1.4.0
+  url: https://endpoint.mint.isi.edu/modelCatalog-1.6.0
   prefix: https://w3id.org/okn/i/mint
-  graph_base: http://endpoint.mint.isi.edu/modelCatalog-1.4.0/data/
+  graph_base: http://endpoint.mint.isi.edu/modelCatalog-1.6.0/data/
 
 custom_queries_directory: examples/modelcatalog_full/custom_queries
 
@@ -340,3 +340,37 @@ custom_paths:
       summary: Get a list of models
       tags:
         - Model
+  /custom/datasetspecifications/{id}/datatransformations:
+    get:
+      description: Gets a list of data transformations related a dataset
+      parameters:
+        - description: Name of the custom query
+          in: query
+          name: custom_query_name
+          required: false
+          schema:
+            default: custom_datatransformations
+            type: string
+        - description: Username to query
+          in: query
+          name: username
+          required: false
+          schema:
+            type: string
+        - description: The ID of the dataspecification
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DataTransformation'
+          description: Gets a list of data transformations filter related a dataset.
+      summary: Gets a list of data transformations related a dataset
+      tags:
+        - DataTransformation

@@ -2,9 +2,8 @@ PREFIX sd: <https://w3id.org/okn/o/sd#>
 PREFIX sdm: <https://w3id.org/okn/o/sdm#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 CONSTRUCT {
-?dt ?p ?o .
+    ?dt ?p ?o .
 }
-
 WHERE {
     GRAPH ?_g_iri {
     	?_resource_iri rdfs:label ?label .

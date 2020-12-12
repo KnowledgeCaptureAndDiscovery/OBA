@@ -24,7 +24,7 @@ WHERE {
                     ?model sd:hasVersion ?version.
                     ?version sd:hasConfiguration ?configuration.
                     ?configuration sd:hasSetup ?setup .
-                    ?model sdm:usefulForCalculatingIndex ?sv.
+                    ?model sd:usefulForCalculatingIndex ?sv.
                   }
                   ?sv rdfs:label ?variableLabel .
                   FILTER REGEX(?variableLabel, ?_label, "i")

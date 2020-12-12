@@ -14,7 +14,7 @@ WHERE {
         {
             SELECT DISTINCT ?model where {
                 ?model a ?type.
-                ?model sdm:usefulForCalculatingIndex ?index .
+                ?model sd:usefulForCalculatingIndex ?index .
                 ?index rdfs:label ?indexLabel
                 FILTER REGEX(?indexLabel, ?_label, "i")
                 VALUES ?type {sdm:Model sdm:ModelConfiguration sdm:ModelConfigurationSetup}

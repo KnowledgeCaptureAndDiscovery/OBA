@@ -14,7 +14,7 @@ WHERE {
     GRAPH ?_g_iri {
         {
       		SELECT DISTINCT ?model {
-                ?model sdm:usefulForCalculatingIndex ?sv .
+                ?model sd:usefulForCalculatingIndex ?sv .
                 ?sv rdfs:label ?variableLabel
                 FILTER REGEX(?variableLabel, ?_label, "i")
       		}
