@@ -16,7 +16,8 @@ WHERE {
                   ?model sd:hasVersion ?modelV .
                   ?modelV sd:hasConfiguration ?config .
                   {
-                   ?config ?prop ?w .
+                   ?config ?prop ?d .
+                   ?d sd:hasPresentation ?w.
                    ?w a sd:VariablePresentation .
                   } UNION {
                    ?config ?prop ?d.
