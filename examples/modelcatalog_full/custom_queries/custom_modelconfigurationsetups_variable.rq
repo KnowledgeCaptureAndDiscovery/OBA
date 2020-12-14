@@ -17,14 +17,10 @@ WHERE {
                 SELECT DISTINCT ?setup {
                   ?setup a sdm:ModelConfigurationSetup .
                   {
-                    ?setup sd:hasOutput ?output.
-                    ?output sd:hasPresentation ?vp.
-                    ?vp sd:hasStandardVariable ?sv.
+                    ?setup sd:hasOutput/sd:hasPresentation/sd:hasStandardVariable ?sv.
                   } UNION {
-                    ?model sd:hasVersion ?version.
-                    ?version sd:hasConfiguration ?configuration.
-                    ?configuration sd:hasSetup ?setup .
-                    ?model sd:usefulForCalculatingIndex ?sv.
+                    ?model sd:hasVersion/sd:hasConfiguration/sd:hasSetup ?setup .
+                    ?model sd:usefulForCalculatingIndex/sd:hasStandardVariable ?sv .
                   }
                   ?sv rdfs:label ?variableLabel .
                   FILTER REGEX(?variableLabel, ?_label, "i")
