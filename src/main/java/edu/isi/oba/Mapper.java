@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.model.*;
 
 import static edu.isi.oba.Oba.logger;
@@ -85,8 +86,10 @@ class Mapper {
             }
             System.out.println(destinationPath);
             ontologyPaths.add(destinationPath);
-            //this.manager.loadOntology(IRI.create(ontologyURL));
-            this.manager.loadOntologyFromOntologyDocument(new File(destinationPath));
+            // Set to silent so missing imports don't make the program fail.
+            OWLOntologyLoaderConfiguration loadingConfig = new OWLOntologyLoaderConfiguration();
+            loadingConfig = loadingConfig.setMissingImportHandlingStrategy(MissingImportHandlingStrategy.SILENT);
+            this.manager.loadOntologyFromOntologyDocument(new FileDocumentSource(new File(destinationPath)), loadingConfig);
             i++;
         }
     }

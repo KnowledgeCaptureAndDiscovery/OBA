@@ -67,4 +67,15 @@ public class MapperTest {
         Assert.assertEquals(false, mapper.ontologies.isEmpty());
         
     }
+
+    /**
+     * Test an ontology (very simple, two classes) with a missing import
+     */
+    @Test
+    public void testMissingImportOntology() throws Exception{
+        String example_remote = "src/test/resources/missing_import/config.yaml";
+        YamlConfig config_data = get_yaml_data(example_remote);
+        Mapper mapper = new Mapper(config_data);
+        Assert.assertEquals(false, mapper.ontologies.isEmpty());
+    }
 }

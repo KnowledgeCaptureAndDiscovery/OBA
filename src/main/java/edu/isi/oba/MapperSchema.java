@@ -386,6 +386,7 @@ class MapperSchema {
      * @param clas Class that will be analyzed in order to get its restrictions
      */
     private void getClassRestrictions(OWLClass clas){
+    	//this is failing when classes are subclasses of unions
     	OWLOntologyManager m = OWLManager.createOWLOntologyManager();
     	OWLDataFactory dataFactory = m.getOWLDataFactory();
     	OWLClass owlThing = dataFactory.getOWLThing();
@@ -396,7 +397,7 @@ class MapperSchema {
     		for (OWLSubClassOfAxiom ax : ontology.getSubClassAxiomsForSubClass(clas)) {
     			OWLClassExpression superCls = ax.getSuperClass();
     			// Ask our superclass to accept a visit from the RestrictionVisitor
-    			// - e.g. if it is an existential restiction then the restriction visitor
+    			// - e.g. if it is an existential restriction then the restriction visitor
     			// will answer it - if not the visitor will ignore it
     			superCls.accept(restrictionVisitor);
     		}
@@ -452,7 +453,7 @@ class MapperSchema {
 									try {
 										this.properties.put(mapperDataProperty.name, mapperDataProperty.getSchemaByDataProperty());
 									} catch (Exception e) {
-										logger.warning("Error when processing data proeprty " + mapperDataProperty.name);
+										logger.warning("Error when processing data property " + mapperDataProperty.name);
 									}
 								}
 							}
