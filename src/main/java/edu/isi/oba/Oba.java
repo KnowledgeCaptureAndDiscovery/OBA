@@ -102,9 +102,12 @@ class Oba {
     }
     String file_path = destination_dir + File.separator + "servers" + File.separator + "context.json";
     String file_path_class = destination_dir + File.separator + "servers" + File.separator + "context_class.json";
-
-    ObaUtils.write_file(file_path, context_json_object.toString(4));
-    ObaUtils.write_file(file_path_class, context_json_object_class.toString(4));
+    try {
+        ObaUtils.write_file(file_path, context_json_object.toString(4));
+        ObaUtils.write_file(file_path_class, context_json_object_class.toString(4));
+    }catch(Exception e){
+        logger.severe("Could not generate the context files: "+e.getMessage());
+    }
   }
 
   private static void copy_custom_queries(String source, String destination){

@@ -1,6 +1,6 @@
 ontologies:
-  - src/test/resources/missing_import/missing_import.ttl
-name: missing-import-example
+  - src/test/resources/only_classes/o.ttl
+name: only-classes
 output_dir: outputs
 
 openapi:
@@ -8,9 +8,9 @@ openapi:
   info:
     description: This is the API for the restrictions example ontology
     version: v1.5.0
-    title: Missing import example ontology
+    title: Only 2 classes example ontology
   externalDocs:
-    description: Missing import example ontology
+    description: Only 2 classes
     url: https://w3id.org/example
   servers:
     - url: http://localhost:8080/v1.5.0
@@ -24,9 +24,9 @@ endpoint:
   graph_base: http://localhost:8080/example-1.5.0/data/
 
 enable_get_paths: true
-enable_post_paths: true
-enable_delete_paths: true
-enable_put_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
 
 auth:
   provider: firebase

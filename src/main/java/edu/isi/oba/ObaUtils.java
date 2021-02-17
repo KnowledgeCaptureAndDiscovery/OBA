@@ -199,7 +199,6 @@ public class ObaUtils {
         for (int i = 1; i < objects.length; i++) {
             mergeJSON = mergeJSONObjects(mergeJSON, (JSONObject) objects[i].get(common_key));
         }
-
         return new JSONObject().put(common_key, mergeJSON);
     }
 
@@ -232,9 +231,13 @@ public class ObaUtils {
             try {
                 jsons[i] = run_owl_jsonld(ontologies[i], only_classes);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                logger.severe("One of the ontologies did not generate the context file: " +e.getMessage());
+                return null;
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.severe("One of the ontologies did not generate the context file: " +e.getMessage());
+                //e.printStackTrace();
+                return null;
             }
         }
         return ObaUtils.concat_json_common_key(jsons, "@context");
@@ -276,7 +279,7 @@ public class ObaUtils {
         while ((s = stdInput.readLine()) != null) {
             result.append(s);
         }
-        if (result != null){
+        if (result != null && !result.toString().isEmpty()){
             JSONObject json = new JSONObject(result.toString());
             //TODO: This is a hack to remove
             //     "": {"@id": "http://dbpedia.org/ontology/"}
