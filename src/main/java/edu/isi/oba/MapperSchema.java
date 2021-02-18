@@ -383,18 +383,18 @@ class MapperSchema {
     /**
      * Read the Ontology and gets all the Class restrictions on object or data properties and
      * generate SchemaProperties.
-     * @param clas Class that will be analyzed in order to get its restrictions
+     * @param analyzedClass Class that will be analyzed in order to get its restrictions
      */
-    private void getClassRestrictions(OWLClass clas){
-    	//this is failing when classes are subclasses of unions
+    private void getClassRestrictions(OWLClass analyzedClass){
+    	//this is failing when classes are subclasses of unions or intersections
     	OWLOntologyManager m = OWLManager.createOWLOntologyManager();
     	OWLDataFactory dataFactory = m.getOWLDataFactory();
     	OWLClass owlThing = dataFactory.getOWLThing();
     	RestrictionVisitor restrictionVisitor;
 
     	for (OWLOntology ontology : ontologies) {
-    		restrictionVisitor = new RestrictionVisitor(clas,ontology,owlThing, "");
-    		for (OWLSubClassOfAxiom ax : ontology.getSubClassAxiomsForSubClass(clas)) {
+    		restrictionVisitor = new RestrictionVisitor(analyzedClass,ontology,owlThing, "");
+    		for (OWLSubClassOfAxiom ax : ontology.getSubClassAxiomsForSubClass(analyzedClass)) {
     			OWLClassExpression superCls = ax.getSuperClass();
     			// Ask our superclass to accept a visit from the RestrictionVisitor
     			// - e.g. if it is an existential restriction then the restriction visitor

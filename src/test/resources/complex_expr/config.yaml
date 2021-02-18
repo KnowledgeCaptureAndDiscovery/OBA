@@ -1,0 +1,58 @@
+#Name of the project
+name: BusinessOntology-v0.6
+
+## OpenAPI Section
+### Name, version and URL of the OpenAPI
+### For more information about the section. Go to the official documentation
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is the API of the Business Ontology
+    title: Business Ontology test
+    version: v1
+  externalDocs:
+    description: BusinessOntology
+    url:  https://www.semanticarts.com/gist/previous-versions/
+  servers:
+    - url: http://localhost:8080/v1
+      description: localhost server
+
+## Ontologies
+### List of ontologies
+ontologies:
+  - src/test/resources/complex_expr/ontology.owl
+
+## SPARQL information
+endpoint:
+  url: http://localhost:7201/sparql
+  prefix: https://businessontology.com/resource
+
+## Filter the paths by methods
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+## Select the classes to add in the API
+classes:
+  - https://businessontology.com/ontology/Address
+  - https://businessontology.com/ontology/AddressType
+  - https://businessontology.com/ontology/BaseUnit
+  - https://businessontology.com/ontology/Category
+  - https://businessontology.com/ontology/Component
+  - https://businessontology.com/ontology/Contract
+  - https://businessontology.com/ontology/Duration
+  - https://businessontology.com/ontology/DurationUnit
+  - https://businessontology.com/ontology/Identifier
+  - https://businessontology.com/ontology/IntellectualProperty
+  - https://businessontology.com/ontology/LivingThing
+  - https://businessontology.com/ontology/Magnitude
+  - https://businessontology.com/ontology/Mass
+  - https://businessontology.com/ontology/MassUnit
+  - https://businessontology.com/ontology/Organization
+  - https://businessontology.com/ontology/Person
+  - https://businessontology.com/ontology/PhysicalSubstance
+  - https://businessontology.com/ontology/System
+  - https://businessontology.com/ontology/UnitOfMeasure
+  - https://businessontology.com/ontology/Volume
+follow_references: true

@@ -156,12 +156,12 @@ class Mapper {
 
     private List<OWLClass> add_owlclass_to_openapi(Query query, Path pathGenerator, OWLOntology ontology,
                                                    String defaultOntologyPrefixIRI, OWLClass cls, Boolean topLevel) {
+        //This method fails to parse a class when it has a some property with union of classes.
         List<OWLClass> ref = new ArrayList<>();
         String classPrefixIRI = cls.getIRI().getNamespace();
         if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
             try{
                 MapperSchema mapperSchema = getMapperSchema(query, ontology, cls, this.schemaDescriptions.get(cls.getIRI()));
-
                 for (OWLClass ref_class : mapperSchema.getProperties_range()) {
                     if (this.mapped_classes.contains(ref_class)){
                         logger.info("The class " + ref_class + " exists ");
