@@ -28,7 +28,7 @@ class Mapper {
     List<String> selected_paths;
     List<OWLOntology> ontologies;
     List<OWLClass> selected_classes;
-    List<OWLClass> mapped_classes;
+    List<OWLClass> mappedClasses;
     YamlConfig config_data;
 
     public OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -36,9 +36,8 @@ class Mapper {
 
     public Mapper(YamlConfig config_data) throws OWLOntologyCreationException, IOException {
         this.config_data = config_data;
-        List<String> paths = config_data.getPaths();
-        this.selected_paths = paths;
-        this.mapped_classes = new ArrayList<>();
+        this.selected_paths = config_data.getPaths();
+        this.mappedClasses = new ArrayList<>();
         this.follow_references = config_data.getFollow_references();
 
         List<String> config_ontologies = config_data.getOntologies();
@@ -77,7 +76,7 @@ class Mapper {
             }
             else{
                 try {
-                    //copy to right folder
+                    //copy to the right folder
                     Files.copy(new File(ontologyPath).toPath(), ontologyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ex) {
                     Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, "ERROR while loading file: "+ontologyPath, ex);
@@ -98,8 +97,8 @@ class Mapper {
      * Obtain Schemas using the ontology classes
      * The schemas includes the properties
      *
-     * @param config_data
-     * @return schemas
+     * @param destination_dir directory to write the final results
+     * @param config_data yaml configuration
      */
     public void createSchemas(String destination_dir, YamlConfig config_data) {
         Query query = new Query(destination_dir);
@@ -117,19 +116,15 @@ class Mapper {
         for (OWLOntology ontology : this.ontologies) {
 
             OWLDocumentFormat format = ontology.getFormat();
-            //String defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
             String defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
             Set<OWLClass> classes = ontology.getClassesInSignature();
 
-            /**
-             * Find the classes and return the related classes
-             */
             for (OWLClass cls : classes) {
-                //filter if the class prefix is not the default ontology's prefix
+                //filter if the class prefix does not have the default ontology prefix
                 if (cls.getIRI() != null) {
-                    if (selected_classes != null && !selected_classes.contains(cls))
-                        continue;
-                    add_owlclass_to_openapi(query, pathGenerator, ontology, defaultOntologyPrefixIRI, cls, true);
+                    if (selected_classes == null || selected_classes.contains(cls)){
+                        add_owlclass_to_openapi(query, pathGenerator, ontology, defaultOntologyPrefixIRI, cls, true);
+                    }
                 }
             }
         }
@@ -156,24 +151,42 @@ class Mapper {
 
     private List<OWLClass> add_owlclass_to_openapi(Query query, Path pathGenerator, OWLOntology ontology,
                                                    String defaultOntologyPrefixIRI, OWLClass cls, Boolean topLevel) {
-        //This method fails to parse a class when it has a some property with union of classes.
         List<OWLClass> ref = new ArrayList<>();
         String classPrefixIRI = cls.getIRI().getNamespace();
         if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
             try{
                 MapperSchema mapperSchema = getMapperSchema(query, ontology, cls, this.schemaDescriptions.get(cls.getIRI()));
+                // add references to schemas in class restrictions (check selected classes to avoid conflicts)
+                for (String classToCheck : mapperSchema.getPropertiesFromObjectRestrictions_ranges()) {
+                    OWLClass clsToCheck = manager.getOWLDataFactory().getOWLClass(IRI.create(classPrefixIRI + classToCheck));
+                    if (this.mappedClasses.contains(clsToCheck) || this.selected_classes.contains(clsToCheck)){
+                        logger.info("The class " + clsToCheck + " exists ");
+                    } else {
+                        //rare cases have instances, so we filter them out and recheck that the target is a class.
+                        if(ontology.containsClassInSignature(clsToCheck.getIRI())) {
+                            System.out.println("ADD "+ clsToCheck);
+                            for (OWLOntology temp_ontology : this.ontologies) {
+                                if (follow_references) {
+                                    this.mappedClasses.add(clsToCheck);
+                                    getMapperSchema(query, temp_ontology, clsToCheck, this.schemaDescriptions.get(clsToCheck.getIRI()));
+                                    add_owlclass_to_openapi(query, pathGenerator, temp_ontology, classPrefixIRI, clsToCheck, false);
+                                }
+                            }
+                        }
+                    }
+                }
+                // add references to schemas in property ranges
                 for (OWLClass ref_class : mapperSchema.getProperties_range()) {
-                    if (this.mapped_classes.contains(ref_class)){
+                    if (this.mappedClasses.contains(ref_class)){
                         logger.info("The class " + ref_class + " exists ");
                     } else {
                         for (OWLOntology temp_ontology : this.ontologies) {
                             if ( follow_references ) {
-                                this.mapped_classes.add(ref_class);
+                                this.mappedClasses.add(ref_class);
                                 getMapperSchema(query, temp_ontology, ref_class,this.schemaDescriptions.get(ref_class.getIRI()));
-                                OWLDocumentFormat format = ontology.getFormat();
-                                //String temp_defaultOntologyPrefixIRI = ((RDFXMLDocumentFormat) format).getDefaultPrefix();
-                                String temp_defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
-                                add_owlclass_to_openapi(query, pathGenerator, temp_ontology, temp_defaultOntologyPrefixIRI, ref_class, false);
+//                                OWLDocumentFormat format = ontology.getFormat();
+//                                String temp_defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
+                                add_owlclass_to_openapi(query, pathGenerator, temp_ontology, classPrefixIRI, ref_class, false);
                             }
                         }
                     }
@@ -236,16 +249,10 @@ class Mapper {
                 mapperSchema.getCls().getIRI().getIRIString()));
     }
 
-// Method not used
-//    private void add_path_relation(Path pathGenerator, String schema_name, String predicate, String path) {
-//        String relation = "/" + schema_name.toLowerCase() + "s/{id}/" + path;
-//        this.paths.addPathItem(relation, pathGenerator.generate_plural(schema_name));
-//
-//    }
 
     public List<OWLClass> filter_classes() {
         List<String> selected_classes_iri = this.config_data.getClasses();
-        List<OWLClass> filtered_classes = new ArrayList();
+        ArrayList<OWLClass> filtered_classes = new ArrayList();
         for (OWLOntology ontology : this.ontologies) {
             for (OWLClass cls : ontology.getClassesInSignature()) {
                 if (selected_classes_iri.contains(cls.getIRI().toString())) {

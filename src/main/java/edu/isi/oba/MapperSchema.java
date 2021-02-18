@@ -45,6 +45,14 @@ class MapperSchema {
         return properties_range;
     }
 
+    public List<String> getPropertiesFromObjectRestrictions_ranges(){
+    	List<String> aggregatedClasses = new ArrayList<>();
+    	for (List<String> l : propertiesFromObjectRestrictions_ranges.values()){
+    		aggregatedClasses.addAll(l);
+		}
+    	return aggregatedClasses;
+	}
+
     public Schema getSchema() {
         return schema;
     }
@@ -96,12 +104,6 @@ class MapperSchema {
         example.setValue(exampleMap);
         schema.setExample(example);
         return schema;
-    }
-
-    private List<String> required() {
-        return new ArrayList<String>() {{
-            //add("id");
-        }};
     }
 
     /**
@@ -197,8 +199,8 @@ class MapperSchema {
     						}
     						Map<String, Map<String,String>> restrictionsValuesFromClass = restrictionVisitor.getRestrictionsValuesFromClass();
     						for (String j :  restrictionsValuesFromClass.keySet()) {     						
-    							if (j==propertyName) {
-    								restrictionValues=restrictionsValuesFromClass.get(j);
+    							if (j.equals(propertyName)) {
+    								restrictionValues = restrictionsValuesFromClass.get(j);
     							}
     						}          		    						
     					}
@@ -239,7 +241,6 @@ class MapperSchema {
         properties.put(labelProperty.name, labelProperty.getSchemaByDataProperty());
         properties.put(typeProperty.name, typeProperty.getSchemaByDataProperty());
         properties.put(descriptionProperty.name, descriptionProperty.getSchemaByDataProperty());
-
     }
 
     /**
@@ -307,7 +308,7 @@ class MapperSchema {
         					}
         					Map<String, Map<String,String>> restrictionsValuesFromClass = restrictionVisitor.getRestrictionsValuesFromClass();
         					for (String j :  restrictionsValuesFromClass.keySet()) {
-        						if (j==propertyName) {
+        						if (j.equals(propertyName)) {
         							restrictionValues=restrictionsValuesFromClass.get(j);
         						}
         					}
@@ -386,14 +387,13 @@ class MapperSchema {
      * @param analyzedClass Class that will be analyzed in order to get its restrictions
      */
     private void getClassRestrictions(OWLClass analyzedClass){
-    	//this is failing when classes are subclasses of unions or intersections
     	OWLOntologyManager m = OWLManager.createOWLOntologyManager();
     	OWLDataFactory dataFactory = m.getOWLDataFactory();
     	OWLClass owlThing = dataFactory.getOWLThing();
     	RestrictionVisitor restrictionVisitor;
 
     	for (OWLOntology ontology : ontologies) {
-    		restrictionVisitor = new RestrictionVisitor(analyzedClass,ontology,owlThing, "");
+    		restrictionVisitor = new RestrictionVisitor(analyzedClass, ontology, owlThing, "");
     		for (OWLSubClassOfAxiom ax : ontology.getSubClassAxiomsForSubClass(analyzedClass)) {
     			OWLClassExpression superCls = ax.getSuperClass();
     			// Ask our superclass to accept a visit from the RestrictionVisitor
@@ -410,7 +410,7 @@ class MapperSchema {
     		if (restrictionsValuesFromClass.size()!=0) {
     			// When the restriction is a ObjectComplementOf it doesn't have a object property,
     			// thus we need to set its value at the setSchema function
-    			if (restrictionsValuesFromClass.containsKey("complementOf") && restrictionsValuesFromClass.size()==1) {
+    			if (restrictionsValuesFromClass.containsKey("complementOf") && restrictionsValuesFromClass.size() == 1) {
     				for (String j :  restrictionsValuesFromClass.keySet()) {
     					Map<String,String> restrictionValues=restrictionsValuesFromClass.get(j);
     					for (String restriction:  restrictionValues.keySet()) {
@@ -442,7 +442,7 @@ class MapperSchema {
 						}
 					}
 					for (OWLDataProperty dp : propertiesFromDataRestrictions) {
-						List<String> valuesFromDataRestrictions_ranges = new ArrayList<String>();
+						List<String> valuesFromDataRestrictions_ranges = new ArrayList<>();
 						String propertyDescription = ObaUtils.getDescription(dp, ontology_cls);
 						if (propertiesFromDataRestrictions_ranges.size() != 0) {
 							List<String> rangesDP = propertiesFromDataRestrictions_ranges.get(sfp.getShortForm(dp.getIRI()));

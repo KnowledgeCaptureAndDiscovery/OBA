@@ -84,6 +84,7 @@ class Oba {
         logger.info("OBA finished successfully. Output can be found at: "+destination_dir);
     }catch (Exception e){
         logger.severe("Error while creating the API specification: "+e.getLocalizedMessage());
+        e.printStackTrace();
         System.exit(1);
     }
   }

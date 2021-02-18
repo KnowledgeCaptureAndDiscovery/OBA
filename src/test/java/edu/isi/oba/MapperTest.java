@@ -1,13 +1,24 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.AuthConfig;
 import edu.isi.oba.config.YamlConfig;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.Schema;
 import org.junit.Assert;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLClass;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import static edu.isi.oba.ObaUtils.get_yaml_data;
 
@@ -77,5 +88,34 @@ public class MapperTest {
         YamlConfig config_data = get_yaml_data(example_remote);
         Mapper mapper = new Mapper(config_data);
         Assert.assertEquals(false, mapper.ontologies.isEmpty());
+    }
+
+    /**
+     * Test an ontology (very simple, two classes) with a missing import
+     */
+    @Test
+    public void testComplexOntology() throws Exception{
+        InputStream stream = Oba.class.getClassLoader().getResourceAsStream("logging.properties");
+        try {
+            LogManager.getLogManager().readConfiguration(stream);
+            edu.isi.oba.Oba.logger = Logger.getLogger(Oba.class.getName());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        edu.isi.oba.Oba.logger.setLevel(Level.FINE);
+        edu.isi.oba.Oba.logger.addHandler(new ConsoleHandler());
+        String example_remote = "src/test/resources/complex_expr/config.yaml";
+        YamlConfig config_data = get_yaml_data(example_remote);
+        String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
+        config_data.setAuth(new AuthConfig());
+        Mapper mapper = new Mapper(config_data);
+        OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://businessontology.com/ontology/Person");
+        String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0));
+        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true);
+        Schema schema = mapperSchema.getSchema();
+        // The person schema must not be null.
+        Assert.assertNotNull(schema);
+        Assert.assertEquals(schema.getName(),"Person");
     }
 }
