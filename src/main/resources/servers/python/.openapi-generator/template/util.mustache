@@ -67,9 +67,6 @@ def deserialize_date(string):
     :return: date.
     :rtype: date
     """
-    if string is None:
-      return None
-    
     try:
         from dateutil.parser import parse
         return parse(string).date()
@@ -87,9 +84,6 @@ def deserialize_datetime(string):
     :return: datetime.
     :rtype: datetime
     """
-    if string is None:
-      return None
-    
     try:
         from dateutil.parser import parse
         return parse(string)
@@ -115,6 +109,9 @@ def deserialize_model(data, klass):
                 and instance.attribute_map[attr] in data \
                 and isinstance(data, (list, dict)):
             value = data[instance.attribute_map[attr]]
+            #fix: force list if the type is a list
+            if attr_type == typing.List[type(value)] and type(value) != typing.List:
+                value = [value]            
             setattr(instance, attr, _deserialize(value, attr_type))
 
     return instance
