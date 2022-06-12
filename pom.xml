@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <groupId>edu.isi.oba</groupId>
     <artifactId>oba</artifactId>
-    <version>3.6.0.03</version>
+    <version>3.6.0.04</version>
     <name>core</name>
     <url>https://github.com/KnowledgeCaptureAndDiscovery/OBA</url>
 
