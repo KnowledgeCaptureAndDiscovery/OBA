@@ -9,7 +9,7 @@ from {{packageName}} import util
 {{#operations}}
 {{#operation}}
 
-def {{operationId}}({{#allParams}}{{paramName}}{{^required}}=None{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}):  # noqa: E501
+def {{operationId}}({{#allParams}}{{paramName}}{{^required}}=None{{/required}}{{^-last}}, {{/-last}}{{/allParams}}):  # noqa: E501
     """{{#summary}}{{.}}{{/summary}}{{^summary}}{{operationId}}{{/summary}}
 
     {{#notes}}{{.}}{{/notes}} # noqa: E501
@@ -110,9 +110,9 @@ def {{operationId}}({{#allParams}}{{paramName}}{{^required}}=None{{/required}}{{
         {{/isMapContainer}}
     {{/allParams}}
 
-    return query_manager.{{#lambda.lowercase}}{{httpMethod}}_resource{{/lambda.lowercase}}({{#pathParams}}{{paramName}}={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/pathParams}}{{#queryParams}}
-        {{paramName}}={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/queryParams}}{{#bodyParams}}
-        body={{paramName}}{{#hasMore}},{{/hasMore}}{{#-last}},{{/-last}}{{/bodyParams}}
+    return query_manager.{{#lambda.lowercase}}{{httpMethod}}_resource{{/lambda.lowercase}}({{#pathParams}}{{paramName}}={{paramName}},{{/pathParams}}{{#queryParams}}
+        {{paramName}}={{paramName}},{{/queryParams}}{{#bodyParams}}
+        body={{paramName}},{{/bodyParams}}
         rdf_type_uri={{#lambda.uppercase}}{{baseName}}_type_uri{{/lambda.uppercase}},
         rdf_type_name={{#lambda.uppercase}}{{baseName}}_type_name{{/lambda.uppercase}}, 
         kls={{baseName}})
