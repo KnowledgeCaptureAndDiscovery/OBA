@@ -1,6 +1,4 @@
-# Ontology-Based APIs (OBA) [![Build Status](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA.svg?branch=master)](https://travis-ci.org/KnowledgeCaptureAndDiscovery/OBA)
-[![DOI](https://zenodo.org/badge/184804693.svg)](https://zenodo.org/badge/latestdoi/184804693)
-
+# Ontology-Based APIs (OBA) [![Test](https://github.com/KnowledgeCaptureAndDiscovery/OBA/actions/workflows/build.yaml/badge.svg)](https://github.com/KnowledgeCaptureAndDiscovery/OBA/actions/workflows/build.yaml)
 
 OBA reads ontologies (OWL) and generates an OpenAPI Specification (OAS). Using this definition, OBA creates a REST API server automatically.
 
