@@ -1,0 +1,27 @@
+ontologies:
+  - examples/jazz/qm.xml
+name: rqm-test
+output_dir: outputs
+
+openapi:
+  openapi: 3.0.1
+  info:
+    description: This is an API example for the Software Description Ontology for models [https://w3id.org/okn/o/sdm](https://w3id.org/okn/o/sdm).
+    title: Jazz Catalog
+    version: v7.0.2
+  externalDocs:
+    description: Jazz Catalog
+    url: https://jazz.net/wiki/bin/view/Deployment/CLMProductAPILanding
+  servers:
+    - url: https://elmwb.com:9443/qm
+
+endpoint:
+  url: https://elmwb.com:9443/qm
+
+enable_get_paths: true
+enable_post_paths: false
+enable_delete_paths: false
+enable_put_paths: false
+
+follow_references: true
+
