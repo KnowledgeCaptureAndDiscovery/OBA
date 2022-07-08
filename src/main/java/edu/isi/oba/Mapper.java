@@ -117,6 +117,10 @@ class Mapper {
 
             OWLDocumentFormat format = ontology.getFormat();
             String defaultOntologyPrefixIRI = format.asPrefixOWLDocumentFormat().getDefaultPrefix();
+            if (defaultOntologyPrefixIRI == null) {
+                logger.severe("Unable to find the default prefix for the ontology");
+                System.exit(1);
+            }
             Set<OWLClass> classes = ontology.getClassesInSignature();
 
             for (OWLClass cls : classes) {
