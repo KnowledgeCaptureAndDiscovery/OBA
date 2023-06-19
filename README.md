@@ -1,4 +1,4 @@
-# Ontology-Based APIs (OBA) [![Test](https://github.com/KnowledgeCaptureAndDiscovery/OBA/actions/workflows/build.yaml/badge.svg)](https://github.com/KnowledgeCaptureAndDiscovery/OBA/actions/workflows/build.yaml)
+# Ontology-Based APIs (OBA) [![Test](https://github.com/KnowledgeCaptureAndDiscovery/OBA/actions/workflows/build.yaml/badge.svg)](https://github.com/KnowledgeCaptureAndDiscovery/OBA/actions/workflows/build.yaml) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6639554.svg)](https://doi.org/10.5281/zenodo.6639554)
 
 OBA reads ontologies (OWL) and generates an OpenAPI Specification (OAS). Using this definition, OBA creates a REST API server automatically.
 
@@ -35,3 +35,19 @@ $ java -jar oba-*-jar-with-dependencies.jar -c config.yaml
 Congratulations! You have generated an Open Api Specification.
 
 For instructions on using OBA to create your API server, go to the [documentation](https://oba.readthedocs.io/en/latest/)
+
+## Citation
+Please cite our work as follows:
+
+```
+@inproceedings{garijo2020OBA,
+	title        = {{OBA}: An Ontology-Based Framework for Creating REST APIs for Knowledge Graphs},
+	author       = {Garijo, Daniel and Osorio, Maximiliano},
+	booktitle={International Semantic Web Conference},
+	pages={48--64},
+	year={2020},
+    doi={https://doi.org/10.1007/978-3-030-62466-8_4},
+	organization = {Springer, Cham},
+    isbn={978-3-030-62466-8}
+}
+```
