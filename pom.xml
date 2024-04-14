@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <groupId>edu.isi.oba</groupId>
     <artifactId>oba</artifactId>
-    <version>3.6.2</version>
+    <version>3.7.0</version>
     <name>core</name>
     <url>https://github.com/KnowledgeCaptureAndDiscovery/OBA</url>
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>8</maven.compiler.release>
-        <jdk.version>8</jdk.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <jdk.version>17</jdk.version>
         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
         <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
     </properties>
@@ -101,7 +102,8 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
-        <!-- "Unused dependency" - but it is called via SerializerUtils from org.openapitools/openapi-generator and throws an error if not included explicitly -->
+        <!-- "Unused dependency" - but it is called via SerializerUtils from
+        org.openapitools/openapi-generator and throws an error if not included explicitly -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
