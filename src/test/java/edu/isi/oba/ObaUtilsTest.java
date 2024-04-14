@@ -78,8 +78,10 @@ public class ObaUtilsTest {
 
     @Test
     public void run() {
-        String ontology1 = "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.4.0/ontology.xml";
-        String ontology2 = "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.5.0/ontology.xml";
+        //See: https://github.com/mintproject/Mint-ModelCatalog-Ontology/tree/master/release/1.8.0/ontology.owl
+        String ontology1 = "https://raw.githubusercontent.com/mintproject/Mint-ModelCatalog-Ontology/master/release/1.8.0/ontology.owl";
+        //See: https://github.com/KnowledgeCaptureAndDiscovery/SoftwareDescriptionOntology/tree/master/release/1.9.0/ontology.owl
+        String ontology2 = "https://raw.githubusercontent.com/KnowledgeCaptureAndDiscovery/SoftwareDescriptionOntology/master/release/1.9.0/ontology.owl";
         File ont1 = new File("ontology1");
         File ont2 = new File("ontology2");
         ObaUtils.downloadOntology(ontology1, ont1.getPath());
