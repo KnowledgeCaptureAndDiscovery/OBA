@@ -6,15 +6,15 @@
     <packaging>jar</packaging>
     <groupId>edu.isi.oba</groupId>
     <artifactId>oba</artifactId>
-    <version>3.6.2</version>
+    <version>3.7.0</version>
     <name>core</name>
     <url>https://github.com/KnowledgeCaptureAndDiscovery/OBA</url>
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>8</maven.compiler.release>
-        <jdk.version>8</jdk.version>
+        <maven.compiler.release>11</maven.compiler.release>
+        <jdk.version>11</jdk.version>
         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
         <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
     </properties>
