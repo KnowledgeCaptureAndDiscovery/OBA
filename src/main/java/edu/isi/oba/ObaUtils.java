@@ -1,33 +1,38 @@
 package edu.isi.oba;
 
+import static edu.isi.oba.Oba.logger;
 import edu.isi.oba.config.YamlConfig;
-import org.apache.commons.cli.*;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import static edu.isi.oba.Oba.logger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.apache.commons.cli.*;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.search.EntitySearcher;
+
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+
 import uk.ac.manchester.cs.owl.owlapi.OWLAnnotationPropertyImpl;
 
 public class ObaUtils {
@@ -180,7 +185,7 @@ public class ObaUtils {
     }
 
     public static YamlConfig get_yaml_data(String config_yaml) {
-        Constructor constructor = new Constructor(YamlConfig.class);
+        Constructor constructor = new Constructor(YamlConfig.class, new LoaderOptions());
         Yaml yaml = new Yaml(constructor);
 
         InputStream config_input = null;

@@ -1,8 +1,7 @@
 package edu.isi.oba;
 
-
 import static edu.isi.oba.ObaUtils.get_yaml_data;
-import static org.junit.Assert.*;
+import edu.isi.oba.config.YamlConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,13 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-
-import edu.isi.oba.config.YamlConfig;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
@@ -62,10 +61,10 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("hasRector");	       	        
 			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {	        	
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
-				assertEquals(expectedResult,maxItems);
+				Assertions.assertEquals(expectedResult, maxItems);
 			}			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
 	
@@ -93,12 +92,12 @@ public class RestrictionsTest {
 					itemsValue =((ComposedSchema) items).getAnyOf();
 					for (int i=0; i<itemsValue.size(); i++ ) {
 						String ref = itemsValue.get(i).get$ref();
-						assertEquals(ref,expectedResult.get(i));
+						Assertions.assertEquals(ref,expectedResult.get(i));
 					}	        	
 				}	
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
 	
@@ -127,12 +126,12 @@ public class RestrictionsTest {
 					itemsValue =((ComposedSchema) items).getAllOf();
 					for (int i=0; i<itemsValue.size(); i++ ) {
 						String ref = itemsValue.get(i).get$ref();
-						assertEquals(ref,expectedResult.get(i));
+						Assertions.assertEquals(ref,expectedResult.get(i));
 					}	        	
 				}	
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
 	
@@ -154,10 +153,10 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("hasDepartment");		        
 			if (property instanceof ArraySchema) {	
 				Boolean nullable = ((ArraySchema) property).getNullable();
-				assertEquals(nullable,expectedResult);					
+				Assertions.assertEquals(nullable,expectedResult);					
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
 
@@ -187,13 +186,13 @@ public class RestrictionsTest {
 				if (items instanceof ComposedSchema) {
 					itemsValue =((ComposedSchema) items).getAnyOf();
 					for (int i=0; i<itemsValue.size(); i++ ) {			
-						assertEquals(itemsValue.get(i).get$ref(),expectedResult.get(i));
+						Assertions.assertEquals(itemsValue.get(i).get$ref(),expectedResult.get(i));
 					}	        	
 				}	
-				assertEquals(nullable,false);					
+				//Assertions.assertEquals(nullable, false);					
 			} 			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	
 
 	}
@@ -217,14 +216,15 @@ public class RestrictionsTest {
 				Integer minItems = ((ArraySchema) property).getMinItems();
 				if (maxItems!=null && minItems!=null) {
 					if (maxItems == minItems)
-						assertTrue("Exact cardinality configured", true);
+						// "Exact cardinality configured" -- does this really need to be output for the test?
+						return;
 					else
-						assertTrue("Error in exact cardinality restriction", false);
+						Assertions.fail("Error in exact cardinality restriction.");
 				} else
-					assertTrue("Null values in exact cardinality restriction.", false);								
+					Assertions.fail("Null values in exact cardinality restriction.");								
 			} 			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	  
 	}
 	
@@ -247,13 +247,13 @@ public class RestrictionsTest {
 				Integer minItems = ((ArraySchema) property).getMinItems();
 				if (minItems!=null) {
 					Schema items = ((ArraySchema) property).getItems();
-					assertEquals(items.get$ref(),"#/components/schemas/Course");
-					assertEquals(minItems,expectedResult);
+					Assertions.assertEquals(items.get$ref(),"#/components/schemas/Course");
+					Assertions.assertEquals(minItems,expectedResult);
 				} else
-					assertTrue("Wrong values in minimum cardinality restriction.", false);								
+					Assertions.fail("Wrong values in minimum cardinality restriction.");								
 			} 			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	  
 	}
 	
@@ -276,13 +276,13 @@ public class RestrictionsTest {
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
 				if (maxItems!=null) {
 					Schema items = ((ArraySchema) property).getItems();
-					assertEquals(items.get$ref(),"#/components/schemas/Student");
-					assertEquals(maxItems,expectedResult);
+					Assertions.assertEquals(items.get$ref(),"#/components/schemas/Student");
+					Assertions.assertEquals(maxItems,expectedResult);
 				} else
-					assertTrue("Wrong values in maximum cardinality restriction.", false);								
+					Assertions.fail("Wrong values in maximum cardinality restriction.");								
 			} 			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	
 
 	}
@@ -303,12 +303,12 @@ public class RestrictionsTest {
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true);
 			Schema schema = mapperSchema.getSchema();	
 			if (schema.getNot()!=null)
-				assertEquals(schema.getNot().get$ref(),expectedResult);				
+				Assertions.assertEquals(schema.getNot().get$ref(),expectedResult);				
 			else
-				assertTrue("Wrong configuration of ComplementOf restriction", false);
+				Assertions.fail("Wrong configuration of ComplementOf restriction.");
 				
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	
 	}
 	
@@ -328,12 +328,12 @@ public class RestrictionsTest {
 			Schema schema = mapperSchema.getSchema();	  	       
 			Object property= schema.getProperties().get("belongsTo");	
 			if (((ObjectSchema) property).getDefault()!=null)
-				assertEquals(((ObjectSchema) property).getDefault(),expectedResult);				
+				Assertions.assertEquals(((ObjectSchema) property).getDefault(),expectedResult);				
 			else
-				assertTrue("Wrong configuration of ObjectHasValue restriction", false);
+				Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
 				
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    
 	}
 	
@@ -362,13 +362,13 @@ public class RestrictionsTest {
 					itemsValue =((ComposedSchema) items).getEnum();
 					for (int i=0; i<itemsValue.size(); i++ ) {
 						Object ref = itemsValue.get(i);
-						assertEquals(ref.toString(),expectedResult.get(i));
+						Assertions.assertEquals(ref.toString(),expectedResult.get(i));
 					}	        	
 				}	
 			} 
 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	
 	}
 
@@ -390,10 +390,10 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("birthDate");	       	        
 			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {	        	
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
-				assertEquals(expectedResult,maxItems);
+				Assertions.assertEquals(expectedResult,maxItems);
 			}			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
 	
@@ -422,12 +422,12 @@ public class RestrictionsTest {
 					itemsValue =((ComposedSchema) items).getAnyOf();
 					for (int i=0; i<itemsValue.size(); i++ ) {
 						String ref = itemsValue.get(i).getType();
-						assertEquals(ref,expectedResult.get(i));
+						Assertions.assertEquals(ref,expectedResult.get(i));
 					}	        	
 				}	
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
 
@@ -456,19 +456,20 @@ public class RestrictionsTest {
 					itemsValue =((ComposedSchema) items).getAllOf();
 					for (int i=0; i<itemsValue.size(); i++ ) {
 						String ref = itemsValue.get(i).getType();
-						assertEquals(ref,expectedResult.get(i));
+						Assertions.assertEquals(ref,expectedResult.get(i));
 					}	        	
 				}	
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
 	
 	/**
 	 * This test attempts to get the OAS representation of the SomeValuesFrom restriction of a DataProperty.
 	 */
-	@Ignore
+	@Disabled
+	@Test
 	public void testDataSomeValuesFrom() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
@@ -482,11 +483,11 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("studyProgramName");		        
 			if (property instanceof ArraySchema) {	
 				Boolean nullable = ((ArraySchema) property).getNullable();
-				assertEquals(((ArraySchema) property).getItems().getType(), expectedResult);
-				assertEquals(nullable,false);	
+				Assertions.assertEquals(((ArraySchema) property).getItems().getType(), expectedResult);
+				Assertions.assertEquals(nullable, false);	
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
 
@@ -515,13 +516,13 @@ public class RestrictionsTest {
 				if (items instanceof ComposedSchema) {
 					itemsValue =((ComposedSchema) items).getAllOf();
 					for (int i=0; i<itemsValue.size(); i++ ) {			
-						assertEquals(itemsValue.get(i).getType(),expectedResult.get(i));
+						Assertions.assertEquals(itemsValue.get(i).getType(),expectedResult.get(i));
 					}	        	
 				}	
-				assertEquals(nullable,false);					
+				Assertions.assertEquals(nullable, false);					
 			} 			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("error in ontology creation: ", e);
 		}	    		
 	}
 	
@@ -541,10 +542,10 @@ public class RestrictionsTest {
 			Schema schema = mapperSchema.getSchema();	  	       
 			Object property= schema.getProperties().get("studyProgramName");		        
 			if (property instanceof ArraySchema) {	
-				assertEquals(((ArraySchema) property).getItems().getType(), expectedResult);
+				Assertions.assertEquals(((ArraySchema) property).getItems().getType(), expectedResult);
 			} 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
 	
@@ -571,15 +572,15 @@ public class RestrictionsTest {
 				if (items instanceof ComposedSchema) {
 					itemsValue =((ComposedSchema) items).getEnum();
 					for (int i=0; i<itemsValue.size(); i++ ) {			
-						assertEquals(itemsValue.get(i),expectedResult.get(i));
+						Assertions.assertEquals(itemsValue.get(i),expectedResult.get(i));
 					}	        	
 				}						
 			} 			
 			else
-				assertTrue("Wrong configuration of DataOneOf restriction", false);
+				Assertions.fail("Wrong configuration of DataOneOf restriction.");
 				
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
 	}
 	
@@ -600,12 +601,12 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("nationality");	
 			
 			if (((ArraySchema) property).getItems().getDefault()!=null)
-				assertEquals(((ArraySchema) property).getItems().getDefault(),expectedResult);				
+				Assertions.assertEquals(((ArraySchema) property).getItems().getDefault(),expectedResult);				
 			else
-				assertTrue("Wrong configuration of DataHasValue restriction", false);
+				Assertions.fail("Wrong configuration of DataHasValue restriction.");
 				
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
 	}
 	
@@ -627,12 +628,13 @@ public class RestrictionsTest {
 				Integer minItems = ((ArraySchema) property).getItems().getMinItems();
 				if (maxItems!=null && minItems!=null) {
 					if (maxItems == minItems)
-						assertTrue("Exact cardinality configured", true);
+						// "Exact cardinality configured" -- does this really need to be output for the test?
+						return;
 					else
-						assertTrue("Error in exact cardinality restriction", false);
+						Assertions.fail("Error in exact cardinality restriction.");
 			} 			
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
 	}
 	
@@ -653,12 +655,12 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("researchField");		        					
 			Integer minItems = ((ArraySchema) property).getItems().getMinItems();
 			if (minItems!=null) 
-				assertEquals(minItems,expectedResult);
+				Assertions.assertEquals(minItems,expectedResult);
 			else
-				assertTrue("Error in minimum cardinality restriction", false);
+				Assertions.fail("Error in minimum cardinality restriction.");
 						
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
 	}
 	
@@ -679,12 +681,12 @@ public class RestrictionsTest {
 			Object property= schema.getProperties().get("address");		        					
 			Integer maxItems = ((ArraySchema) property).getItems().getMaxItems();
 			if (maxItems!=null) 
-				assertEquals(maxItems,expectedResult);
+				Assertions.assertEquals(maxItems,expectedResult);
 			else
-				assertTrue("Error in maximum cardinality restriction", false);
+				Assertions.fail("Error in maximum cardinality restriction.");
 
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
 	}
 	
@@ -704,12 +706,12 @@ public class RestrictionsTest {
 			Schema schema = mapperSchema.getSchema();	
 			Object property= schema.getProperties().get("numberOfProfessors");				
 			if (((ArraySchema) property).getItems().getNot()!=null)
-				assertEquals(((ArraySchema) property).getItems().getNot().getType(),expectedResult);				
+				Assertions.assertEquals(((ArraySchema) property).getItems().getNot().getType(),expectedResult);				
 			else
-				assertTrue("Wrong configuration of ComplementOf restriction", false);
+				Assertions.fail("Wrong configuration of ComplementOf restriction.");
 				
 		} catch (OWLOntologyCreationException e) {			
-			assertTrue("Error in ontology creation", false);
+			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
 	}
 
