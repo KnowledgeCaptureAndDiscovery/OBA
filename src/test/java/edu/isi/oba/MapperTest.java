@@ -1,26 +1,27 @@
 package edu.isi.oba;
 
+import static edu.isi.oba.ObaUtils.get_yaml_data;
 import edu.isi.oba.config.AuthConfig;
 import edu.isi.oba.config.YamlConfig;
-import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.media.Schema;
-import org.junit.Assert;
-import org.junit.Test;
-import org.semanticweb.owlapi.model.OWLClass;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import static edu.isi.oba.ObaUtils.get_yaml_data;
+import io.swagger.v3.oas.models.media.Schema;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import org.semanticweb.owlapi.model.OWLClass;
 
 public class MapperTest {
     @Test
@@ -36,7 +37,7 @@ public class MapperTest {
         }
         Collections.sort(filter_classes);
         Collections.sort(config);
-        Assert.assertEquals(config, filter_classes);
+        Assertions.assertEquals(config, filter_classes);
 
     }
     
@@ -49,7 +50,7 @@ public class MapperTest {
         String local_ontology = "src/test/config/mcat_reduced.yaml";
         YamlConfig config_data = get_yaml_data(local_ontology);
         Mapper mapper = new Mapper(config_data);
-        Assert.assertEquals(false, mapper.ontologies.isEmpty());
+        Assertions.assertEquals(false, mapper.ontologies.isEmpty());
     }
 
     /**
@@ -61,7 +62,7 @@ public class MapperTest {
         String local_ontology = "examples/example with spaces/config.yaml";
         YamlConfig config_data = get_yaml_data(local_ontology);
         Mapper mapper = new Mapper(config_data);
-        Assert.assertEquals(false, mapper.ontologies.isEmpty());
+        Assertions.assertEquals(false, mapper.ontologies.isEmpty());
     }
     
     /**
@@ -75,7 +76,7 @@ public class MapperTest {
         String example_remote = "src/test/config/pplan.yaml";
         YamlConfig config_data = get_yaml_data(example_remote);
         Mapper mapper = new Mapper(config_data);
-        Assert.assertEquals(false, mapper.ontologies.isEmpty());
+        Assertions.assertEquals(false, mapper.ontologies.isEmpty());
         
     }
 
@@ -87,7 +88,7 @@ public class MapperTest {
         String example_remote = "src/test/resources/missing_import/config.yaml";
         YamlConfig config_data = get_yaml_data(example_remote);
         Mapper mapper = new Mapper(config_data);
-        Assert.assertEquals(false, mapper.ontologies.isEmpty());
+        Assertions.assertEquals(false, mapper.ontologies.isEmpty());
     }
 
     /**
@@ -115,7 +116,7 @@ public class MapperTest {
         MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true);
         Schema schema = mapperSchema.getSchema();
         // The person schema must not be null.
-        Assert.assertNotNull(schema);
-        Assert.assertEquals(schema.getName(),"Person");
+        Assertions.assertNotNull(schema);
+        Assertions.assertEquals(schema.getName(),"Person");
     }
 }

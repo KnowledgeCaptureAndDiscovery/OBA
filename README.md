@@ -2,7 +2,7 @@
 
 OBA reads ontologies (OWL) and generates an OpenAPI Specification (OAS). Using this definition, OBA creates a REST API server automatically.
 
-![Diagram](docs/figures/oba.svg) 
+![Diagram](docs/figures/oba.svg)
 
 ## Quickstart
 
@@ -11,6 +11,11 @@ There are two option to run OBA:
 1. Download the binary.
 2. Build the binary from the repository.
 
+### Pre-requisites
+
+Due to recent versions of the OpenAPI generator being built with Java 11, you will need Java 11 or higher to run OBA v3.7.0. The current recommended distribution of Java 11+ JDKs (and "JREs") is at [Adoptium's releases page](https://adoptium.net/temurin/releases/?version=11).
+
+Java versions higher than 11 are also available to use. Java 11 is simply the minimum version.
 
 ### Downloading binary
 
@@ -37,6 +42,7 @@ Congratulations! You have generated an Open Api Specification.
 For instructions on using OBA to create your API server, go to the [documentation](https://oba.readthedocs.io/en/latest/)
 
 ## Citation
+
 Please cite our work as follows:
 
 ```
