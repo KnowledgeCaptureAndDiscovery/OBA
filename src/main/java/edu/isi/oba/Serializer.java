@@ -62,7 +62,7 @@ class Serializer {
     List<String> messageList = result.getMessages();
     Set<String> errors = new HashSet<>(messageList);
     Set<String> warnings = new HashSet<>();
-    if (errors.size() > 0) {
+    if (!errors.isEmpty()) {
       throw new Exception("Error when validating the API specification. " + errors.iterator().next());
     }
   }
