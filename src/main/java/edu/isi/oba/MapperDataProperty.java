@@ -99,10 +99,10 @@ class MapperDataProperty {
 
   public Schema getSchemaByDataProperty(){
 	  
-    if (this.type.size() == 0) {
+    if (this.type.isEmpty()) {
       return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable).description(description);
     }
-    else if (this.type.size() > 1){
+    else if (this.type.size() > 1) {
     	return (array) ? composedSchema(this.type, nullable) : new Schema().nullable(nullable).description(description);
     }
 
@@ -110,6 +110,7 @@ class MapperDataProperty {
     if (schemaType == null){
       logger.severe("property " + this.name + " type " + this.type);
     }
+    
     switch (schemaType) {
       case STRING_TYPE:
         return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable).description(description);
