@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class YamlConfig {
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
   String DEFAULT_PROJECT_NAME = "default_project";
@@ -28,6 +27,8 @@ public class YamlConfig {
   private LinkedHashMap<String, PathItem> custom_paths = null;
   public List<String> classes;
   public Boolean follow_references = false;
+  public Boolean default_descriptions = true;
+  public Boolean default_properties = true;
 
   public Boolean getEnable_get_paths() {
     return enable_get_paths;
@@ -158,6 +159,22 @@ public class YamlConfig {
 
   public void setFollow_references(Boolean follow_references) {
     this.follow_references = follow_references;
+  }
+
+  public Boolean getDefault_descriptions() {
+    return this.default_descriptions;
+  }
+
+  public void setDefault_descriptions(Boolean default_descriptions) {
+    this.default_descriptions = default_descriptions;
+  }
+
+  public Boolean getDefault_properties() {
+    return this.default_properties;
+  }
+
+  public void setDefault_properties(Boolean default_properties) {
+    this.default_properties = default_properties;
   }
 
   public AuthConfig getAuth() {

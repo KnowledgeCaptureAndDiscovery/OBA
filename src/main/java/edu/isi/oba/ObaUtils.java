@@ -36,6 +36,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import uk.ac.manchester.cs.owl.owlapi.OWLAnnotationPropertyImpl;
 
 public class ObaUtils {
+    public static final String DEFAULT_DESCRIPTION = "Description not available";
     public static final String[] POSSIBLE_VOCAB_SERIALIZATIONS = { "application/rdf+xml", "text/turtle", "text/n3",
 			"application/ld+json" };
     private static final String RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#";
@@ -377,28 +378,31 @@ public class ObaUtils {
      * Method that given a class, property or data property, searches for the best description.
      * @param entity entity to search.
      * @param ontology ontology to be used to search descriptions.
+     * @param default_descriptions flag indicating whether default descriptions should or should not be included.
      * @return Description String (prioritizes English language)
      */
-    public static String getDescription(OWLEntity entity, OWLOntology ontology){
-        String descriptionValue = "Description not available";
-        for(String description:ObaUtils.DESCRIPTION_PROPERTIES){
-               Object[] annotationsObjects = EntitySearcher.getAnnotationObjects(entity, ontology, new OWLAnnotationPropertyImpl(new IRI(description) {
-               })).toArray();
-               if(annotationsObjects.length!=0){
-                   Optional<OWLLiteral> descriptionLiteral;
-                   for(Object annotation: annotationsObjects){
-                       descriptionLiteral = ((OWLAnnotation) annotation).getValue().asLiteral();
-                       if(descriptionLiteral.isPresent()){
-                           if(annotationsObjects.length == 1 || descriptionLiteral.get().getLang().equals("en")){
-                               descriptionValue = descriptionLiteral.get().getLiteral();
-                           }
-                       }
-                   }
-                   break;
-               }
-           }
-        return descriptionValue;
+    public static String getDescription(OWLEntity entity, OWLOntology ontology, Boolean default_descriptions) {
+        String descriptionValue = ObaUtils.DEFAULT_DESCRIPTION;
+        for (String description: ObaUtils.DESCRIPTION_PROPERTIES) {
+            Object[] annotationsObjects = EntitySearcher.getAnnotationObjects(entity, ontology, new OWLAnnotationPropertyImpl(new IRI(description){})).toArray();
+
+            if (annotationsObjects.length != 0) {
+                Optional<OWLLiteral> descriptionLiteral;
+                for (Object annotation: annotationsObjects) {
+                    descriptionLiteral = ((OWLAnnotation) annotation).getValue().asLiteral();
+
+                    if (descriptionLiteral.isPresent()) {
+                        if (annotationsObjects.length == 1 || descriptionLiteral.get().getLang().equals("en")) {
+                            descriptionValue = descriptionLiteral.get().getLiteral();
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return !Optional.ofNullable(default_descriptions).orElse(false) && ObaUtils.DEFAULT_DESCRIPTION.equals(descriptionValue) ? null : descriptionValue;
     }
-    
 }
 

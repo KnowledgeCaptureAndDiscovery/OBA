@@ -4,6 +4,7 @@ import edu.isi.oba.config.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import org.json.JSONObject;
+import org.openapitools.codegen.examples.ExampleGenerator;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -66,30 +67,29 @@ class Oba {
     } else {
       config_data.setAuth(new AuthConfig());
     }
+
     try {
         Mapper mapper = new Mapper(config_data);
-        mapper.createSchemas(destination_dir, config_data);
+        mapper.createSchemas(destination_dir);
 
         LinkedHashMap<String, PathItem> custom_paths = config_data.getCustom_paths();
         OpenAPI openapi_base = config_data.getOpenapi();
         String custom_queries_dir = config_data.getCustom_queries_directory();
 
         //copy base project
-        ObaUtils.unZipIt(SERVERS_ZIP, destination_dir);
+        ObaUtils.unZipIt(Oba.SERVERS_ZIP, destination_dir);
         //get schema and paths
         generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
         generate_openapi_template(mapper, destination_dir, config_data, selected_language);
         generate_context(config_data, destination_dir);
         copy_custom_queries(custom_queries_dir, destination_dir);
-        logger.info("OBA finished successfully. Output can be found at: "+destination_dir);
-    }catch (Exception e){
-        logger.severe("Error while creating the API specification: "+e.getLocalizedMessage());
+        logger.info("OBA finished successfully. Output can be found at: " + destination_dir);
+    } catch (Exception e) {
+        logger.severe("Error while creating the API specification: " + e.getLocalizedMessage());
         e.printStackTrace();
         System.exit(1);
     }
   }
-
- 
   
   private static void generate_context(YamlConfig config_data, String destination_dir) {
     List<String> ontologies = config_data.getOntologies();
@@ -106,12 +106,12 @@ class Oba {
     try {
         ObaUtils.write_file(file_path, context_json_object.toString(4));
         ObaUtils.write_file(file_path_class, context_json_object_class.toString(4));
-    }catch(Exception e){
+    } catch(Exception e) {
         logger.severe("Could not generate the context files: "+e.getMessage());
     }
   }
 
-  private static void copy_custom_queries(String source, String destination){
+  private static void copy_custom_queries(String source, String destination) {
     if (source != null) {
       try {
         ObaUtils.copyFolder(new File(source), new File(destination + File.separator + "queries" + File.separator + "custom"));
@@ -140,10 +140,8 @@ class Oba {
                                             String dir,
                                             LinkedHashMap<String, PathItem> custom_paths
                                             ) throws Exception {
-    String destinationProjectDirectory = dir + File.separator + SERVERS_DIRECTORY;
+    String destinationProjectDirectory = dir + File.separator + Oba.SERVERS_DIRECTORY;
     Path destinationProject = Paths.get(destinationProjectDirectory);
     new Serializer(mapper, destinationProject, openapi_base, custom_paths);
   }
-
-
 }
