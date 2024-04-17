@@ -172,7 +172,7 @@ components:
 
 ### Including default schema properties
 
-You may wish to include common properties for each even if not defined for the entity/class. Currently, the default properites that are added to each schema are `description`, `id`, `label`, and `type`. For example:
+You may wish to include common properties for each even if not defined for the entity/class. Currently, the default properites that are added to each schema are `description`, `id`, `label`, and `type`. Additional default properties are included (`eventDateTime`, `quantity`, `isBool`) which are meant to provide examples are other common data types. For example:
 
 ```yaml
 components:
@@ -183,24 +183,34 @@ components:
           type: string
         propertyB:
           type: integer
+        eventDateTime:
+          description: a date/time of the resource
+          format: date-time
+          nullable: true
+          type: string
+        quantity:
+          description: a number quantity of the resource
+          nullable: true
+          type: number
+        isBool:
+          description: a boolean indicator of the resource
+          nullable: true
+          type: boolean
         description:
           description: small description
-          items:
-            type: string
           nullable: true
-          type: array
-        id:
-          description: identifier
-          nullable: false
           type: string
         label:
           description: short description of the resource
-          items:
-            type: string
           nullable: true
-          type: array
+          type: string
+        id:
+          description: identifier
+          format: int32
+          nullable: false
+          type: integer
         type:
-          description: type of the resource
+          description: type(s) of the resource
           items:
             type: string
           nullable: true

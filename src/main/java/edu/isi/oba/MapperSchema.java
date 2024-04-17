@@ -288,8 +288,8 @@ class MapperSchema {
 		// Add some typical default properties (e.g. id, lable, type, and description)
         MapperDataProperty idProperty = new MapperDataProperty("id", "identifier", true, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("integer");}}, false, false);
         MapperDataProperty labelProperty = new MapperDataProperty("label", "short description of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("string");}}, false, true);
-        MapperDataProperty typeProperty = new MapperDataProperty("type", "type of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("string");}}, false, true);
-        MapperDataProperty descriptionProperty = new MapperDataProperty("description", "small description", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("string");}}, false, true);
+        MapperDataProperty typeProperty = new MapperDataProperty("type", "type(s) of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("string");}}, true, true);
+		MapperDataProperty descriptionProperty = new MapperDataProperty("description", "small description", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("string");}}, false, true);
 		
 		// Also add some default property examples of different types (e.g. a date/time, a boolean, and a float)
 		MapperDataProperty eventDateTimeProperty = new MapperDataProperty("eventDateTime", "a date/time of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("dateTime");}}, false, true);
