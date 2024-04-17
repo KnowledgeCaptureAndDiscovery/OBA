@@ -293,7 +293,7 @@ class MapperSchema {
 		
 		// Also add some default property examples of different types (e.g. a date/time, a boolean, and a float)
 		MapperDataProperty eventDateTimeProperty = new MapperDataProperty("eventDateTime", "a date time of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("dateTime");}}, false, true);
-		MapperDataProperty isBoolProperty = new MapperDataProperty("isGood", "a boolean indicator of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("boolean");}}, false, true);
+		MapperDataProperty isBoolProperty = new MapperDataProperty("isBool", "a boolean indicator of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("boolean");}}, false, true);
 		MapperDataProperty quantityProperty = new MapperDataProperty("quantity", "a number quantity of the resource", false, defaultRestrictionValues, valuesFromDataRestrictions_ranges, new ArrayList<String>(){{add("float");}}, false, true);
 
 		return Map.ofEntries(
