@@ -53,7 +53,7 @@ public class ObaUtilsTest {
         try {
             Mapper mapper = new Mapper(config_data);
             OWLClass planClass = mapper.manager.getOWLDataFactory().getOWLClass("http://purl.org/net/p-plan#Plan");
-            String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0));
+            String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0), true);
             Assertions.assertNotEquals(desc, "");
         }catch(Exception e){
             Assertions.fail("Failed to get description.", e);

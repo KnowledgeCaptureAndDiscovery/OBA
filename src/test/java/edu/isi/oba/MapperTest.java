@@ -112,8 +112,8 @@ public class MapperTest {
         config_data.setAuth(new AuthConfig());
         Mapper mapper = new Mapper(config_data);
         OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://businessontology.com/ontology/Person");
-        String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0));
-        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true);
+        String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
         Schema schema = mapperSchema.getSchema();
         // The person schema must not be null.
         Assertions.assertNotNull(schema);

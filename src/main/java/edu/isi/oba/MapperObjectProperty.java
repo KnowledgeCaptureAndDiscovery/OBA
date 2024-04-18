@@ -1,8 +1,8 @@
 package edu.isi.oba;
 
-import io.swagger.v3.oas.models.media.*;
-
 import static edu.isi.oba.Oba.logger;
+
+import io.swagger.v3.oas.models.media.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
