@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import io.swagger.v3.oas.models.media.Schema;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.semanticweb.owlapi.model.OWLClass;
