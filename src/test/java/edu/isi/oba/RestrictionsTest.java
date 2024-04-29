@@ -209,20 +209,35 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasRecord");		        
-			if (property instanceof ArraySchema) {					
-				Integer maxItems = ((ArraySchema) property).getMaxItems();
-				Integer minItems = ((ArraySchema) property).getMinItems();
-				if (maxItems!=null && minItems!=null) {
-					if (maxItems == minItems)
-						// "Exact cardinality configured" -- does this really need to be output for the test?
-						return;
-					else
-						Assertions.fail("Error in exact cardinality restriction.");
-				} else
-					Assertions.fail("Null values in exact cardinality restriction.");								
-			} 			
+			Schema schema = mapperSchema.getSchema();
+			
+			boolean isRequired = schema.getRequired().contains("hasRecord");
+
+			// For exact cardinality, the class schema should have it marked as required.
+			if (isRequired) {
+				Object property= schema.getProperties().get("hasRecord");
+				Integer maxItems = null;
+				Integer minItems = null;
+				
+				// If the property is an array, it is an object property (i.e. has a "$ref" value).  Otherwise, it is a data property.
+				if (property instanceof ArraySchema) {
+					maxItems = ((ArraySchema) property).getMaxItems();
+					minItems = ((ArraySchema) property).getMinItems();
+					//return;
+				} else if (property instanceof ObjectSchema) {
+					maxItems = ((ObjectSchema) property).getMaxItems();
+					minItems = ((ObjectSchema) property).getMinItems();
+				}
+
+				// Property is known to be required.  And cardinality restrictions should have also been removed, so min/max items should be null.
+				if (minItems == null && maxItems == null) {
+					return;
+				} else {
+					Assertions.fail("Error in exact cardinality restriction.");
+				}
+			} else {
+				Assertions.fail("Error in exact cardinality restriction.");
+			}		
 		} catch (OWLOntologyCreationException e) {			
 			Assertions.fail("Error in ontology creation: ", e);
 		}	  
@@ -314,24 +329,45 @@ public class RestrictionsTest {
 	
 	/**
 	 * This test attempts to get the OAS representation of the hasValue of an ObjectProperty.
+	 * 
+	 * This corresponds to a named individual (of a particular class).  Before version 3.1.0, OpenAPI does not support
+	 * the "$ref" at the same level of a default value.  For this reason, they are treated as separate items
+	 * under the "allOf" key (which is an array type).  The "$ref" value is the named individual's class and the "default" value is
+	 * the named individual's name.
 	 */
 	@Test
 	public void testObjectHasValue() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
-			String expectedResult = "<https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment>";
+			// The short form of: "<https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment>"
+			// resolves to the default value of: "ArtificialIntelligenceDepartment".
+			String expectedResult = "ArtificialIntelligenceDepartment";
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
 			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("belongsTo");	
-			if (((ObjectSchema) property).getDefault()!=null)
-				Assertions.assertEquals(((ObjectSchema) property).getDefault(),expectedResult);				
-			else
+			Object property = schema.getProperties().get("belongsTo");	
+
+			if (property instanceof ArraySchema) {
+				Schema items = ((ArraySchema) property).getItems();
+				if (items != null && (items.getAllOf() != null && !items.getAllOf().isEmpty())) {
+					for (var item: items.getAllOf()) {
+						if (((ObjectSchema) item).getDefault() != null) {
+							Assertions.assertEquals(((ObjectSchema) item).getDefault(), expectedResult);
+							return;
+						}
+					}
+
+					// If we reach here, then none of the items had a default value, so fail.
+					Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
+				} else {
+					Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
+				}				
+			} else {
 				Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
-				
+			}
 		} catch (OWLOntologyCreationException e) {			
 			Assertions.fail("Error in ontology creation: ", e);
 		}	    
@@ -419,11 +455,13 @@ public class RestrictionsTest {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAnyOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {
-						String ref = itemsValue.get(i).getType();
-						Assertions.assertEquals(ref,expectedResult.get(i));
-					}	        	
+					itemsValue = ((ComposedSchema) items).getAnyOf();
+					if (itemsValue != null) {
+						for (int i = 0; i < itemsValue.size(); i++) {
+							String ref = itemsValue.get(i).getType();
+							Assertions.assertEquals(ref,expectedResult.get(i));
+						}
+					}
 				}	
 			} 
 		} catch (OWLOntologyCreationException e) {			
@@ -600,11 +638,13 @@ public class RestrictionsTest {
 			Schema schema = mapperSchema.getSchema();	  	       
 			Object property= schema.getProperties().get("nationality");	
 			
-			if (((ArraySchema) property).getItems().getDefault()!=null)
-				Assertions.assertEquals(((ArraySchema) property).getItems().getDefault(),expectedResult);				
-			else
+			if (property instanceof ArraySchema && ((ArraySchema) property).getItems().getDefault() != null) {
+				Assertions.assertEquals(((ArraySchema) property).getItems().getDefault(), expectedResult);
+			} else if (((Schema) property).getDefault() != null) {
+				Assertions.assertEquals(((Schema) property).getDefault(), expectedResult);
+			} else {
 				Assertions.fail("Wrong configuration of DataHasValue restriction.");
-				
+			}
 		} catch (OWLOntologyCreationException e) {			
 			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
@@ -623,16 +663,33 @@ public class RestrictionsTest {
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
 			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("universityName");		        					
+			Object property= schema.getProperties().get("universityName");
+
+			if (property instanceof ArraySchema) {
 				Integer maxItems = ((ArraySchema) property).getItems().getMaxItems();
 				Integer minItems = ((ArraySchema) property).getItems().getMinItems();
 				if (maxItems!=null && minItems!=null) {
-					if (maxItems == minItems)
+					if (maxItems == minItems) {
 						// "Exact cardinality configured" -- does this really need to be output for the test?
 						return;
-					else
+					} else {
 						Assertions.fail("Error in exact cardinality restriction.");
-			} 			
+					}
+				} 
+			} else if (property instanceof Schema) {
+				Integer maxItems = ((Schema) property).getMaxItems();
+				Integer minItems = ((Schema) property).getMinItems();
+				if (maxItems!=null && minItems!=null) {
+					if (maxItems == minItems) {
+						// "Exact cardinality configured" -- does this really need to be output for the test?
+						return;
+					} else {
+						Assertions.fail("Error in exact cardinality restriction.");
+					}
+				} 
+			} else {
+				Assertions.fail("Wrong configuration of cardinality restriction.");
+			}
 		} catch (OWLOntologyCreationException e) {			
 			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
@@ -653,8 +710,17 @@ public class RestrictionsTest {
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
 			Schema schema = mapperSchema.getSchema();	  	       
 			Object property= schema.getProperties().get("researchField");		        					
-			Integer minItems = ((ArraySchema) property).getItems().getMinItems();
-			if (minItems!=null) 
+			Integer minItems = null;
+
+			if (property instanceof ArraySchema) {
+				minItems = ((ArraySchema) property).getItems().getMinItems();
+			} else if (property instanceof Schema) {
+				minItems = ((Schema) property).getMinItems();
+			} else {
+				Assertions.fail("Wrong configuration of minimum cardinality restriction.");
+			}
+
+			if (minItems != null) 
 				Assertions.assertEquals(minItems,expectedResult);
 			else
 				Assertions.fail("Error in minimum cardinality restriction.");
@@ -679,7 +745,16 @@ public class RestrictionsTest {
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
 			Schema schema = mapperSchema.getSchema();	  	       
 			Object property= schema.getProperties().get("address");		        					
-			Integer maxItems = ((ArraySchema) property).getItems().getMaxItems();
+			Integer maxItems = null;
+
+			if (property instanceof ArraySchema) {
+				maxItems = ((ArraySchema) property).getItems().getMaxItems();
+			} else if (property instanceof Schema) {
+				maxItems = ((Schema) property).getMaxItems();
+			} else {
+				Assertions.fail("Wrong configuration of minimum cardinality restriction.");
+			}
+
 			if (maxItems!=null) 
 				Assertions.assertEquals(maxItems,expectedResult);
 			else
@@ -704,12 +779,15 @@ public class RestrictionsTest {
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
 			Schema schema = mapperSchema.getSchema();	
-			Object property= schema.getProperties().get("numberOfProfessors");				
-			if (((ArraySchema) property).getItems().getNot()!=null)
-				Assertions.assertEquals(((ArraySchema) property).getItems().getNot().getType(),expectedResult);				
-			else
+			Object property= schema.getProperties().get("numberOfProfessors");
+
+			if (property instanceof ArraySchema && ((ArraySchema) property).getItems().getNot().getType() != null) {
+				Assertions.assertEquals(((ArraySchema) property).getItems().getNot().getType(), expectedResult);
+			} else if (((Schema) property).getNot().getType() != null) {
+				Assertions.assertEquals(((Schema) property).getNot().getType(), expectedResult);
+			} else {
 				Assertions.fail("Wrong configuration of ComplementOf restriction.");
-				
+			}
 		} catch (OWLOntologyCreationException e) {			
 			Assertions.fail("Error in ontology creation: ", e);
 		}	    			
