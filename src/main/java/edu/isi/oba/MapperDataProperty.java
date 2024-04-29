@@ -60,7 +60,7 @@ class MapperDataProperty {
     Map.entry("Literal", "string")
   );
 
-  private String getDataType(String key){
+  private String getDataType(String key) {
     return this.dataTypes.get(key);
   }
 
@@ -90,34 +90,33 @@ class MapperDataProperty {
     this.valuesFromDataRestrictions_ranges=valuesFromDataRestrictions_ranges;
   }
 
-  public Schema getSchemaByDataProperty(){
+  public Schema getSchemaByDataProperty() {
 	  
     if (this.type.isEmpty()) {
-      return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable).description(description);
-    }
-    else if (this.type.size() > 1) {
-    	return (array) ? composedSchema(this.type, nullable) : new Schema().nullable(nullable).description(description);
+      return (this.array) ? this.arraySchema(new StringSchema()) : this.nonArraySchema(new StringSchema());
+    } else if (this.type.size() > 1) {
+    	return (this.array) ? this.composedSchema() : this.nonArraySchema(new Schema());
     }
 
     String schemaType = getDataType(this.type.get(0));
-    if (schemaType == null){
+    if (schemaType == null) {
       logger.severe("property " + this.name + " type " + this.type);
     }
     
     switch (schemaType) {
       case STRING_TYPE:
-        return (array) ? arraySchema(new StringSchema(), nullable) : new StringSchema().nullable(nullable).description(description);
+        return (this.array) ? this.arraySchema(new StringSchema()) : this.nonArraySchema(new StringSchema());
       case NUMBER_TYPE:
-        return (array) ? arraySchema(new NumberSchema(), nullable) : new NumberSchema().nullable(nullable).description(description);
+        return (this.array) ? this.arraySchema(new NumberSchema()) : this.nonArraySchema(new NumberSchema());
       case INTEGER_TYPE:
-        return (array) ? arraySchema(new IntegerSchema(), nullable) : new IntegerSchema().nullable(nullable).description(description);
+        return (this.array) ? this.arraySchema(new IntegerSchema()) : this.nonArraySchema(new IntegerSchema());
       case BOOLEAN_TYPE:
-        return (array) ? arraySchema(new BooleanSchema(), nullable) : new BooleanSchema().nullable(nullable).description(description);
+        return (this.array) ? this.arraySchema(new BooleanSchema()) : this.nonArraySchema(new BooleanSchema());
       case DATETIME_TYPE:
-          return (array) ? arraySchema(new DateTimeSchema() , nullable) : new DateTimeSchema().nullable(nullable).description(description);
+          return (this.array) ? this.arraySchema(new DateTimeSchema()) : this.nonArraySchema(new DateTimeSchema());
       default:
         logger.warning("datatype mapping failed " + this.type.get(0));
-        return (array) ? arraySchema(new Schema(), nullable) : new Schema().nullable(nullable).description(description);
+        return (this.array) ? this.arraySchema(new Schema()) : this.nonArraySchema(new Schema());
     }
   }
 
@@ -126,18 +125,18 @@ class MapperDataProperty {
    *
    * @return An ArraySchema: including a composedSchema with a list of items for anyOf, allOf restrictions.
    */ 
-  private ArraySchema composedSchema(List<String> base, boolean nullable){
+  private ArraySchema composedSchema() {
 	  ArraySchema array = new ArraySchema();
 	  Schema schema;
 	  ComposedSchema composedSchema = new ComposedSchema();
 	  array.setDescription(description);
-	  array.setNullable(nullable);
+	  array.setNullable(this.nullable);
 
 	  // Operations for managing boolean combinations 
-	  for (String restriction:  restrictions.keySet()) { 
-		  String value = restrictions.get(restriction); 	  
-		  for (String item: base) {		  
-			  switch (getDataType(item)) {
+	  for (String restriction: this.restrictions.keySet()) { 
+		  String value = this.restrictions.get(restriction); 	  
+		  for (String item: this.type) {		  
+			  switch (this.getDataType(item)) {
 			  case STRING_TYPE:
 				  schema = new StringSchema();
 
@@ -181,13 +180,17 @@ class MapperDataProperty {
 			  
 			  switch (restriction) {
 			  case "unionOf":
-				  if (value=="someValuesFrom")
-		        		nullable=false;	
+				  if (value == "someValuesFrom") {
+            this.nullable = false;
+          }
+
 				  composedSchema.addAnyOfItem(schema); 
 				  break;
 			  case "intersectionOf":
-				  if (value=="someValuesFrom")
-		        		nullable=false;	
+				  if (value == "someValuesFrom") {
+            this.nullable = false;	
+          }
+
 				  composedSchema.addAllOfItem(schema);
 				  break;
 			  default:
@@ -197,7 +200,7 @@ class MapperDataProperty {
 	  }
 
 	  array.setItems(composedSchema);
-    array.setNullable(nullable);
+    array.setNullable(this.nullable);
 
 	  if (isFunctional) {
       array.setMaxItems(1);
@@ -206,58 +209,77 @@ class MapperDataProperty {
 	  return array;
   }
 
-  private ArraySchema arraySchema(Schema base, boolean nullable) {
+  private Schema nonArraySchema(Schema base) {
+    base.setDescription(this.description);
+    base.setNullable(this.nullable);
+
+    return this.getSchemaRestrictions(base);
+  }
+
+  private ArraySchema arraySchema(Schema base) {
 	  ArraySchema array = new ArraySchema();
-	  array.setDescription(description);
+	  array.setDescription(this.description);
 
-	  if (isFunctional)
-		  array.setMaxItems(1);
+	  if (this.isFunctional) {
+      array.setMaxItems(1);
+    }
 
-	  for (String restriction:  restrictions.keySet()) { 
-		  String value = restrictions.get(restriction);
-		  switch (restriction) {
-		  case "dataHasValue":      		
-			  base.setDefault(value);
-			  break;
-		  case "maxCardinality":
-			  base.setMaxItems(Integer.parseInt(value));
-			  break ;
-		  case "minCardinality":	
-			  base.setMinItems(Integer.parseInt(value));
-			  break ;
-		  case "exactCardinality":
-			  base.setMaxItems(Integer.parseInt(value));
-			  base.setMinItems(Integer.parseInt(value));
-			  break ;
-		  case "someValuesFrom": 
-			  nullable=false;
-			  break ;
-		  case "allValuesFrom":      	 
-			  //nothing to do
-			  break ; 		   
-		  case "oneOf":   
-			  if (value=="someValuesFrom")
-				  nullable=false;	
-			  for (String rangeValue:valuesFromDataRestrictions_ranges)
-				  base.addEnumItemObject(rangeValue);
-			  break;			 
-		  case "complementOf":  
-			  Schema schema = new Schema();
-			  Schema complementOf = new Schema();
-			  complementOf.setType(getDataType(type.get(0)));
-			  complementOf.setFormat(type.get(0));
-			  schema.setNot(complementOf);
-			  array.setNullable(nullable);
-			  array.setItems(schema);
-			  return array;
-		  default:
-		  } 
-	  } 
+    if (this.restrictions.containsKey("complementOf")) {
+      Schema schema = new Schema();
+      Schema complementOf = new Schema();
+      complementOf.setType(this.getDataType(this.type.get(0)));
+      complementOf.setFormat(this.type.get(0));
+      schema.setNot(complementOf);
+      array.setNullable(this.nullable);
+      array.setItems(schema);
+      return array;
+    }
 
-	  array.setNullable(nullable);
+    base = this.getSchemaRestrictions(base);
+
+	  array.setNullable(this.nullable);
 	  array.setItems(base);
 
 	  return array;
   }
 
+  private Schema getSchemaRestrictions(Schema base) {
+    for (String restriction: this.restrictions.keySet()) { 
+      String value = restrictions.get(restriction);
+      switch (restriction) {
+        case "dataHasValue":
+          base.setDefault(value);
+          break;
+        case "maxCardinality":
+          base.setMaxItems(Integer.parseInt(value));
+          break;
+        case "minCardinality":
+          base.setMinItems(Integer.parseInt(value));
+          break;
+        case "exactCardinality":
+          base.setMaxItems(Integer.parseInt(value));
+          base.setMinItems(Integer.parseInt(value));
+          break;
+        case "someValuesFrom":
+          this.nullable = false;
+          break;
+        case "allValuesFrom":
+          //nothing to do
+          break;
+        case "oneOf":
+          if (value == "someValuesFrom") {
+            this.nullable = false;
+          }
+
+          for (String rangeValue: this.valuesFromDataRestrictions_ranges) {
+            base.addEnumItemObject(rangeValue);
+          }
+
+          break;
+        default:
+      }
+    }
+
+    return base;
+  }
 }
