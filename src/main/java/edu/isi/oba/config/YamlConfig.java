@@ -44,6 +44,14 @@ public class YamlConfig {
     this.configFlags.put(CONFIG_FLAG.PATH_GET, enable_get_paths);
   }
 
+  public Boolean getEnable_patch_paths() {
+    return this.configFlags.get(CONFIG_FLAG.PATH_PATCH);
+  }
+
+  public void setEnable_patch_paths(Boolean enable_patch_paths) {
+    this.configFlags.put(CONFIG_FLAG.PATH_PATCH, enable_patch_paths);
+  }
+
   public Boolean getEnable_post_paths() {
     return this.configFlags.get(CONFIG_FLAG.PATH_POST);
   }
