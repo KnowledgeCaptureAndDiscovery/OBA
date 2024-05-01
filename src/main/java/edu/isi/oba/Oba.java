@@ -4,7 +4,6 @@ import edu.isi.oba.config.*;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import org.json.JSONObject;
-import org.openapitools.codegen.examples.ExampleGenerator;
 
 import java.io.*;
 import java.nio.file.Path;
