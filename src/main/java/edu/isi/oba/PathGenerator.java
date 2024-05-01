@@ -1,62 +1,65 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.CONFIG_FLAG;
+
 import io.swagger.models.Method;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.*;
-import io.swagger.v3.oas.models.parameters.Parameter;
-import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-class Path {
-  public Boolean enable_get_paths;
-  public Boolean enable_post_paths;
-  public Boolean enable_put_paths;
-  public Boolean enable_delete_paths;
+class PathGenerator {
+  private final Map<CONFIG_FLAG, Boolean> configFlags = new HashMap<>();
   private Boolean auth;
 
-  public Path(Boolean enable_get_paths, Boolean enable_post_paths, Boolean enable_put_paths, Boolean enable_delete_paths, Boolean auth) {
+  public PathGenerator(Map<CONFIG_FLAG, Boolean> configFlags, Boolean auth) {
     this.auth = auth;
-    this.enable_get_paths = enable_get_paths;
-    this.enable_post_paths = enable_post_paths;
-    this.enable_put_paths = enable_put_paths;
-    this.enable_delete_paths = enable_delete_paths;
+    this.configFlags.putAll(configFlags);
   }
 
-  public PathItem generate_singular(String schemaName, String schemaURI){
+  public PathItem generate_singular(String schemaName, String schemaURI) {
     PathItem path_item = new PathItem();
-    if (enable_get_paths)
+    if (this.configFlags.get(CONFIG_FLAG.PATH_GET)) {
       path_item.get(new MapperOperation(schemaName, schemaURI, Method.GET, Cardinality.SINGULAR, auth).getOperation());
+    }
 
-    if (enable_delete_paths)
+    if (this.configFlags.get(CONFIG_FLAG.PATH_DELETE)) {
       path_item.delete(new MapperOperation(schemaName, schemaURI, Method.DELETE, Cardinality.SINGULAR, auth).getOperation());
+    }
 
-    if (enable_put_paths)
+    if (this.configFlags.get(CONFIG_FLAG.PATH_POST)) {
+      path_item.put(new MapperOperation(schemaName, schemaURI, Method.POST, Cardinality.SINGULAR, auth).getOperation());
+    }
+
+    if (this.configFlags.get(CONFIG_FLAG.PATH_PUT)) {
       path_item.put(new MapperOperation(schemaName, schemaURI, Method.PUT, Cardinality.SINGULAR, auth).getOperation());
+    }
 
     return path_item;
   }
 
 
-  public PathItem generate_plural(String schemaName, String schemaURI){
+  public PathItem generate_plural(String schemaName, String schemaURI) {
     PathItem path_item = new PathItem();
-    if (enable_get_paths)
+    if (this.configFlags.get(CONFIG_FLAG.PATH_GET)) {
       path_item.get(new MapperOperation(schemaName, schemaURI, Method.GET, Cardinality.PLURAL, auth).getOperation());
-    if (enable_post_paths)
+    }
+
+    if (this.configFlags.get(CONFIG_FLAG.PATH_POST)) {
       path_item.post(new MapperOperation(schemaName,schemaURI, Method.POST, Cardinality.PLURAL, auth).getOperation());
+    }
+
     return path_item;
   }
 
 
-  public PathItem user_login(String schema_name) {
+  public static PathItem user_login(String schema_name) {
     ApiResponses apiResponses = new ApiResponses();
 
     final RequestBody requestBody = new RequestBody();
