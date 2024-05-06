@@ -36,7 +36,7 @@ public class RestrictionsTest {
 		put(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true);
 		put(CONFIG_FLAG.DEFAULT_PROPERTIES, true);
 		put(CONFIG_FLAG.FOLLOW_REFERENCES, true);
-		put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, true);
+		put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, false);
 	}};
 	
 	/**
@@ -245,10 +245,10 @@ public class RestrictionsTest {
 	
 	/**
 	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty,
-	 * when properties may or may not be arrays, depending on cardinality.
+	 * when properties may or may not be arrays, depending on cardinality.  Plus, list of required properties are set to be generated for schemas.
 	 */
 	@Test
-	public void testObjectExactCardinalityWithoutArraysGenerated() throws OWLOntologyCreationException, Exception {
+	public void testObjectExactCardinalityWithRequiredPropertiesAndWithoutArraysGenerated() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
@@ -257,6 +257,7 @@ public class RestrictionsTest {
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 
 			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, false);
+			this.configFlags.put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 
