@@ -1,5 +1,6 @@
 package edu.isi.oba;
 
+import edu.isi.oba.config.CONFIG_FLAG;
 import static edu.isi.oba.Oba.logger;
 
 import io.swagger.v3.oas.models.examples.Example;
@@ -35,9 +36,8 @@ class MapperSchema {
     private OWLOntology ontology_cls;
     private OWLReasonerFactory reasonerFactory;
     public List<OWLClass> properties_range;
-    private boolean follow_references;
-	private Boolean default_descriptions;
-	private Boolean default_properties;
+
+	private final Map<CONFIG_FLAG, Boolean> configFlags = new HashMap<>();
 
     public List<OWLObjectProperty> propertiesFromObjectRestrictions;
     public Map<String, List<String>> propertiesFromObjectRestrictions_ranges;
@@ -62,11 +62,9 @@ class MapperSchema {
         return this.schema;
     }
 
-    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, String clsDescription, Map<IRI, String> schemaNames, OWLOntology class_ontology, Boolean follow_references, Boolean default_descriptions, Boolean default_properties) {
+    public MapperSchema(List<OWLOntology> ontologies, OWLClass cls, String clsDescription, Map<IRI, String> schemaNames, OWLOntology class_ontology, Map<CONFIG_FLAG, Boolean> configFlags) {
         this.schemaNames = schemaNames;
-        this.follow_references = follow_references;
-		this.default_descriptions = default_descriptions;
-		this.default_properties = default_properties;
+		this.configFlags.putAll(configFlags);
         this.cls = cls;
         this.cls_description = clsDescription;
         this.type = "object";
@@ -230,7 +228,7 @@ class MapperSchema {
     					}
 
 						List<String> propertyRanges = getCodeGenTypesByRangeData(ranges, odp);
-    					String propertyDescription = ObaUtils.getDescription(odp, this.ontology_cls, this.default_descriptions);
+    					String propertyDescription = ObaUtils.getDescription(odp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
     					MapperDataProperty mapperProperty = new MapperDataProperty(propertyName, propertyDescription, isFunctional, restrictionValues, valuesFromDataRestrictions_ranges, propertyRanges, array, nullable);
     					try {
     						this.properties.put(mapperProperty.name, mapperProperty.getSchemaByDataProperty());
@@ -242,7 +240,7 @@ class MapperSchema {
     		}
     	}
 
-		if (this.default_properties) {
+		if (this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS)) {
 			properties.putAll(this.getDefaultProperties());
 		}
     	
@@ -338,7 +336,7 @@ class MapperSchema {
 
         				String propertyURI = odp.getIRI().toString();
         				propertyNameURI.put(propertyURI, propertyName);
-        				List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing, this.follow_references);
+        				List<String> propertyRanges = getCodeGenTypesByRangeObject(ranges, odp, owlThing);
 
         				Map<String,String> restrictionValues = new HashMap<String, String>() ;
         				for (OWLOntology ontology: this.ontologies) {
@@ -358,7 +356,7 @@ class MapperSchema {
 							}
         				}
 
-        				String propertyDescription = ObaUtils.getDescription(odp, this.ontology_cls, this.default_descriptions);
+        				String propertyDescription = ObaUtils.getDescription(odp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
         				MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, isFunctional, restrictionValues, propertyRanges);
         				try {
         					this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
@@ -398,10 +396,9 @@ class MapperSchema {
      * @param ranges Represents a ObjectPropertyRange
      * @param odp  Represents a OWLObjectProperty
      * @param owlThing
-     * @param follow_references
      * @return A list<String> with the properties
      */
-    private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp, OWLClass owlThing, boolean follow_references) {
+    private List<String> getCodeGenTypesByRangeObject(Set<OWLObjectPropertyRangeAxiom> ranges, OWLObjectProperty odp, OWLClass owlThing) {
         List<String> objectProperty = new ArrayList<>();
 
         for (OWLObjectPropertyRangeAxiom propertyRangeAxiom : ranges) {
@@ -412,9 +409,8 @@ class MapperSchema {
     						logger.info("Ignoring owl:Thing" + odp);
     					} else {
     						this.properties_range.add(rangeClass.asOWLClass());
-    						if (follow_references) {
-								objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
-							}
+    						if (this.configFlags.get(CONFIG_FLAG.FOLLOW_REFERENCES))
+        						objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
     					}
     				}
     			}
@@ -469,7 +465,7 @@ class MapperSchema {
 				} else {
 					for (OWLObjectProperty op: this.propertiesFromObjectRestrictions) {
 						MapperObjectProperty mapperObjectProperty;
-						String propertyDescription = ObaUtils.getDescription(op, this.ontology_cls, this.default_descriptions);
+						String propertyDescription = ObaUtils.getDescription(op, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
 						if (!this.propertiesFromObjectRestrictions_ranges.isEmpty()) {
 							List<String> rangesOP = this.propertiesFromObjectRestrictions_ranges.get(this.sfp.getShortForm(op.getIRI()));
 							for (String j : restrictionsValuesFromClass.keySet()) {
@@ -536,7 +532,7 @@ class MapperSchema {
 
 					for (OWLDataProperty dp: this.propertiesFromDataRestrictions) {
 						List<String> valuesFromDataRestrictions_ranges = new ArrayList<>();
-						String propertyDescription = ObaUtils.getDescription(dp, this.ontology_cls, this.default_descriptions);
+						String propertyDescription = ObaUtils.getDescription(dp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
 						if (!this.propertiesFromDataRestrictions_ranges.isEmpty()) {
 							List<String> rangesDP = this.propertiesFromDataRestrictions_ranges.get(this.sfp.getShortForm(dp.getIRI()));
 							for (String j: restrictionsValuesFromClass.keySet()) {
@@ -601,7 +597,7 @@ class MapperSchema {
 			this.properties = setProperties();
     	}
     	
-		if (this.default_properties) {
+		if (this.configFlags.get(CONFIG_FLAG.DEFAULT_PROPERTIES)) {
 			this.properties.putAll(this.getDefaultProperties());
 		}
     }
