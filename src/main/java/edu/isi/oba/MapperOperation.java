@@ -180,7 +180,7 @@ class MapperOperation {
   }
 
   private void setOperationPut() {
-    String requestDescription = "An old " + this.schemaName + "to be updated";
+    String requestDescription = "An old " + this.schemaName + " to be updated";
 
     summary = "Update an existing " + this.schemaName;
     description = "Updates an existing " + this.schemaName +
