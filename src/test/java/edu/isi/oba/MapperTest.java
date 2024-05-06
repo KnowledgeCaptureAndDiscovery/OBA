@@ -2,6 +2,7 @@ package edu.isi.oba;
 
 import static edu.isi.oba.ObaUtils.get_yaml_data;
 import edu.isi.oba.config.AuthConfig;
+import edu.isi.oba.config.CONFIG_FLAG;
 import edu.isi.oba.config.YamlConfig;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -18,7 +20,6 @@ import java.util.logging.Logger;
 import io.swagger.v3.oas.models.media.Schema;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.semanticweb.owlapi.model.OWLClass;
@@ -113,7 +114,7 @@ public class MapperTest {
         Mapper mapper = new Mapper(config_data);
         OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://businessontology.com/ontology/Person");
         String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), true, true, true);
+        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), Map.ofEntries(Map.entry(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true), Map.entry(CONFIG_FLAG.DEFAULT_PROPERTIES, true), Map.entry(CONFIG_FLAG.FOLLOW_REFERENCES, true)));
         Schema schema = mapperSchema.getSchema();
         // The person schema must not be null.
         Assertions.assertNotNull(schema);

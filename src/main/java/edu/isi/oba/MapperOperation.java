@@ -2,7 +2,6 @@ package edu.isi.oba;
 
 import io.swagger.models.Method;
 import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -30,13 +29,11 @@ class MapperOperation {
   private final ApiResponses apiResponses = new ApiResponses();
   private final Cardinality cardinality;
   private final Schema schema;
+  private final Operation operation;
 
   public Operation getOperation() {
     return operation;
   }
-
-  private final Operation operation;
-
 
   public MapperOperation(String schemaName, String schemaURI, Method method, Cardinality cardinality, Boolean auth) {
     this.auth = auth;
@@ -50,6 +47,9 @@ class MapperOperation {
       case GET:
         setOperationGet();
         break;
+      case PATCH:
+        setOperationPatch();
+        break;
       case PUT:
         setOperationPut();
         break;
@@ -59,7 +59,8 @@ class MapperOperation {
       case DELETE:
         setOperationDelete();
         break;
-
+      default:
+        break;
     }
 
     if (cardinality == Cardinality.SINGULAR){
@@ -70,13 +71,14 @@ class MapperOperation {
               .schema(new StringSchema()));
     }
 
-    if (auth && (method == Method.PUT || method == Method.POST  || method == Method.DELETE )) {
+    if (auth && Set.of(Method.PATCH, Method.PUT, Method.POST, Method.DELETE).contains(method)) {
       parameters.add(new QueryParameter()
               .description("Username")
               .name("user")
               .required(false)
               .schema(new StringSchema()));
     }
+
     operation = new Operation()
           .description(description)
           .summary(summary)
@@ -84,18 +86,15 @@ class MapperOperation {
           .parameters(parameters)
           .responses(apiResponses);
 
-
-    if (method == Method.PUT || method == Method.POST ){
+    if (Set.of(Method.PATCH, Method.PUT, Method.POST).contains(method)) {
       operation.setRequestBody(requestBody);
     }
 
-
-    if (method == Method.PUT || method == Method.POST  || method == Method.DELETE ){
+    if (Set.of(Method.PATCH, Method.PUT, Method.POST, Method.DELETE).contains(method)) {
       SecurityRequirement securityRequirement = new SecurityRequirement();
       securityRequirement.addList("BearerAuth");
       operation.addSecurityItem(securityRequirement);
     }
-
   }
 
   private void setOperationGet() {
@@ -113,7 +112,7 @@ class MapperOperation {
       case PLURAL:
         summary = "List all instances of " + this.schemaName;
         description = "Gets a list of all instances of " + this.schemaName +
-                " (more information in " +this.schemaURI+")";
+                " (more information in " + this.schemaURI + ")";
         responseDescriptionOk = "Successful response - returns an array with the instances of " + schemaName + ".";
 
         //Set response
@@ -140,9 +139,9 @@ class MapperOperation {
                 .schema(new IntegerSchema()._default(100).maximum(BigDecimal.valueOf(200)).minimum(BigDecimal.valueOf(1))));
         break;
       case SINGULAR:
-        summary = "Get a single " + this.schemaName +" by its id";
-        description = "Gets the details of a given " + this.schemaName+
-                " (more information in " +this.schemaURI+")";
+        summary = "Get a single " + this.schemaName + " by its id";
+        description = "Gets the details of a given " + this.schemaName +
+                " (more information in " + this.schemaURI + ")";
         responseDescriptionOk = "Gets the details of a given " + schemaName;
 
         //Set request
@@ -153,7 +152,10 @@ class MapperOperation {
         break;
 
     }
+  }
 
+  private void setOperationPatch() {
+    // TODO: implement
   }
 
   private void setOperationPost() {
@@ -177,13 +179,12 @@ class MapperOperation {
     );
   }
 
-
   private void setOperationPut() {
     String requestDescription = "An old " + this.schemaName + "to be updated";
 
     summary = "Update an existing " + this.schemaName;
-    description = "Updates an existing " + this.schemaName+
-                " (more information in " +this.schemaURI+")";
+    description = "Updates an existing " + this.schemaName +
+                " (more information in " + this.schemaURI + ")";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
@@ -199,14 +200,12 @@ class MapperOperation {
             )
             .addApiResponse("404", new ApiResponse()
                     .description("Not Found"));
-
   }
-
 
   private void setOperationDelete() {
     summary = "Delete an existing " + this.schemaName;
-    description = "Delete an existing " + this.schemaName+
-                " (more information in " +this.schemaURI+")";
+    description = "Delete an existing " + this.schemaName +
+                " (more information in " + this.schemaURI + ")";
 
     //Set the response
     apiResponses
@@ -214,7 +213,5 @@ class MapperOperation {
                     .description("Deleted"))
             .addApiResponse("404", new ApiResponse()
                     .description("Not Found"));
-
   }
-
 }
