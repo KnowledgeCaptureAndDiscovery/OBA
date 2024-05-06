@@ -7,6 +7,7 @@ import edu.isi.oba.config.YamlConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -30,10 +31,13 @@ public class RestrictionsTest {
 	static Logger logger = null;
 
 	// Convenience variable so we don't need to retype this for each MapperSchema constructor.
-	private final Map<CONFIG_FLAG, Boolean> configFlags = Map.ofEntries(
-		Map.entry(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true),
-		Map.entry(CONFIG_FLAG.DEFAULT_PROPERTIES, true),
-		Map.entry(CONFIG_FLAG.FOLLOW_REFERENCES, true));
+	private Map<CONFIG_FLAG, Boolean> configFlags = new HashMap<>(){{
+		put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, true);
+		put(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true);
+		put(CONFIG_FLAG.DEFAULT_PROPERTIES, true);
+		put(CONFIG_FLAG.FOLLOW_REFERENCES, true);
+		put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, true);
+	}};
 	
 	/**
 	 * This method allows you to configure the logger variable that is required to print several 
@@ -204,22 +208,59 @@ public class RestrictionsTest {
 		}	
 
 	}
-	
+
 	/**
-	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty.
+	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty,
+	 * when arrays are set to always be generated for properties.
 	 */
 	@Test
-	public void testObjectExactCardinality() throws OWLOntologyCreationException, Exception {
+	public void testObjectExactCardinalityWithArraysGenerated() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+
+			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			Schema schema = mapperSchema.getSchema();	  	       
+			Object property= schema.getProperties().get("hasRecord");		        
+			if (property instanceof ArraySchema) {					
+				Integer maxItems = ((ArraySchema) property).getMaxItems();
+				Integer minItems = ((ArraySchema) property).getMinItems();
+				if (maxItems != null && minItems != null) {
+					if (maxItems == minItems)
+						// "Exact cardinality configured" -- does this really need to be output for the test?
+						return;
+					else
+						Assertions.fail("Error in exact cardinality restriction.");
+				} else
+					Assertions.fail("Null values in exact cardinality restriction.");								
+			} 			
+		} catch (OWLOntologyCreationException e) {			
+			Assertions.fail("Error in ontology creation: ", e);
+		}	  
+	}
+	
+	/**
+	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty,
+	 * when properties may or may not be arrays, depending on cardinality.
+	 */
+	@Test
+	public void testObjectExactCardinalityWithoutArraysGenerated() throws OWLOntologyCreationException, Exception {
+		try {
+			this.initializeLogger();
+			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
+			Mapper mapper = new Mapper(config_data);
+			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+
+			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, false);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 
-			boolean isRequired = schema.getRequired().contains("hasRecord");
+			boolean isRequired = schema.getRequired() != null && schema.getRequired().contains("hasRecord");
 
 			// For exact cardinality, the class schema should have it marked as required.
 			if (isRequired) {

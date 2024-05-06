@@ -110,7 +110,10 @@ class MapperSchema {
 			schema.setType(this.type);
 			schema.setProperties(this.getProperties());
 
-			schema.setRequired(this.required_properties);
+			if (this.configFlags.containsKey(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY) 
+				&& this.configFlags.get(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY)) {
+				schema.setRequired(this.required_properties);
+			}
 
 			HashMap<String, String> exampleMap = new HashMap<>();
 			exampleMap.put("id", "some_id");
@@ -505,8 +508,11 @@ class MapperSchema {
 										// If cardinality is exactly 1, then we can remove the min/max property constraints
 										// and set the property to be required for the class.
 										if (exactCardinality == 1 || (minCardinality == 1 && maxCardinality == 1)) {
-											opSchema.setMinItems(null);
-											opSchema.setMaxItems(null);
+											if (!this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) || !this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
+												opSchema.setMinItems(null);
+												opSchema.setMaxItems(null);
+											}
+											
 											is_required = true;
 										}
 
@@ -554,6 +560,9 @@ class MapperSchema {
 									boolean isArray = exactCardinality > 1
 														|| minCardinality > 0
 														|| maxCardinality > 1;
+									
+									// If config flag to generate arrays is set, use it to override current setting.
+									isArray |= (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)); 
 									
 									// If cardinality is exactly 1 OR a minimum of 1, then not nullable.
 									boolean isNullable = (exactCardinality == -1 && minCardinality == -1) ? true : exactCardinality != 1 && minCardinality < 1;
