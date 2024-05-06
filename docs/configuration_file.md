@@ -57,6 +57,12 @@ default_descriptions: true
 
 ## Enable/disable generation of default properties (description, id, label, and type) for each schema
 default_properties: true
+
+## Enable/disable generation of arrays for property type(s) all the time, regardless of cardinality / restrictions
+always_generate_arrays: true
+
+## Enable/disable generation of list of required properties for a schema, if the the cardinality indicates it is required (e.g. exactly 1)
+required_properties_from_cardinality: false
 ```
 
 ## Supported settings
@@ -301,6 +307,38 @@ For more information, go to [filtering classes](filtering.md#default_properties)
 
 ```yaml
 default_properties: false
+```
+
+### always_generate_arrays
+
+Enable/disable generation of arrays for property type(s) all the time, regardless of cardinality / restrictions.
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `True`    |
+
+For more information, go to [filtering classes](filtering.md#always_generate_arrays)
+
+```yaml
+always_generate_arrays: true
+```
+
+### required_properties_from_cardinality
+
+Enable/disable generation of list of required properties for a schema, if the the cardinality indicates it is required (e.g. exactly 1).
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `False`   |
+
+For more information, go to [filtering classes](filtering.md#required_properties_from_cardinality)
+
+```yaml
+required_properties_from_cardinality: true
 ```
 
 ## auth
