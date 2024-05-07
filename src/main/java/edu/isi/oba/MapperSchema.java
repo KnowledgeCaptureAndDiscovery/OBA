@@ -192,15 +192,10 @@ class MapperSchema {
     				}
 
     				if (inspect) {
-    					Boolean isFunctional = false;
+						boolean isFunctional = EntitySearcher.isFunctional(odp, this.ontologies.stream());
+
     					for (OWLOntology ontology: this.ontologies) {
     						ranges.addAll(ontology.getDataPropertyRangeAxioms(odp));
-    						functional = ontology.getAxioms(AxiomType.FUNCTIONAL_DATA_PROPERTY);
-    						for (OWLFunctionalDataPropertyAxiom functionalAxiom:functional) {
-    							if (functionalAxiom.getProperty().equals(odp)) {
-									isFunctional = true;
-								}
-    						}
     					}
 
     					if (ranges.isEmpty()) {
@@ -321,17 +316,11 @@ class MapperSchema {
         			}
 
         			if (inspect) {
-        				Boolean isFunctional = false;
+						boolean isFunctional = EntitySearcher.isFunctional(odp, this.ontologies.stream());
+
         				Set<OWLObjectPropertyRangeAxiom> ranges = new HashSet<>();
         				for (OWLOntology ontology: this.ontologies) {
         					ranges.addAll(ontology.getObjectPropertyRangeAxioms(odp));
-
-        					functional = ontology.getAxioms(AxiomType.FUNCTIONAL_OBJECT_PROPERTY);
-        					for (OWLFunctionalObjectPropertyAxiom functionalAxiom:functional) {
-        						if (functionalAxiom.getProperty().equals(odp)) {
-        							isFunctional = true;
-        						}
-        					}
         				}
 
         				if (ranges.isEmpty()) {
