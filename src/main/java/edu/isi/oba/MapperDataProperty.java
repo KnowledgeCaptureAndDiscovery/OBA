@@ -237,6 +237,20 @@ class MapperDataProperty {
 
     base = this.getSchemaRestrictions(base);
 
+    // Can this be done in a better way?
+    Integer minItemsInteger = base.getMinItems();
+    if (minItemsInteger != null) {
+      base.setMinItems(null);
+      array.setMinItems(minItemsInteger);
+    }
+
+    // Can this be done in a better way?
+    Integer maxItemsInteger = base.getMaxItems();
+    if (maxItemsInteger != null) {
+      base.setMaxItems(null);
+      array.setMaxItems(maxItemsInteger);
+    }
+
 	  array.setNullable(this.nullable);
 	  array.setItems(base);
 
