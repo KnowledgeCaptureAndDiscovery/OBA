@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.IRIShortFormProvider;
 import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
@@ -73,9 +74,9 @@ class MapperSchema {
         this.reasonerFactory = new StructuralReasonerFactory();
         this.reasoner = reasonerFactory.createReasoner(this.ontology_cls);
         this.properties_range = new ArrayList<>();
-        this.propertiesFromObjectRestrictions_ranges= new HashMap<>();
+        this.propertiesFromObjectRestrictions_ranges = new HashMap<>();
         this.propertiesFromObjectRestrictions = new ArrayList<>();
-        this.propertiesFromDataRestrictions_ranges= new HashMap<>();
+        this.propertiesFromDataRestrictions_ranges = new HashMap<>();
         this.propertiesFromDataRestrictions = new ArrayList<>();
         this.properties = new HashMap<>();
 		this.required_properties = new ArrayList<>();
@@ -186,7 +187,7 @@ class MapperSchema {
     				// the property will be inspected.
     				if (!propertiesFromDataRestrictions.isEmpty()) {
     					if (propertiesFromDataRestrictions.contains(odp)) {           				
-    						inspect=false;
+    						inspect = false;
     					}    
     				}
 
@@ -360,6 +361,7 @@ class MapperSchema {
         				}
 
         				String propertyDescription = ObaUtils.getDescription(odp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
+
         				MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, isFunctional, restrictionValues, propertyRanges);
         				try {
         					this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
@@ -467,6 +469,8 @@ class MapperSchema {
 					}
 				} else {
 					for (OWLObjectProperty op: this.propertiesFromObjectRestrictions) {
+						boolean isFunctional = EntitySearcher.isFunctional(op, this.ontologies.stream());
+
 						MapperObjectProperty mapperObjectProperty;
 						String propertyDescription = ObaUtils.getDescription(op, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
 						if (!this.propertiesFromObjectRestrictions_ranges.isEmpty()) {
@@ -479,7 +483,7 @@ class MapperSchema {
 									int maxCardinality = -1;
 
 									if (rangesOP != null && rangesOP.get(0).equals("defaultValue")) {
-										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, false, restrictionValues, rangesOP, false, true);
+										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, isFunctional, restrictionValues, rangesOP, false, true);
 									} else {
 										String exactCardinalityStr = restrictionValues.get("exactCardinality");
 										exactCardinalityStr = ((exactCardinalityStr == null || exactCardinalityStr.isBlank()) ? "-1" : exactCardinalityStr);
@@ -493,11 +497,20 @@ class MapperSchema {
 										maxCardinalityStr = ((maxCardinalityStr == null || maxCardinalityStr.isBlank()) ? "-1" : maxCardinalityStr);
 										maxCardinality = Integer.parseInt(maxCardinalityStr);
 
+										// If cardinality is present and allows for multiple values and it is not functional,
+										// then this is an array.
+										boolean isArray = !isFunctional
+															&& (exactCardinality > 1
+															|| minCardinality > 1
+															|| maxCardinality > 1);
+										
+										// If config flag to generate arrays is set, use it to override current setting.
+										isArray |= (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS));
+
 										// If cardinality is exactly 1 OR a minimum of 1, then not nullable.
 										boolean isNullable = (exactCardinality == -1 && minCardinality == -1) ? true : exactCardinality != 1 && minCardinality < 1;
 
-										// References always need to be included as an array of items.
-										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, false, restrictionValues, rangesOP, true, isNullable);
+										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, isFunctional, restrictionValues, rangesOP, isArray, isNullable);
 									}
 									
 									try {
@@ -508,7 +521,7 @@ class MapperSchema {
 										// If cardinality is exactly 1, then we can remove the min/max property constraints
 										// and set the property to be required for the class.
 										if (exactCardinality == 1 || (minCardinality == 1 && maxCardinality == 1)) {
-											if (!this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) || !this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
+											if (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && !this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
 												opSchema.setMinItems(null);
 												opSchema.setMaxItems(null);
 											}
@@ -521,7 +534,6 @@ class MapperSchema {
 										if (minCardinality > 0) {
 											is_required = true;
 										}
-
 
 										if (is_required) {
 											this.required_properties.add(mapperObjectProperty.name);
@@ -537,6 +549,8 @@ class MapperSchema {
 					}
 
 					for (OWLDataProperty dp: this.propertiesFromDataRestrictions) {
+						boolean isFunctional = EntitySearcher.isFunctional(dp, this.ontologies.stream());
+
 						List<String> valuesFromDataRestrictions_ranges = new ArrayList<>();
 						String propertyDescription = ObaUtils.getDescription(dp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
 						if (!this.propertiesFromDataRestrictions_ranges.isEmpty()) {
@@ -556,18 +570,20 @@ class MapperSchema {
 									maxCardinalityStr = ((maxCardinalityStr == null || maxCardinalityStr.isBlank()) ? "-1" : maxCardinalityStr);
 									int maxCardinality = Integer.parseInt(maxCardinalityStr);
 
-									// If cardinality is present and allows for multiple values, then this is an array.
-									boolean isArray = exactCardinality > 1
-														|| minCardinality > 0
-														|| maxCardinality > 1;
+									// If cardinality is present and allows for multiple values and it is not functional,
+									// then this is an array.
+									boolean isArray = !isFunctional
+														&& (exactCardinality > 1
+														|| minCardinality > 1
+														|| maxCardinality > 1);
 									
 									// If config flag to generate arrays is set, use it to override current setting.
-									isArray |= (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)); 
+									isArray |= (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS));
 									
 									// If cardinality is exactly 1 OR a minimum of 1, then not nullable.
 									boolean isNullable = (exactCardinality == -1 && minCardinality == -1) ? true : exactCardinality != 1 && minCardinality < 1;
 
-									MapperDataProperty mapperDataProperty = new MapperDataProperty(this.sfp.getShortForm(dp.getIRI()), propertyDescription, false, restrictionValues, valuesFromDataRestrictions_ranges, rangesDP, isArray, isNullable);
+									MapperDataProperty mapperDataProperty = new MapperDataProperty(this.sfp.getShortForm(dp.getIRI()), propertyDescription, isFunctional, restrictionValues, valuesFromDataRestrictions_ranges, rangesDP, isArray, isNullable);
 									try {
 										Schema dpSchema = mapperDataProperty.getSchemaByDataProperty();
 
@@ -576,8 +592,11 @@ class MapperSchema {
 										// If cardinality is exactly 1, then we can remove the min/max property constraints
 										// and set the property to be required for the class.
 										if (exactCardinality == 1 || (minCardinality == 1 && maxCardinality == 1)) {
-											dpSchema.setMinItems(null);
-											dpSchema.setMaxItems(null);
+											if (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && !this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
+												dpSchema.setMinItems(null);
+												dpSchema.setMaxItems(null);
+											}
+
 											is_required = true;
 										}
 
@@ -586,7 +605,6 @@ class MapperSchema {
 										if (minCardinality > 0) {
 											is_required = true;
 										}
-
 
 										if (is_required) {
 											this.required_properties.add(mapperDataProperty.name);
