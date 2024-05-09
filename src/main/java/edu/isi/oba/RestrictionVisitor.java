@@ -80,7 +80,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 
 	@Override
 	public void visit( OWLEquivalentClassesAxiom ce ) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 
 		// If equivalent class axiom AND contains owl:oneOf, then we're looking at an ENUM class.
 		ce.classExpressions().filter((e) -> e instanceof OWLObjectOneOf).forEach((oneOfObj) -> {
@@ -143,9 +143,9 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	 */
 	@Override
 	public void visit(OWLObjectAllValuesFrom ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		Map<String, String> restrictionsValues = new HashMap<>();
-		for (OWLObjectProperty property:ce.getObjectPropertiesInSignature()) {
+		for (OWLObjectProperty property: ce.getObjectPropertiesInSignature()) {
 			propertiesFromObjectRestrictions.add(property);
 			property_name = sfp.getShortForm(property.getIRI());
 		}
@@ -168,45 +168,45 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 		
 	@Override
 	public void visit(OWLObjectUnionOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		
 		// Loop through each item in the union and accept visits.
-		for (OWLClassExpression e : ce.getOperands()) {
+		for (OWLClassExpression e: ce.getOperands()) {
 			e.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(OWLObjectIntersectionOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		
 		// Loop through each item in the intersection and accept visits.
-		for (OWLClassExpression e : ce.getOperands()) {
+		for (OWLClassExpression e: ce.getOperands()) {
 			e.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(OWLObjectMinCardinality ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		setPropertiesWithCardinality(ce, "minCardinality");
 	}
 
 	@Override
 	public void visit(OWLObjectMaxCardinality ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		setPropertiesWithCardinality(ce,"maxCardinality");
 	}
 
 	@Override
 	public void visit(OWLObjectExactCardinality ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		setPropertiesWithCardinality(ce, "exactCardinality");
 	}
 	
 	@Override
 	public void visit(OWLObjectComplementOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
 		String complementName = this.sfp.getShortForm(ce.getOperand().asOWLClass().getIRI());
 		restrictionsValues.put("complementOf", complementName );
@@ -267,9 +267,9 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	 */
 	@Override
 	public void visit(OWLDataAllValuesFrom ce) {
-		logger.info( "\n Analyzed Class: " + this.cls+ " with axiom: "+ce);
+		logger.info( "\n Analyzed Class: " + this.cls + " with axiom: " + ce);
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for (OWLDataProperty property:ce.getDataPropertiesInSignature()) {
+		for (OWLDataProperty property: ce.getDataPropertiesInSignature()) {
 			propertiesFromDataRestrictions.add(property);
 			property_name = sfp.getShortForm(property.getIRI());
 		}
@@ -325,39 +325,39 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 
 	@Override
 	public void visit(OWLDataUnionOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		
 		// Loop through each item in the union and accept visits.
-		for (OWLDataRange e : ce.getOperands()) {
+		for (OWLDataRange e: ce.getOperands()) {
 			e.accept(this);
 		}
 	}
 	
 	@Override
 	public void visit(OWLDataIntersectionOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 
 		// Loop through each item in the intersection and accept visits.
-		for (OWLDataRange e : ce.getOperands()) {
+		for (OWLDataRange e: ce.getOperands()) {
 			e.accept(this);
 		}
 	}
 	
 	@Override
 	public void visit(OWLDataMinCardinality ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		setDataPropertiesWithCardinality(ce,"minCardinality");
 	}
 	
 	@Override
 	public void visit(OWLDataMaxCardinality ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		setDataPropertiesWithCardinality(ce,"maxCardinality");
 	}
 	
 	@Override
 	public void visit(OWLDataExactCardinality ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		setDataPropertiesWithCardinality(ce,"exactCardinality");
 	}
 	
@@ -416,7 +416,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 		String property_name = "";
 		List<String> ranges = new ArrayList<String>();
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for (OWLObjectProperty property:ce.getObjectPropertiesInSignature()) {
+		for (OWLObjectProperty property: ce.getObjectPropertiesInSignature()) {
 			propertiesFromObjectRestrictions.add(property);
 			property_name = sfp.getShortForm(property.getIRI());
 			ranges.add(sfp.getShortForm(ce.getFiller().asOWLClass().getIRI()));
@@ -439,7 +439,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
 		//if the expression ce is not part of a composed expression (existential or universal)
 		if (property_name.isEmpty()) {
-			for (OWLObjectProperty property:properties) {
+			for (OWLObjectProperty property: properties) {
 				propertiesFromObjectRestrictions.add(property);
 				property_name = sfp.getShortForm(property.getIRI());
 				restrictionsValues.put(restriction, "");
@@ -447,7 +447,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 			}
 		} else {
 			List<String> rangeList = new ArrayList<String>();
-			for (OWLClassExpression range:ranges) {
+			for (OWLClassExpression range: ranges) {
 				rangeList.add(sfp.getShortForm(range.asOWLClass().getIRI()));
 				if (range.asOWLClass().equals(owlThing)) {
 					logger.info("Ignoring owl:Thing range" + property_name);
@@ -460,7 +460,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 				for (String j: restrictionsValuesFromClass.keySet()) {
 					if (j.equals(property_name)) {
 						Map<String,String> value = restrictionsValuesFromClass.get(property_name);
-						for (String i : value.keySet() ) {
+						for (String i: value.keySet() ) {
 							restrictionsValues.put(restriction, i);
 						}
 
@@ -484,7 +484,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
 		//if the expression ce is not part of a composed expression (existential or universal)
 		if (property_name.equals("")) {
-			for (OWLDataProperty property:properties) {
+			for (OWLDataProperty property: properties) {
 				propertiesFromDataRestrictions.add(property);
 				property_name = sfp.getShortForm(property.getIRI());
 				restrictionsValues.put(restriction, "");
@@ -492,7 +492,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 			}
 		} else {
 			List<String> rangeList = new ArrayList<String>();
-			for (OWLDataRange range:ranges) {
+			for (OWLDataRange range: ranges) {
 				rangeList.add(sfp.getShortForm(range.asOWLDatatype().getIRI()));
 				if (range.getClass().equals(owlThing)) {
 					logger.info("Ignoring owl: Thing range" + property_name);
@@ -505,7 +505,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 				for (String j: restrictionsValuesFromClass.keySet()) {
 					if (j.equals(property_name)) {
 						Map<String,String> value = restrictionsValuesFromClass.get(property_name);
-						for (String i : value.keySet()) {
+						for (String i: value.keySet()) {
 							restrictionsValues.put(restriction, i);
 						}
 
@@ -524,7 +524,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 		String property_name = "";
 		List<String> ranges = new ArrayList<>();
 		Map<String, String> restrictionsValues = new HashMap<>();
-		for (OWLDataProperty property:ce.getDataPropertiesInSignature()) {
+		for (OWLDataProperty property: ce.getDataPropertiesInSignature()) {
 			propertiesFromDataRestrictions.add(property);
 			property_name = sfp.getShortForm(property.getIRI());
 
