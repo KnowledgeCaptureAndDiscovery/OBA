@@ -17,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.jibx.schema.codegen.extend.DefaultNameConverter;
+import org.jibx.schema.codegen.extend.NameConverter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.model.*;
@@ -249,13 +251,18 @@ class Mapper {
     }
 
     private void add_path(PathGenerator pathGenerator, MapperSchema mapperSchema) {
-        String singular_name = "/" + mapperSchema.name.toLowerCase() + "s/{id}";
-        String plural_name = "/" + mapperSchema.name.toLowerCase() + "s";
+        // Pluralizing currently only works for English.  Non-English words will be treated as though they are English.
+        // TODO: Java support for singularization/pluralization and locale/international support supoort for the process does not have many good options that we could find so far.
+        // TODO: If such an option exists or becomes available, this should be updated to support pluralization in other languages.
+        // TODO: The language/locale would need to be set as a configuration value and passed into this class somehow.
+        NameConverter nameTools = new DefaultNameConverter();
+        String plural_name = "/" + nameTools.pluralize(mapperSchema.name.toLowerCase());
+
         //Create the plural paths: for example: /models/
         this.paths.addPathItem(plural_name, pathGenerator.generate_plural(mapperSchema.name,
                 mapperSchema.getCls().getIRI().getIRIString()));
         //Create the plural paths: for example: /models/id
-        this.paths.addPathItem(singular_name, pathGenerator.generate_singular(mapperSchema.name,
+        this.paths.addPathItem(plural_name + "/{id}", pathGenerator.generate_singular(mapperSchema.name,
                 mapperSchema.getCls().getIRI().getIRIString()));
     }
 
