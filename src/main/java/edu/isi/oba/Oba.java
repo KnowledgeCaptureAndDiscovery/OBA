@@ -1,9 +1,9 @@
 package edu.isi.oba;
 
 import edu.isi.oba.config.*;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -13,6 +13,8 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
+import org.json.JSONObject;
 
 class Oba {
   public static final String SERVERS_ZIP = "/servers.zip";

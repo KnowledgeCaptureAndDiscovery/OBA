@@ -25,7 +25,7 @@ class MapperObjectProperty {
     this.ref = ref;
     this.array = true;
     this.nullable = true;
-    this.isFunctional=isFunctional;
+    this.isFunctional = isFunctional;
     this.restrictions = restrictions;
   }
 
@@ -35,7 +35,7 @@ class MapperObjectProperty {
     this.ref = ref;
     this.array = array;
     this.nullable = nullable;
-    this.isFunctional=isFunctional;
+    this.isFunctional = isFunctional;
     this.restrictions = restrictions;
   }
 
@@ -51,24 +51,52 @@ class MapperObjectProperty {
     }
   }
 
-  private Schema getObjectPropertiesByRef(String ref, boolean array, boolean nullable) {
-    Schema object = new ObjectSchema();
-    object.setDescription(this.description);
-
-    if (array) {
+  private Schema getObjectPropertiesByRef(String ref, boolean isArray, boolean isNullable) {
+    if (this.restrictions.isEmpty()) {
+      Schema object = new ObjectSchema();
       object.set$ref(ref);
-      ArraySchema objects = new ArraySchema();
-      objects.setDescription(this.description);
 
-      if (this.isFunctional) {
+      if (isArray) {
+        ArraySchema objects = new ArraySchema();
+        objects.setDescription(this.description);
+        objects.setNullable(isNullable);
+        objects.setItems(object);
+
+        if (this.isFunctional) {
           objects.setMaxItems(1);
+        }
+
+        return objects;
+      } else {
+        object.setDescription(this.description);
+        object.setNullable(isNullable);
+        object.setType("object");
+
+        if (this.isFunctional) {
+          object.setMaxItems(1);
+        }
+
+        return object;
       }
-      
-      for (String restriction:  this.restrictions.keySet()) {
-    	  String value = this.restrictions.get(restriction);
-        switch (restriction) {
+    }
+
+    ArraySchema objects = new ArraySchema();
+    objects.setType("array");
+
+    // For OpenAPI v3.0, "$ref" cannot be used as a sibling with "default".
+    // see: https://swagger.io/docs/specification/using-ref/
+    // see: https://stackoverflow.com/a/77189463
+    // A workaround is to include both within "items" and as separate entries under "allOf".
+    // TODO: version check here (and elsewhere?) to differentiate the schema structure.  For v3.1+, it can support "$ref" and "default" as siblings.
+    ArraySchema allOfItems = new ArraySchema();
+    allOfItems.setType(null);
+
+    for (String restriction:  this.restrictions.keySet()) {
+      String value = this.restrictions.get(restriction);
+
+      switch (restriction) {
         case "maxCardinality":
-        objects.setMaxItems(Integer.parseInt(value));
+          objects.setMaxItems(Integer.parseInt(value));
           break;
         case "minCardinality":
           objects.setMinItems(Integer.parseInt(value));
@@ -78,34 +106,47 @@ class MapperObjectProperty {
           objects.setMinItems(Integer.parseInt(value));
           break;
         case "someValuesFrom":
-          nullable=false;
+          isNullable = false;
           break;
         case "allValuesFrom":
           //nothing to do in the Schema
           break;
-        default:
+        case "objectHasReference": {
+          Schema object = new ObjectSchema();
+          object.set$ref(value);
+          object.setType(null);
+          allOfItems.addAllOfItem(object);
           break;
         }
-      }     
-      objects.setNullable(nullable);
-      objects.setItems(object);      
-      return objects;
-    } else {
-    	for (String restriction:  this.restrictions.keySet()) { 
-    		String value = this.restrictions.get(restriction);
-    		if (restriction=="objectHasValue") {      		
-    			object.setDefault(value);
-    			object.type("string");
-    			object.format("uri");
-    			return object;
-    		}
-    	}
-
-    	return object;
+        case "objectHasValue": {
+          Schema object = new ObjectSchema();
+          object.setDefault(value);
+          object.setType("string");
+          allOfItems.addAllOfItem(object);
+          break;
+        }
+        default:
+          break;
+      }
     }
 
-    
+    if (allOfItems.getAllOf() == null || allOfItems.getAllOf().isEmpty()) {
+      Schema object = new ObjectSchema();
+      object.set$ref(ref);
+      objects.items(object);
+    } else {
+      objects.items(allOfItems);
+    }
+
+    if (this.isFunctional) {
+      objects.setMaxItems(1);
+    }
+
+    objects.setNullable(isNullable);
+
+    return objects;
   }
+
   private Schema getComposedSchemaObject(List<String> refs, boolean array, boolean nullable) {
     Schema object = new ObjectSchema();
     ComposedSchema composedSchema = new ComposedSchema();
@@ -113,7 +154,7 @@ class MapperObjectProperty {
     object.setType("object");
     object.setDescription(this.description);
 
-    if (array) {
+    if (array && !this.restrictions.isEmpty()) {
     	ArraySchema objects = new ArraySchema();
     	objects.setDescription(this.description);
     	
@@ -171,7 +212,7 @@ class MapperObjectProperty {
     				//if the property range is complex it will be omitted   
     				logger.warning("omitted complex restriction");
     				objects.setItems(object);
-    			}             
+    			}
     		}
     	}
 
@@ -182,17 +223,8 @@ class MapperObjectProperty {
 
     	return objects;
     } else {
+      object.setNullable(nullable);
       return object;
     }
   }
-
-  private ArraySchema arraySchema(Schema base, boolean nullable) {
-    ArraySchema array = new ArraySchema();
-    array.setNullable(nullable);
-    array.setItems(base);
-    if (isFunctional)
-        array.setMaxItems(1);
-    return array;
-  }
-
 }

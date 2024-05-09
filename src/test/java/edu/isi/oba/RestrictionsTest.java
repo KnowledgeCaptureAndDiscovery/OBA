@@ -7,6 +7,7 @@ import edu.isi.oba.config.YamlConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -30,10 +31,13 @@ public class RestrictionsTest {
 	static Logger logger = null;
 
 	// Convenience variable so we don't need to retype this for each MapperSchema constructor.
-	private final Map<CONFIG_FLAG, Boolean> configFlags = Map.ofEntries(
-		Map.entry(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true),
-		Map.entry(CONFIG_FLAG.DEFAULT_PROPERTIES, true),
-		Map.entry(CONFIG_FLAG.FOLLOW_REFERENCES, true));
+	private Map<CONFIG_FLAG, Boolean> configFlags = new HashMap<>(){{
+		put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, true);
+		put(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true);
+		put(CONFIG_FLAG.DEFAULT_PROPERTIES, true);
+		put(CONFIG_FLAG.FOLLOW_REFERENCES, true);
+		put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, false);
+	}};
 	
 	/**
 	 * This method allows you to configure the logger variable that is required to print several 
@@ -65,13 +69,13 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#University");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasRector");	       	        
-			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {	        	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("hasRector");
+			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
 				Assertions.assertEquals(expectedResult, maxItems);
-			}			
-		} catch (OWLOntologyCreationException e) {			
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
@@ -80,31 +84,31 @@ public class RestrictionsTest {
 	 * This test attempts to get the OAS representation of a ObjectUnionOf restriction.
 	 */
 	@Test
-	public void testObjectUnionOf() throws OWLOntologyCreationException, Exception {		
+	public void testObjectUnionOf() throws OWLOntologyCreationException, Exception {
 		List<String> expectedResult = new ArrayList<String>();
 		expectedResult.add("#/components/schemas/Organization");
 		expectedResult.add("#/components/schemas/Person");
-		try {	
+		try {
 			this.initializeLogger();
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#StudyMaterial");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("author");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("author");
+			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAnyOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {
+					itemsValue = ((ComposedSchema) items).getAnyOf();
+					for (int i = 0; i < itemsValue.size(); i++) {
 						String ref = itemsValue.get(i).get$ref();
-						Assertions.assertEquals(ref,expectedResult.get(i));
-					}	        	
-				}	
-			} 
-		} catch (OWLOntologyCreationException e) {			
+						Assertions.assertEquals(expectedResult.get(i), ref);
+					}
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
@@ -114,7 +118,7 @@ public class RestrictionsTest {
 	 */
 	@Test
 	public void testObjectIntersectionOf() throws OWLOntologyCreationException, Exception {
-		List<String> expectedResult = new ArrayList<String>();			
+		List<String> expectedResult = new ArrayList<String>();
 		expectedResult.add("#/components/schemas/Assignment");
 		expectedResult.add("#/components/schemas/Exam");
 		
@@ -125,20 +129,20 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Course");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasEvaluationMethod");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("hasEvaluationMethod");
+			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAllOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {
+					itemsValue = ((ComposedSchema) items).getAllOf();
+					for (int i = 0; i < itemsValue.size(); i++) {
 						String ref = itemsValue.get(i).get$ref();
-						Assertions.assertEquals(ref,expectedResult.get(i));
-					}	        	
-				}	
-			} 
-		} catch (OWLOntologyCreationException e) {			
+						Assertions.assertEquals(expectedResult.get(i), ref);
+					}
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
@@ -151,19 +155,20 @@ public class RestrictionsTest {
 	public void testSimpleObjectSomeValuesFrom() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
-			Boolean expectedResult=false;
+			Boolean expectedResult = false;
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#University");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasDepartment");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("hasDepartment");
+
+			if (property instanceof ArraySchema) {
 				Boolean nullable = ((ArraySchema) property).getNullable();
-				Assertions.assertEquals(nullable,expectedResult);					
-			} 
-		} catch (OWLOntologyCreationException e) {			
+				Assertions.assertEquals(expectedResult, nullable);
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
@@ -174,7 +179,7 @@ public class RestrictionsTest {
 	 */
 	@Test
 	public void testObjectSomeValuesFrom_ComposedByRestriction() throws OWLOntologyCreationException, Exception {
-		List<String> expectedResult = new ArrayList<String>();			
+		List<String> expectedResult = new ArrayList<String>();
 		expectedResult.add("#/components/schemas/BachelorProgram");
 		expectedResult.add("#/components/schemas/MasterProgram");
 		expectedResult.add("#/components/schemas/PhDProgram");
@@ -185,55 +190,103 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Student");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("enrolledIn");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("enrolledIn");
+			if (property instanceof ArraySchema) {
 				Boolean nullable = ((ArraySchema) property).getNullable();
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAnyOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {			
-						Assertions.assertEquals(itemsValue.get(i).get$ref(),expectedResult.get(i));
-					}	        	
-				}	
-				//Assertions.assertEquals(nullable, false);					
-			} 			
-		} catch (OWLOntologyCreationException e) {			
+					itemsValue = ((ComposedSchema) items).getAnyOf();
+					for (int i = 0; i < itemsValue.size(); i++) {
+						Assertions.assertEquals(expectedResult.get(i), itemsValue.get(i).get$ref());
+					}
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	
-
+		}
 	}
-	
+
 	/**
-	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty.
+	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty,
+	 * when arrays are set to always be generated for properties.
 	 */
 	@Test
-	public void testObjectExactCardinality() throws OWLOntologyCreationException, Exception {
+	public void testObjectExactCardinalityWithArraysGenerated() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+
+			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasRecord");		        
-			if (property instanceof ArraySchema) {					
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("hasRecord");
+			if (property instanceof ArraySchema) {
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
 				Integer minItems = ((ArraySchema) property).getMinItems();
-				if (maxItems!=null && minItems!=null) {
-					if (maxItems == minItems)
-						// "Exact cardinality configured" -- does this really need to be output for the test?
-						return;
-					else
-						Assertions.fail("Error in exact cardinality restriction.");
-				} else
-					Assertions.fail("Null values in exact cardinality restriction.");								
-			} 			
-		} catch (OWLOntologyCreationException e) {			
+				if (maxItems != null && minItems != null) {
+					Assertions.assertEquals(1, minItems);
+					Assertions.assertEquals(minItems, maxItems);
+				} else {
+					Assertions.fail("Null values in exact cardinality restriction.");
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	  
+		}
+	}
+	
+	/**
+	 * This test attempts to get the OAS representation of the exact cardinality of an ObjectProperty,
+	 * when properties may or may not be arrays, depending on cardinality.  Plus, list of required properties are set to be generated for schemas.
+	 */
+	@Test
+	public void testObjectExactCardinalityWithRequiredPropertiesAndWithoutArraysGenerated() throws OWLOntologyCreationException, Exception {
+		try {
+			this.initializeLogger();
+			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
+			Mapper mapper = new Mapper(config_data);
+			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+
+			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, false);
+			this.configFlags.put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			Schema schema = mapperSchema.getSchema();
+
+			boolean isRequired = schema.getRequired() != null && schema.getRequired().contains("hasRecord");
+
+			// For exact cardinality, the class schema should have it marked as required when required properties are generated.
+			if (isRequired) {
+				Object property = schema.getProperties().get("hasRecord");
+				Integer maxItems = null;
+				Integer minItems = null;
+				
+				// If the property is an array, it is an object property (i.e. has a "$ref" value).  Otherwise, it is a data property.
+				if (property instanceof ArraySchema) {
+					maxItems = ((ArraySchema) property).getMaxItems();
+					minItems = ((ArraySchema) property).getMinItems();
+				} else if (property instanceof ObjectSchema) {
+					maxItems = ((ObjectSchema) property).getMaxItems();
+					minItems = ((ObjectSchema) property).getMinItems();
+				}
+
+				// Property is known to be required.  And cardinality restrictions should have also been removed, so min/max items should be null.
+				if (minItems == null && maxItems == null) {
+					return;
+				} else {
+					Assertions.fail("Error in exact cardinality restriction.");
+				}
+			} else {
+				Assertions.fail("Error in exact cardinality restriction.");
+			}
+		} catch (OWLOntologyCreationException e) {
+			Assertions.fail("Error in ontology creation: ", e);
+		}
 	}
 	
 	/**
@@ -249,20 +302,21 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("takesCourse");		        
-			if (property instanceof ArraySchema) {									
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("takesCourse");
+			if (property instanceof ArraySchema) {
 				Integer minItems = ((ArraySchema) property).getMinItems();
-				if (minItems!=null) {
+				if (minItems != null) {
 					Schema items = ((ArraySchema) property).getItems();
-					Assertions.assertEquals(items.get$ref(),"#/components/schemas/Course");
-					Assertions.assertEquals(minItems,expectedResult);
-				} else
-					Assertions.fail("Wrong values in minimum cardinality restriction.");								
-			} 			
-		} catch (OWLOntologyCreationException e) {			
+					Assertions.assertEquals("#/components/schemas/Course", items.get$ref());
+					Assertions.assertEquals(expectedResult, minItems);
+				} else {
+					Assertions.fail("Wrong values in minimum cardinality restriction.");
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	  
+		}
 	}
 	
 	/**
@@ -278,23 +332,22 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Course");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasStudentEnrolled");		        
-			if (property instanceof ArraySchema) {									
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("hasStudentEnrolled");
+			if (property instanceof ArraySchema) {
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
-				if (maxItems!=null) {
+				if (maxItems != null) {
 					Schema items = ((ArraySchema) property).getItems();
-					Assertions.assertEquals(items.get$ref(),"#/components/schemas/Student");
-					Assertions.assertEquals(maxItems,expectedResult);
-				} else
-					Assertions.fail("Wrong values in maximum cardinality restriction.");								
-			} 			
-		} catch (OWLOntologyCreationException e) {			
+					Assertions.assertEquals("#/components/schemas/Student", items.get$ref());
+					Assertions.assertEquals(expectedResult, maxItems);
+				} else {
+					Assertions.fail("Wrong values in maximum cardinality restriction.");
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	
-
+		}
 	}
-	
 
 	/**
 	 * This test attempts to get the OAS representation of the complementOf of an ObjectProperty.
@@ -309,40 +362,61 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInOtherDepartment");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	
-			if (schema.getNot()!=null)
-				Assertions.assertEquals(schema.getNot().get$ref(),expectedResult);				
-			else
+			Schema schema = mapperSchema.getSchema();
+			if (schema.getNot() != null) {
+				Assertions.assertEquals(expectedResult, schema.getNot().get$ref());
+			} else {
 				Assertions.fail("Wrong configuration of ComplementOf restriction.");
-				
-		} catch (OWLOntologyCreationException e) {			
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	
+		}
 	}
 	
 	/**
 	 * This test attempts to get the OAS representation of the hasValue of an ObjectProperty.
+	 * 
+	 * This corresponds to a named individual (of a particular class).  Before version 3.1.0, OpenAPI does not support
+	 * the "$ref" at the same level of a default value.  For this reason, they are treated as separate items
+	 * under the "allOf" key (which is an array type).  The "$ref" value is the named individual's class and the "default" value is
+	 * the named individual's name.
 	 */
 	@Test
 	public void testObjectHasValue() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
-			String expectedResult = "<https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment>";
+			// The short form of: "<https://w3id.org/example/resource/Department/ArtificialIntelligenceDepartment>"
+			// resolves to the default value of: "ArtificialIntelligenceDepartment".
+			String expectedResult = "ArtificialIntelligenceDepartment";
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("belongsTo");	
-			if (((ObjectSchema) property).getDefault()!=null)
-				Assertions.assertEquals(((ObjectSchema) property).getDefault(),expectedResult);				
-			else
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("belongsTo");
+
+			if (property instanceof ArraySchema) {
+				Schema items = ((ArraySchema) property).getItems();
+				if (items != null && (items.getAllOf() != null && !items.getAllOf().isEmpty())) {
+					for (var item: items.getAllOf()) {
+						if (((ObjectSchema) item).getDefault() != null) {
+							Assertions.assertEquals(expectedResult, ((ObjectSchema) item).getDefault());
+							return;
+						}
+					}
+
+					// If we reach here, then none of the items had a default value, so fail.
+					Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
+				} else {
+					Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
+				}
+			} else {
 				Assertions.fail("Wrong configuration of ObjectHasValue restriction.");
-				
-		} catch (OWLOntologyCreationException e) {			
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	    
+		}
 	}
 	
 	/**
@@ -360,27 +434,25 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Professor");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("hasDegree");		        
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("hasDegree");
 
-			if (property instanceof ArraySchema) {	
+			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Object> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getEnum();
-					for (int i=0; i<itemsValue.size(); i++ ) {
+					itemsValue = ((ComposedSchema) items).getEnum();
+					for (int i = 0; i < itemsValue.size(); i++) {
 						Object ref = itemsValue.get(i);
-						Assertions.assertEquals(ref.toString(),expectedResult.get(i));
-					}	        	
-				}	
-			} 
-
-		} catch (OWLOntologyCreationException e) {			
+						Assertions.assertEquals(expectedResult.get(i), ref.toString());
+					}
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	
+		}
 	}
 
-	
 	/**
 	 * This test attempts to get the OAS representation of a FunctionalDataProperty.
 	 */
@@ -394,13 +466,13 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("birthDate");	       	        
-			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {	        	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("birthDate");
+			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {
 				Integer maxItems = ((ArraySchema) property).getMaxItems();
-				Assertions.assertEquals(expectedResult,maxItems);
-			}			
-		} catch (OWLOntologyCreationException e) {			
+				Assertions.assertEquals(expectedResult, maxItems);
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
@@ -421,20 +493,22 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Course");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("ects");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("ects");
+			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAnyOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {
-						String ref = itemsValue.get(i).getType();
-						Assertions.assertEquals(ref,expectedResult.get(i));
-					}	        	
-				}	
-			} 
-		} catch (OWLOntologyCreationException e) {			
+					itemsValue = ((ComposedSchema) items).getAnyOf();
+					if (itemsValue != null) {
+						for (int i = 0; i < itemsValue.size(); i++) {
+							String ref = itemsValue.get(i).getType();
+							Assertions.assertEquals(expectedResult.get(i), ref);
+						}
+					}
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
@@ -455,20 +529,20 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("memberOfOtherDepartments");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("memberOfOtherDepartments");
+			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAllOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {
+					itemsValue = ((ComposedSchema) items).getAllOf();
+					for (int i = 0; i < itemsValue.size(); i++) {
 						String ref = itemsValue.get(i).getType();
-						Assertions.assertEquals(ref,expectedResult.get(i));
-					}	        	
-				}	
-			} 
-		} catch (OWLOntologyCreationException e) {			
+						Assertions.assertEquals(expectedResult.get(i), ref);
+					}
+				}
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
@@ -487,14 +561,14 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#StudyProgram");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("studyProgramName");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("studyProgramName");
+			if (property instanceof ArraySchema) {
 				Boolean nullable = ((ArraySchema) property).getNullable();
-				Assertions.assertEquals(((ArraySchema) property).getItems().getType(), expectedResult);
-				Assertions.assertEquals(nullable, false);	
-			} 
-		} catch (OWLOntologyCreationException e) {			
+				Assertions.assertEquals(expectedResult, ((ArraySchema) property).getItems().getType());
+				Assertions.assertEquals(false, nullable);
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
 		}
 	}
@@ -507,7 +581,7 @@ public class RestrictionsTest {
 	public void testDataSomeValuesFrom_ComposedByRestriction() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
-			List<String> expectedResult = new ArrayList<String>();			
+			List<String> expectedResult = new ArrayList<String>();
 			expectedResult.add("integer");
 			expectedResult.add("integer");
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
@@ -515,23 +589,24 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("memberOfOtherDepartments");		        
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("memberOfOtherDepartments");
+			if (property instanceof ArraySchema) {
 				Boolean nullable = ((ArraySchema) property).getNullable();
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getAllOf();
-					for (int i=0; i<itemsValue.size(); i++ ) {			
-						Assertions.assertEquals(itemsValue.get(i).getType(),expectedResult.get(i));
-					}	        	
-				}	
-				Assertions.assertEquals(nullable, false);					
-			} 			
-		} catch (OWLOntologyCreationException e) {			
+					itemsValue = ((ComposedSchema) items).getAllOf();
+					for (int i = 0; i < itemsValue.size(); i++) {
+						Assertions.assertEquals(expectedResult.get(i), itemsValue.get(i).getType());
+					}
+				}
+
+				Assertions.assertEquals(false, nullable);
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
-		}	    		
+		}
 	}
 	
 	/**
@@ -547,12 +622,12 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#StudyProgram");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("studyProgramName");		        
-			if (property instanceof ArraySchema) {	
-				Assertions.assertEquals(((ArraySchema) property).getItems().getType(), expectedResult);
-			} 
-		} catch (OWLOntologyCreationException e) {			
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("studyProgramName");
+			if (property instanceof ArraySchema) {
+				Assertions.assertEquals(expectedResult, ((ArraySchema) property).getItems().getType());
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
 		}
 	}
@@ -564,7 +639,7 @@ public class RestrictionsTest {
 	public void testDataOneOf() throws OWLOntologyCreationException, Exception {
 		try {
 			this.initializeLogger();
-			List<String> expectedResult = new ArrayList<String>();			
+			List<String> expectedResult = new ArrayList<String>();
 			expectedResult.add("female");
 			expectedResult.add("male");
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
@@ -572,24 +647,23 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Person");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("gender");	
-			if (property instanceof ArraySchema) {	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("gender");
+			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
 				List<Object> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue =((ComposedSchema) items).getEnum();
-					for (int i=0; i<itemsValue.size(); i++ ) {			
-						Assertions.assertEquals(itemsValue.get(i),expectedResult.get(i));
-					}	        	
-				}						
-			} 			
-			else
+					itemsValue = ((ComposedSchema) items).getEnum();
+					for (int i = 0; i < itemsValue.size(); i++) {
+						Assertions.assertEquals(expectedResult.get(i), itemsValue.get(i));
+					}
+				}
+			} else {
 				Assertions.fail("Wrong configuration of DataOneOf restriction.");
-				
-		} catch (OWLOntologyCreationException e) {			
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	    			
+		}
 	}
 	
 	/**
@@ -605,17 +679,19 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("nationality");	
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("nationality");
 			
-			if (((ArraySchema) property).getItems().getDefault()!=null)
-				Assertions.assertEquals(((ArraySchema) property).getItems().getDefault(),expectedResult);				
-			else
+			if (property instanceof ArraySchema && ((ArraySchema) property).getItems().getDefault() != null) {
+				Assertions.assertEquals(expectedResult, ((ArraySchema) property).getItems().getDefault());
+			} else if (((Schema) property).getDefault() != null) {
+				Assertions.assertEquals(expectedResult, ((Schema) property).getDefault());
+			} else {
 				Assertions.fail("Wrong configuration of DataHasValue restriction.");
-				
-		} catch (OWLOntologyCreationException e) {			
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	    			
+		}
 	}
 	
 	/**
@@ -630,20 +706,34 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#University");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("universityName");		        					
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("universityName");
+
+			if (property instanceof ArraySchema) {
 				Integer maxItems = ((ArraySchema) property).getItems().getMaxItems();
 				Integer minItems = ((ArraySchema) property).getItems().getMinItems();
-				if (maxItems!=null && minItems!=null) {
-					if (maxItems == minItems)
+				if (maxItems != null && minItems != null) {
+					if (maxItems == minItems) {
 						// "Exact cardinality configured" -- does this really need to be output for the test?
 						return;
-					else
+					} else {
 						Assertions.fail("Error in exact cardinality restriction.");
-			} 			
-		} catch (OWLOntologyCreationException e) {			
+					}
+				}
+			} else if (property instanceof Schema) {
+				Integer maxItems = ((Schema) property).getMaxItems();
+				Integer minItems = ((Schema) property).getMinItems();
+				if (maxItems != null && minItems != null) {
+					Assertions.assertEquals(maxItems, minItems);
+				} else {
+					Assertions.fail("Error in exact cardinality restriction.");
+				}
+			} else {
+				Assertions.fail("Wrong configuration of cardinality restriction.");
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	    			
+		}
 	}
 	
 	/**
@@ -659,17 +749,18 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Professor");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("researchField");		        					
-			Integer minItems = ((ArraySchema) property).getItems().getMinItems();
-			if (minItems!=null) 
-				Assertions.assertEquals(minItems,expectedResult);
-			else
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("researchField");
+			Integer minItems = ((ArraySchema) property).getMinItems();
+
+			if (minItems != null) {
+				Assertions.assertEquals(expectedResult, minItems);
+			} else {
 				Assertions.fail("Error in minimum cardinality restriction.");
-						
-		} catch (OWLOntologyCreationException e) {			
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	    			
+		}
 	}
 	
 	/**
@@ -685,17 +776,18 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Person");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	  	       
-			Object property= schema.getProperties().get("address");		        					
-			Integer maxItems = ((ArraySchema) property).getItems().getMaxItems();
-			if (maxItems!=null) 
-				Assertions.assertEquals(maxItems,expectedResult);
-			else
-				Assertions.fail("Error in maximum cardinality restriction.");
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("address");
+			Integer maxItems = ((ArraySchema) property).getMaxItems();
 
-		} catch (OWLOntologyCreationException e) {			
+			if (maxItems != null) {
+				Assertions.assertEquals(expectedResult, maxItems);
+			} else {
+				Assertions.fail("Error in maximum cardinality restriction.");
+			}
+		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
-		}	    			
+		}
 	}
 	
 	/**
@@ -711,16 +803,18 @@ public class RestrictionsTest {
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Department");
 			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
 			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
-			Schema schema = mapperSchema.getSchema();	
-			Object property= schema.getProperties().get("numberOfProfessors");				
-			if (((ArraySchema) property).getItems().getNot()!=null)
-				Assertions.assertEquals(((ArraySchema) property).getItems().getNot().getType(),expectedResult);				
-			else
-				Assertions.fail("Wrong configuration of ComplementOf restriction.");
-				
-		} catch (OWLOntologyCreationException e) {			
-			Assertions.fail("Error in ontology creation: ", e);
-		}	    			
-	}
+			Schema schema = mapperSchema.getSchema();
+			Object property = schema.getProperties().get("numberOfProfessors");
 
+			if (property instanceof ArraySchema && ((ArraySchema) property).getItems().getNot().getType() != null) {
+				Assertions.assertEquals(expectedResult, ((ArraySchema) property).getItems().getNot().getType());
+			} else if (((Schema) property).getNot().getType() != null) {
+				Assertions.assertEquals(expectedResult, ((Schema) property).getNot().getType());
+			} else {
+				Assertions.fail("Wrong configuration of ComplementOf restriction.");
+			}
+		} catch (OWLOntologyCreationException e) {
+			Assertions.fail("Error in ontology creation: ", e);
+		}
+	}
 }

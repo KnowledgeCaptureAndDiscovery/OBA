@@ -50,6 +50,12 @@ default_descriptions: true
 
 ## Enable/disable generation of default properties (description, id, label, and type) for each schema
 default_properties: true
+
+## Enable/disable generation of arrays for property type(s) all the time, regardless of cardinality / restrictions
+always_generate_arrays: true
+
+## Enable/disable generation of list of required properties for a schema, if the the cardinality indicates it is required (e.g. exactly 1)
+required_properties_from_cardinality: false
 ```
 
 The result is available at: [DBPedia Music](https://app.swaggerhub.com/apis/mosoriob/dbpedia-music/v1.3.0)
@@ -230,4 +236,92 @@ components:
         propertyB:
           type: integer
       type: object
+```
+
+### Generating property types as array of items uniformly vs. non-array when cardinality/restrictions warrant it
+
+When a property can have multiple items (e.g. a list of names), the property schema will always generate `type: array` with an `items:` key and sub-item types (e.g. `type: string`). However, in cases where the property is restricted by cardinality, the API spec can be generated so that the property is not an array but a single type (e.g. `type: string`). These cases include cardinality where the property is exactly 1 or is a maximum of 1.
+
+The default is to treat everything as an array, such as:
+
+```yaml
+components:
+  schemas:
+    YourClass:
+      properties:
+        propertyA:
+          items:
+            maxItems: 1
+            minItems: 1
+            type: string
+          type: array
+        propertyB:
+          items:
+            maxItems: 3
+            type: string
+          type: array
+      type: object
+```
+
+The option `always_generate_arrays` allows you to disable the generating all properties with an array of items, if the class restrictions warrant it (e.g. there is exactly one property value allowed). By setting the `always_generate_arrays` value to `false`, the above example becomes:
+
+```yaml
+components:
+  schemas:
+    YourClass:
+      properties:
+        propertyA:
+          type: array
+        propertyB:
+          items:
+            maxItems: 3
+            type: string
+          type: array
+      type: object
+```
+
+### Generating list of required property/properties for a class, when cardinality/restrictions warrant it
+
+When a property is known to be required based on class restrictions (e.g. exactly 1 or a minimum >= 1), OpenAPI specification supports a `required` key directly under the property. By default, OBA does not generate this required list of properties (for each class), for example:
+
+```yaml
+components:
+  schemas:
+    YourClass:
+      properties:
+        propertyA:
+          items:
+            maxItems: 1
+            minItems: 1
+            type: string
+          type: array
+        propertyB:
+          items:
+            maxItems: 3
+            type: string
+          type: array
+      type: object
+```
+
+The option `required_properties_from_cardinality` allows you to generate this list based on class restrictions (e.g. there is exactly one property value or there is a minimum of 1 or more of the property value). By setting the `required_properties_from_cardinality` value to `true`, the above example becomes:
+
+```yaml
+components:
+  schemas:
+    YourClass:
+      properties:
+        propertyA:
+          items:
+            maxItems: 1
+            minItems: 1
+            type: string
+          type: array
+        propertyB:
+          items:
+            maxItems: 3
+            type: string
+          type: array
+      type: object
+      required:
+        - propertyA
 ```

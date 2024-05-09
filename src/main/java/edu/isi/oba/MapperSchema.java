@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
+import org.semanticweb.owlapi.search.EntitySearcher;
 import org.semanticweb.owlapi.util.IRIShortFormProvider;
 import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
@@ -28,7 +29,8 @@ class MapperSchema {
     private Map<String, Schema> dataProperties;
     private Map<String, Schema> objectProperties;
     private Map<String, Schema> properties;
-	private List<String> enumInstances;
+	private List<String> required_properties;
+	private Map<IRI, List<String>> enums;
     final String name;
     private final Map<IRI, String> schemaNames;
     private final Schema schema;
@@ -69,15 +71,16 @@ class MapperSchema {
         this.type = "object";
         this.ontologies = ontologies;
         this.ontology_cls = class_ontology;
-        reasonerFactory = new StructuralReasonerFactory();
+        this.reasonerFactory = new StructuralReasonerFactory();
         this.reasoner = reasonerFactory.createReasoner(this.ontology_cls);
-        properties_range = new ArrayList<>();
-        propertiesFromObjectRestrictions_ranges= new HashMap<>();
-        propertiesFromObjectRestrictions = new ArrayList<>();
-        propertiesFromDataRestrictions_ranges= new HashMap<>();
-        propertiesFromDataRestrictions = new ArrayList<>();
-        properties = new HashMap<>();
-        this.complementOf="";
+        this.properties_range = new ArrayList<>();
+        this.propertiesFromObjectRestrictions_ranges = new HashMap<>();
+        this.propertiesFromObjectRestrictions = new ArrayList<>();
+        this.propertiesFromDataRestrictions_ranges = new HashMap<>();
+        this.propertiesFromDataRestrictions = new ArrayList<>();
+        this.properties = new HashMap<>();
+		this.required_properties = new ArrayList<>();
+        this.complementOf = "";
         this.getClassRestrictions(cls);
         this.name = getSchemaName(cls);
         this.schema = setSchema();
@@ -89,31 +92,29 @@ class MapperSchema {
         return this.properties;
     }
 
-	private List<String> setEnums() {
-        this.enumInstances = this.getEnumInstances();
-
-		return this.enumInstances;
-    }
-
     private Schema setSchema() {
         Schema schema = new Schema();
         schema.setName(this.name);
         schema.setDescription(this.cls_description);
-        schema.setType(this.type);
-        // if the Schema is the complement of other Schema
-        if (complementOf!="") {
-        	Schema complement = new ObjectSchema();
-            complement.set$ref(complementOf);
-        	schema.not(complement);
-        }
 
-        if (this.getEnums() != null && !this.enumInstances.isEmpty()) {
+		if (this.enums.containsKey(this.cls.getIRI())) {
 			// Only string enums allowed in RDF/OWL ??
 			schema.setType("string");
-			schema.setEnum(this.enumInstances);
+			schema.setEnum(this.enums.get(this.cls.getIRI()));
 		} else {
+			// if the Schema is the complement of other Schema
+			if (complementOf!="") {
+				Schema complement = new ObjectSchema();
+				complement.set$ref(complementOf);
+				schema.not(complement);
+			}
 			schema.setType(this.type);
 			schema.setProperties(this.getProperties());
+
+			if (this.configFlags.containsKey(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY) 
+				&& this.configFlags.get(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY)) {
+				schema.setRequired(this.required_properties);
+			}
 
 			HashMap<String, String> exampleMap = new HashMap<>();
 			exampleMap.put("id", "some_id");
@@ -150,29 +151,8 @@ class MapperSchema {
                 }
             }
         }
+
         return false;
-    }
-
-	/**
-     * Obtain a list of enumerations (enums) of a OWLClass.
-     *
-     * @return A List string: enum name/title
-     */
-    private List<String> getEnumInstances() {
-    	List<String> enums = new ArrayList<String>();
-
-    	for (OWLOntology ontology: this.ontologies) {
-			ontology.getEquivalentClassesAxioms(this.cls).forEach((ax) -> {
-				ax.classExpressions().filter((ce) -> ce instanceof OWLObjectOneOf).forEach((oneOfObj) -> {
-					oneOfObj.getIndividualsInSignature().forEach((OWLNamedIndividual indv) -> {
-						logger.info("\tclass has following item as an ENUM: " + this.sfp.getShortForm(indv.getIRI()));
-						enums.add(this.sfp.getShortForm(indv.getIRI()));
-					});
-				});
-			});
-		}
-
-		return enums;
     }
 	
     /**
@@ -207,20 +187,15 @@ class MapperSchema {
     				// the property will be inspected.
     				if (!propertiesFromDataRestrictions.isEmpty()) {
     					if (propertiesFromDataRestrictions.contains(odp)) {           				
-    						inspect=false;
+    						inspect = false;
     					}    
     				}
 
     				if (inspect) {
-    					Boolean isFunctional = false;
+						boolean isFunctional = EntitySearcher.isFunctional(odp, this.ontologies.stream());
+
     					for (OWLOntology ontology: this.ontologies) {
     						ranges.addAll(ontology.getDataPropertyRangeAxioms(odp));
-    						functional = ontology.getAxioms(AxiomType.FUNCTIONAL_DATA_PROPERTY);
-    						for (OWLFunctionalDataPropertyAxiom functionalAxiom:functional) {
-    							if (functionalAxiom.getProperty().equals(odp)) {
-									isFunctional = true;
-								}
-    						}
     					}
 
     					if (ranges.isEmpty()) {
@@ -338,21 +313,14 @@ class MapperSchema {
         				if (propertiesFromObjectRestrictions.contains(odp)) {
         					inspect = false;
         				}
-
         			}
 
         			if (inspect) {
-        				Boolean isFunctional = false;
+						boolean isFunctional = EntitySearcher.isFunctional(odp, this.ontologies.stream());
+
         				Set<OWLObjectPropertyRangeAxiom> ranges = new HashSet<>();
         				for (OWLOntology ontology: this.ontologies) {
         					ranges.addAll(ontology.getObjectPropertyRangeAxioms(odp));
-
-        					functional = ontology.getAxioms(AxiomType.FUNCTIONAL_OBJECT_PROPERTY);
-        					for (OWLFunctionalObjectPropertyAxiom functionalAxiom:functional) {
-        						if (functionalAxiom.getProperty().equals(odp)) {
-        							isFunctional = true;
-        						}
-        					}
         				}
 
         				if (ranges.isEmpty()) {
@@ -376,11 +344,13 @@ class MapperSchema {
         							restrictionValues=restrictionsValuesFromClass.get(j);
         						}
         					}
-        					if (restrictionsValuesFromClass.isEmpty() && propertyRanges.size() > 1)
-                        		propertyRanges.clear();
+        					if (restrictionsValuesFromClass.isEmpty() && propertyRanges.size() > 1) {
+								propertyRanges.clear();
+							}
         				}
 
         				String propertyDescription = ObaUtils.getDescription(odp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
+
         				MapperObjectProperty mapperObjectProperty = new MapperObjectProperty(propertyName, propertyDescription, isFunctional, restrictionValues, propertyRanges);
         				try {
         					this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
@@ -391,6 +361,7 @@ class MapperSchema {
         		}
         	}
         }
+
         return properties;
     }
 
@@ -410,6 +381,7 @@ class MapperSchema {
                 }
             }
         }
+
         return dataProperties;
     }
 
@@ -429,18 +401,16 @@ class MapperSchema {
     				if (!rangeClass.containsEntityInSignature(odp)) {
     					if (rangeClass.asOWLClass().equals(owlThing)) {
     						logger.info("Ignoring owl:Thing" + odp);
-    					}
-    					else {
+    					} else {
     						this.properties_range.add(rangeClass.asOWLClass());
     						if (this.configFlags.get(CONFIG_FLAG.FOLLOW_REFERENCES))
         						objectProperty.add(getSchemaName(rangeClass.asOWLClass()));
     					}
     				}
-
     			}
     		}
-
     	}
+
     	return objectProperty;
     }
 
@@ -453,10 +423,9 @@ class MapperSchema {
     	OWLOntologyManager m = OWLManager.createOWLOntologyManager();
     	OWLDataFactory dataFactory = m.getOWLDataFactory();
     	OWLClass owlThing = dataFactory.getOWLThing();
-    	RestrictionVisitor restrictionVisitor;
 
     	for (OWLOntology ontology: this.ontologies) {
-    		restrictionVisitor = new RestrictionVisitor(analyzedClass, ontology, owlThing, "");
+    		final RestrictionVisitor restrictionVisitor = new RestrictionVisitor(analyzedClass, ontology, owlThing, "");
     		for (OWLSubClassOfAxiom ax: ontology.getSubClassAxiomsForSubClass(analyzedClass)) {
     			OWLClassExpression superCls = ax.getSuperClass();
     			// Ask our superclass to accept a visit from the RestrictionVisitor
@@ -464,25 +433,33 @@ class MapperSchema {
     			// will answer it - if not the visitor will ignore it
     			superCls.accept(restrictionVisitor);
     		}
-			
-    		this.propertiesFromObjectRestrictions = restrictionVisitor.getPropertiesFromObjectRestrictions();
-    		this.propertiesFromObjectRestrictions_ranges  = restrictionVisitor.getPropertiesFromObjectRestrictions_ranges();
-    		this.propertiesFromDataRestrictions = restrictionVisitor.getPropertiesFromDataRestrictions();
-    		this.propertiesFromDataRestrictions_ranges  = restrictionVisitor.getPropertiesFromDataRestrictions_ranges();
-    		Map<String, Map<String,String>> restrictionsValuesFromClass = restrictionVisitor.getRestrictionsValuesFromClass();
 
-    		if (!restrictionsValuesFromClass.isEmpty()) {
-    			// When the restriction is a ObjectComplementOf it doesn't have a object property,
-    			// thus we need to set its value at the setSchema function
-    			if (restrictionsValuesFromClass.containsKey("complementOf") && restrictionsValuesFromClass.size() == 1) {
-    				for (String j: restrictionsValuesFromClass.keySet()) {
-    					Map<String,String> restrictionValues = restrictionsValuesFromClass.get(j);
-    					for (String restriction:  restrictionValues.keySet()) {
-    						this.complementOf = restrictionValues.get(restriction);
-    					}
-    				}
-    			} else {
+			// For equivalent (to) classes (e.g. Defined classes) we need to accept the visit to navigate it.
+			ontology.equivalentClassesAxioms(analyzedClass).forEach((eqClsAx) -> {
+				eqClsAx.accept(restrictionVisitor);
+			});
+
+			this.enums = restrictionVisitor.getAllEnums();
+			this.propertiesFromObjectRestrictions = restrictionVisitor.getPropertiesFromObjectRestrictions();
+			this.propertiesFromObjectRestrictions_ranges  = restrictionVisitor.getPropertiesFromObjectRestrictions_ranges();
+			this.propertiesFromDataRestrictions = restrictionVisitor.getPropertiesFromDataRestrictions();
+			this.propertiesFromDataRestrictions_ranges  = restrictionVisitor.getPropertiesFromDataRestrictions_ranges();
+			Map<String, Map<String,String>> restrictionsValuesFromClass = restrictionVisitor.getRestrictionsValuesFromClass();
+
+			if (!restrictionsValuesFromClass.isEmpty()) {
+				// When the restriction is a ObjectComplementOf it doesn't have a object property,
+				// thus we need to set its value at the setSchema function
+				if (restrictionsValuesFromClass.containsKey("complementOf") && restrictionsValuesFromClass.size() == 1) {
+					for (String j: restrictionsValuesFromClass.keySet()) {
+						Map<String,String> restrictionValues = restrictionsValuesFromClass.get(j);
+						for (String restriction:  restrictionValues.keySet()) {
+							this.complementOf = restrictionValues.get(restriction);
+						}
+					}
+				} else {
 					for (OWLObjectProperty op: this.propertiesFromObjectRestrictions) {
+						boolean isFunctional = EntitySearcher.isFunctional(op, this.ontologies.stream());
+
 						MapperObjectProperty mapperObjectProperty;
 						String propertyDescription = ObaUtils.getDescription(op, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
 						if (!this.propertiesFromObjectRestrictions_ranges.isEmpty()) {
@@ -490,14 +467,68 @@ class MapperSchema {
 							for (String j : restrictionsValuesFromClass.keySet()) {
 								Map<String, String> restrictionValues = restrictionsValuesFromClass.get(j);
 								if (j.equals(this.sfp.getShortForm(op.getIRI()))) {
-									if (rangesOP.get(0).equals("defaultValue")) {
-										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, false, restrictionValues, rangesOP, false, true);
+									int exactCardinality = -1;
+									int minCardinality = -1;
+									int maxCardinality = -1;
+
+									if (rangesOP != null && rangesOP.get(0).equals("defaultValue")) {
+										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, isFunctional, restrictionValues, rangesOP, false, true);
 									} else {
-										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, false, restrictionValues, rangesOP);
+										String exactCardinalityStr = restrictionValues.get("exactCardinality");
+										exactCardinalityStr = ((exactCardinalityStr == null || exactCardinalityStr.isBlank()) ? "-1" : exactCardinalityStr);
+										exactCardinality = Integer.parseInt(exactCardinalityStr);
+
+										String minCardinalityStr = restrictionValues.get("minCardinality");
+										minCardinalityStr = ((minCardinalityStr == null || minCardinalityStr.isBlank()) ? "-1" : minCardinalityStr);
+										minCardinality = Integer.parseInt(minCardinalityStr);
+
+										String maxCardinalityStr = restrictionValues.get("maxCardinality");
+										maxCardinalityStr = ((maxCardinalityStr == null || maxCardinalityStr.isBlank()) ? "-1" : maxCardinalityStr);
+										maxCardinality = Integer.parseInt(maxCardinalityStr);
+
+										// If cardinality is present and allows for multiple values and it is not functional,
+										// then this is an array.
+										boolean isArray = !isFunctional
+															&& (exactCardinality > 1
+															|| minCardinality > 1
+															|| maxCardinality > 1);
+										
+										// If config flag to generate arrays is set, use it to override current setting.
+										isArray |= (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS));
+
+										// If cardinality is exactly 1 OR a minimum of 1, then not nullable.
+										boolean isNullable = (exactCardinality == -1 && minCardinality == -1) ? true : exactCardinality != 1 && minCardinality < 1;
+
+										mapperObjectProperty = new MapperObjectProperty(this.sfp.getShortForm(op.getIRI()), propertyDescription, isFunctional, restrictionValues, rangesOP, isArray, isNullable);
 									}
 									
 									try {
-										this.properties.put(mapperObjectProperty.name, mapperObjectProperty.getSchemaByObjectProperty());
+										Schema opSchema = mapperObjectProperty.getSchemaByObjectProperty();
+
+										boolean is_required = false;
+
+										// If cardinality is exactly 1, then we can remove the min/max property constraints
+										// and set the property to be required for the class.
+										if (exactCardinality == 1 || (minCardinality == 1 && maxCardinality == 1)) {
+											if (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && !this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
+												opSchema.setMinItems(null);
+												opSchema.setMaxItems(null);
+											}
+											
+											is_required = true;
+										}
+
+										// If cardinality minimum is 1, keep the min/max property constraints
+										// and set the property to be required for the class.
+										if (minCardinality > 0) {
+											is_required = true;
+										}
+
+										if (is_required) {
+											this.required_properties.add(mapperObjectProperty.name);
+										}
+
+										this.properties.put(mapperObjectProperty.name, opSchema);
 									} catch (Exception e) {
 										logger.warning("Error when parsing object property "+mapperObjectProperty.name);
 									}
@@ -507,6 +538,8 @@ class MapperSchema {
 					}
 
 					for (OWLDataProperty dp: this.propertiesFromDataRestrictions) {
+						boolean isFunctional = EntitySearcher.isFunctional(dp, this.ontologies.stream());
+
 						List<String> valuesFromDataRestrictions_ranges = new ArrayList<>();
 						String propertyDescription = ObaUtils.getDescription(dp, this.ontology_cls, this.configFlags.get(CONFIG_FLAG.DEFAULT_DESCRIPTIONS));
 						if (!this.propertiesFromDataRestrictions_ranges.isEmpty()) {
@@ -514,9 +547,59 @@ class MapperSchema {
 							for (String j: restrictionsValuesFromClass.keySet()) {
 								Map<String, String> restrictionValues = restrictionsValuesFromClass.get(j);
 								if (j.equals(this.sfp.getShortForm(dp.getIRI()))) {
-									MapperDataProperty mapperDataProperty = new MapperDataProperty(this.sfp.getShortForm(dp.getIRI()), propertyDescription, false, restrictionValues, valuesFromDataRestrictions_ranges, rangesDP, true, true);
+									String exactCardinalityStr = restrictionValues.get("exactCardinality");
+									exactCardinalityStr = ((exactCardinalityStr == null || exactCardinalityStr.isBlank()) ? "-1" : exactCardinalityStr);
+									int exactCardinality = Integer.parseInt(exactCardinalityStr);
+
+									String minCardinalityStr = restrictionValues.get("minCardinality");
+									minCardinalityStr = ((minCardinalityStr == null || minCardinalityStr.isBlank()) ? "-1" : minCardinalityStr);
+									int minCardinality = Integer.parseInt(minCardinalityStr);
+
+									String maxCardinalityStr = restrictionValues.get("maxCardinality");
+									maxCardinalityStr = ((maxCardinalityStr == null || maxCardinalityStr.isBlank()) ? "-1" : maxCardinalityStr);
+									int maxCardinality = Integer.parseInt(maxCardinalityStr);
+
+									// If cardinality is present and allows for multiple values and it is not functional,
+									// then this is an array.
+									boolean isArray = !isFunctional
+														&& (exactCardinality > 1
+														|| minCardinality > 1
+														|| maxCardinality > 1);
+									
+									// If config flag to generate arrays is set, use it to override current setting.
+									isArray |= (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS));
+									
+									// If cardinality is exactly 1 OR a minimum of 1, then not nullable.
+									boolean isNullable = (exactCardinality == -1 && minCardinality == -1) ? true : exactCardinality != 1 && minCardinality < 1;
+
+									MapperDataProperty mapperDataProperty = new MapperDataProperty(this.sfp.getShortForm(dp.getIRI()), propertyDescription, isFunctional, restrictionValues, valuesFromDataRestrictions_ranges, rangesDP, isArray, isNullable);
 									try {
-										this.properties.put(mapperDataProperty.name, mapperDataProperty.getSchemaByDataProperty());
+										Schema dpSchema = mapperDataProperty.getSchemaByDataProperty();
+
+										boolean is_required = false;
+
+										// If cardinality is exactly 1, then we can remove the min/max property constraints
+										// and set the property to be required for the class.
+										if (exactCardinality == 1 || (minCardinality == 1 && maxCardinality == 1)) {
+											if (this.configFlags.containsKey(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS) && !this.configFlags.get(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
+												dpSchema.setMinItems(null);
+												dpSchema.setMaxItems(null);
+											}
+
+											is_required = true;
+										}
+
+										// If cardinality minimum is 1, keep the min/max property constraints
+										// and set the property to be required for the class.
+										if (minCardinality > 0) {
+											is_required = true;
+										}
+
+										if (is_required) {
+											this.required_properties.add(mapperDataProperty.name);
+										}
+
+										this.properties.put(mapperDataProperty.name, dpSchema);
 									} catch (Exception e) {
 										logger.warning("Error when processing data property " + mapperDataProperty.name);
 									}
@@ -524,22 +607,15 @@ class MapperSchema {
 							}
 						}
 					}
-    			}
+				}
+			}
 
-    			this.properties = setProperties();
-    		} else {
-    			this.properties = setProperties();
-				this.enumInstances = this.setEnums();
-    		}
+			this.properties = setProperties();
     	}
     	
 		if (this.configFlags.get(CONFIG_FLAG.DEFAULT_PROPERTIES)) {
 			this.properties.putAll(this.getDefaultProperties());
 		}
-    }
-
-	private List<String> getEnums() {
-        return this.enumInstances;
     }
 
     private Map<String, Schema> getProperties() {

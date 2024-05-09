@@ -50,7 +50,7 @@ class Mapper {
         //Load the ontology into the manager
         int i = 0;
         List<String> ontologyPaths = new ArrayList<>();
-        download_ontologies(config_ontologies, destination_dir, i, ontologyPaths);
+        this.download_ontologies(config_ontologies, destination_dir, i, ontologyPaths);
         //set ontology paths in YAML to the ones we have downloaded (for later reference by owl2jsonld)
         this.config_data.setOntologies(ontologyPaths);
         ontologies = this.manager.ontologies().collect(Collectors.toList());
@@ -58,12 +58,12 @@ class Mapper {
         //Create a temporal Map<IRI, String> schemaNames with the classes
         for (OWLOntology ontology : ontologies) {
             Set<OWLClass> classes = ontology.getClassesInSignature();
-            setSchemaNames(classes);
-            setSchemaDrescriptions(classes,ontology);
+            this.setSchemaNames(classes);
+            this.setSchemaDrescriptions(classes,ontology);
         }
 
         if (config_data.getClasses() != null) {
-            this.selected_classes = filter_classes();
+            this.selected_classes = this.filter_classes();
         }
     }
 
@@ -127,15 +127,15 @@ class Mapper {
             for (OWLClass cls : classes) {
                 //filter if the class prefix does not have the default ontology prefix
                 if (cls.getIRI() != null) {
-                    if (selected_classes == null || selected_classes.contains(cls)) {
-                        add_owlclass_to_openapi(query, pathGenerator, ontology, defaultOntologyPrefixIRI, cls, true);
+                    if (this.selected_classes == null || this.selected_classes.contains(cls)) {
+                        this.add_owlclass_to_openapi(query, pathGenerator, ontology, defaultOntologyPrefixIRI, cls, true);
                     }
                 }
             }
         }
 
         if (this.config_data.getAuth().getEnable()) {
-            add_user_path(pathGenerator);
+            this.add_user_path(pathGenerator);
         }
     }
 
@@ -163,10 +163,11 @@ class Mapper {
         if (defaultOntologyPrefixIRI.equals(classPrefixIRI)) {
             try{
                 MapperSchema mapperSchema = getMapperSchema(query, ontology, cls, this.schemaDescriptions.get(cls.getIRI()));
+
                 // add references to schemas in class restrictions (check selected classes to avoid conflicts)
                 for (String classToCheck : mapperSchema.getPropertiesFromObjectRestrictions_ranges()) {
                     OWLClass clsToCheck = manager.getOWLDataFactory().getOWLClass(IRI.create(classPrefixIRI + classToCheck));
-                    if (this.mappedClasses.contains(clsToCheck) || this.selected_classes.contains(clsToCheck)){
+                    if (this.mappedClasses.contains(clsToCheck) || (this.selected_classes != null && this.selected_classes.contains(clsToCheck))){
                         logger.info("The class " + clsToCheck + " exists ");
                     } else {
                         //rare cases have instances, so we filter them out and recheck that the target is a class.
@@ -175,13 +176,14 @@ class Mapper {
                             for (OWLOntology temp_ontology : this.ontologies) {
                                 if (this.config_data.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES)) {
                                     this.mappedClasses.add(clsToCheck);
-                                    getMapperSchema(query, temp_ontology, clsToCheck, this.schemaDescriptions.get(clsToCheck.getIRI()));
-                                    add_owlclass_to_openapi(query, pathGenerator, temp_ontology, classPrefixIRI, clsToCheck, false);
+                                    this.getMapperSchema(query, temp_ontology, clsToCheck, this.schemaDescriptions.get(clsToCheck.getIRI()));
+                                    this.add_owlclass_to_openapi(query, pathGenerator, temp_ontology, classPrefixIRI, clsToCheck, false);
                                 }
                             }
                         }
                     }
                 }
+
                 // add references to schemas in property ranges
                 for (OWLClass ref_class : mapperSchema.getProperties_range()) {
                     if (this.mappedClasses.contains(ref_class)){
@@ -190,15 +192,17 @@ class Mapper {
                         for (OWLOntology temp_ontology : this.ontologies) {
                             if (this.config_data.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES)) {
                                 this.mappedClasses.add(ref_class);
-                                getMapperSchema(query, temp_ontology, ref_class,this.schemaDescriptions.get(ref_class.getIRI()));
-                                add_owlclass_to_openapi(query, pathGenerator, temp_ontology, classPrefixIRI, ref_class, false);
+                                this.getMapperSchema(query, temp_ontology, ref_class,this.schemaDescriptions.get(ref_class.getIRI()));
+                                this.add_owlclass_to_openapi(query, pathGenerator, temp_ontology, classPrefixIRI, ref_class, false);
                             }
                         }
                     }
                 }
+                
                 //Add the OpenAPI paths
-                if (topLevel)
+                if (topLevel) {
                     addOpenAPIPaths(pathGenerator, mapperSchema, cls);
+                }
             }catch(Exception e){
                 logger.log(Level.SEVERE,"Could not parse class "+cls.getIRI().toString());
             }
@@ -218,16 +222,16 @@ class Mapper {
     }
 
     private void addOpenAPIPaths(PathGenerator pathGenerator, MapperSchema mapperSchema, OWLClass cls) {
-        if (selected_classes != null && !selected_classes.contains(cls)) {
+        if (this.selected_classes != null && !this.selected_classes.contains(cls)) {
             logger.info("Ignoring class " + cls.toString());
         } else {
-            add_path(pathGenerator, mapperSchema);
+            this.add_path(pathGenerator, mapperSchema);
         }
     }
 
     private void setSchemaNames(Set<OWLClass> classes) {
         for (OWLClass cls : classes) {
-            schemaNames.put(cls.getIRI(), cls.getIRI().getShortForm());
+            this.schemaNames.put(cls.getIRI(), cls.getIRI().getShortForm());
         }
     }
     

@@ -19,6 +19,7 @@ public class YamlConfig {
     put(CONFIG_FLAG.PATH_PATCH, false);
     put(CONFIG_FLAG.PATH_POST, false);
     put(CONFIG_FLAG.PATH_PUT, false);
+    put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, false);
   }};
 
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
@@ -194,6 +195,14 @@ public class YamlConfig {
 
   public void setDefault_properties(Boolean default_properties) {
     this.configFlags.put(CONFIG_FLAG.DEFAULT_PROPERTIES, default_properties);
+  }
+
+  public Boolean getRequired_properties_from_cardinality() {
+    return this.configFlags.get(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY);
+  }
+
+  public void setRequired_properties_from_cardinality(Boolean required_properties_from_cardinality) {
+    this.configFlags.put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, required_properties_from_cardinality);
   }
 
   public AuthConfig getAuth() {
