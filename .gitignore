@@ -41,6 +41,9 @@ example.yaml
 # .idea/*.iml
 # .idea/modules
 
+# Generated files
+.vscode/settings.json
+
 # CMake
 cmake-build-*/
 

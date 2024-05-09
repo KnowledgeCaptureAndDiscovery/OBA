@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.IRIShortFormProvider;
@@ -42,7 +41,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	private final OWLClass cls;
 	private final OWLOntology onto;
 	String property_name;
-	OWLClass owlThing; 
+	OWLClass owlThing;
 	
 	public Map<String, Map<String,String>> restrictionsValuesFromClass;
 	
@@ -51,31 +50,54 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	public List<OWLDataProperty> propertiesFromDataRestrictions;
 	public Map<String, List<String>> propertiesFromDataRestrictions_ranges;
 	public List<String> valuesFromDataRestrictions_ranges;
-
+	public Map<IRI, List<String>> enums;
 
 	RestrictionVisitor(OWLClass visitedClass, OWLOntology onto, OWLClass owlThing, String propertyName ) {
 		processedClasses = new HashSet<OWLClass>();
-		this.cls=visitedClass;
-		this.onto=onto;
-		this.property_name=propertyName;           
-		this.owlThing=owlThing;   
+		this.cls = visitedClass;
+		this.onto = onto;
+		this.property_name = propertyName;           
+		this.owlThing = owlThing;   
 		this.propertiesFromObjectRestrictions_ranges= new HashMap<>();
 		this.propertiesFromObjectRestrictions = new ArrayList<>();		
 		this.restrictionsValuesFromClass = new HashMap<>();
 		this.propertiesFromDataRestrictions = new ArrayList<>();
 		this.propertiesFromDataRestrictions_ranges= new HashMap<>();
 		this.valuesFromDataRestrictions_ranges = new ArrayList<>();
+		this.enums = new HashMap<>();
 	}
 
 	@Override
 	public void visit(OWLClass ce) {
-		if (!processedClasses.contains(ce)) {
+		if (!this.processedClasses.contains(ce)) {
 			// If we are processing inherited restrictions then we recursively visit named supers. 
-			processedClasses.add(ce);
-			for (OWLSubClassOfAxiom ax : onto.getSubClassAxiomsForSubClass(ce)) {
-				ax.getSuperClass().accept(this);                        
+			this.processedClasses.add(ce);
+			for (OWLSubClassOfAxiom ax: this.onto.getSubClassAxiomsForSubClass(ce)) {
+				ax.getSuperClass().accept(this);
 			}               
 		}
+	}
+
+	@Override
+	public void visit( OWLEquivalentClassesAxiom ce ) {		 							    	
+		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+
+		// If equivalent class axiom AND contains owl:oneOf, then we're looking at an ENUM class.
+		ce.classExpressions().filter((e) -> e instanceof OWLObjectOneOf).forEach((oneOfObj) -> {
+			var enumValues = new ArrayList<String>();
+			((OWLObjectOneOf) oneOfObj).getOperandsAsList().forEach((indv) -> {
+				enumValues.add(this.sfp.getShortForm(((OWLNamedIndividual) indv).getIRI()));
+			});
+
+			if (!enumValues.isEmpty()) {
+				this.enums.put(this.cls.getIRI(), enumValues);
+			}
+		});
+
+		// Loop through each expression in the equivalent classes axiom and accept visits from everything else.
+		ce.classExpressions().filter((e) -> !(e instanceof OWLObjectOneOf)).forEach((e) -> {
+			e.accept(this);
+		});
 	}
 
 	/**
@@ -85,26 +107,33 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	@Override
 	public void visit(OWLObjectSomeValuesFrom ce) {
 		Map<String, String> restrictionsValues = new HashMap<>();
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);		
-		for(OWLObjectProperty property:ce.getObjectPropertiesInSignature()) {        		   
-			propertiesFromObjectRestrictions.add(property);
-			property_name = sfp.getShortForm(property.getIRI());        		
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
+
+		for(OWLObjectProperty property: ce.getObjectPropertiesInSignature()) {
+			this.propertiesFromObjectRestrictions.add(property);
+			this.property_name = this.sfp.getShortForm(property.getIRI());        		
 		}
-		if (ce.getFiller() instanceof OWLObjectUnionOf || ce.getFiller() instanceof OWLObjectIntersectionOf || ce.getFiller() instanceof OWLObjectOneOf) {			
-			restrictionsValues.put("someValuesFrom", "");			
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
+
+		OWLClassExpression ceFiller = ce.getFiller();
+		if (ceFiller instanceof OWLObjectUnionOf || ceFiller instanceof OWLObjectIntersectionOf || ceFiller instanceof OWLObjectOneOf) {
+			restrictionsValues.put("someValuesFrom", "");
+			this.restrictionsValuesFromClass.put(this.property_name, restrictionsValues);
 			ce.getFiller().accept(this);
-		} else {       	   
-			List<String> ranges = new ArrayList<>();
-			ranges.add(sfp.getShortForm(ce.getFiller().asOWLClass().getIRI()));
-			if (ce.getFiller().asOWLClass().equals(owlThing)) {
-				logger.info("Ignoring owl:Thing range" + property_name);                       
+		} else {
+			if (ceFiller.asOWLClass().equals(owlThing)) {
+				logger.info("Ignoring owl:Thing range" + this.property_name);
+			} else {
+				if (this.propertiesFromObjectRestrictions_ranges.containsKey(this.property_name)) {
+					this.propertiesFromObjectRestrictions_ranges.get(this.property_name).add(this.sfp.getShortForm(ceFiller.asOWLClass().getIRI()));
+				} else {
+					List<String> ranges = new ArrayList<>();
+					ranges.add(this.sfp.getShortForm(ceFiller.asOWLClass().getIRI()));
+					this.propertiesFromObjectRestrictions_ranges.put(this.property_name, ranges);
+				}
 			}
-			else
-				propertiesFromObjectRestrictions_ranges.put(property_name,ranges);        		  
 			
-			restrictionsValues.put("someValuesFrom", "");			
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
+			restrictionsValues.put("someValuesFrom", "");
+			this.restrictionsValuesFromClass.put(this.property_name, restrictionsValues);
 		}
 	}
 	
@@ -127,9 +156,9 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 			ranges.add(sfp.getShortForm(ce.getFiller().asOWLClass().getIRI()));
 			if (ce.getFiller().asOWLClass().equals(owlThing)) {
 				logger.info("Ignoring owl:Thing range" + property_name);                       
+			} else {
+				propertiesFromObjectRestrictions_ranges.put(property_name, ranges);
 			}
-			else
-				propertiesFromObjectRestrictions_ranges.put(property_name,ranges);        		  
 
 			restrictionsValues.put("allValuesFrom", "");			
 			restrictionsValuesFromClass.put(property_name, restrictionsValues);
@@ -139,16 +168,20 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	@Override
 	public void visit( OWLObjectUnionOf ce ) {		 							    	
 		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
-		Set<OWLClassExpression> ranges = ce.getOperands();
-		Set<OWLObjectProperty> properties = ce.getObjectPropertiesInSignature();
-		setBooleanCombinationProperties(ranges,  properties, "unionOf");
+		
+		// Loop through each item in the union and accept visits.
+		for (OWLClassExpression e : ce.getOperands()) {
+			e.accept(this);
+		}
 	}
 	@Override
 	public void visit( OWLObjectIntersectionOf ce ) {		 							    	
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);  
-		Set<OWLClassExpression> ranges = ce.getOperands();
-		Set<OWLObjectProperty> properties = ce.getObjectPropertiesInSignature();
-		setBooleanCombinationProperties(ranges, properties, "intersectionOf");
+		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		
+		// Loop through each item in the intersection and accept visits.
+		for (OWLClassExpression e : ce.getOperands()) {
+			e.accept(this);
+		}
 	}
 
 	@Override
@@ -179,32 +212,49 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit(OWLObjectHasValue ce) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
-		List<String> ranges = new ArrayList<String>();
-		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for(OWLObjectProperty property:ce.getObjectPropertiesInSignature()) {
-			property_name = sfp.getShortForm(property.getIRI());			
-			restrictionsValues.put("objectHasValue",ce.getValue().toString());	
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
-			propertiesFromObjectRestrictions.add(property);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
+		
+		for(OWLObjectProperty property: ce.getObjectPropertiesInSignature()) {
+			List<String> ranges = new ArrayList<String>();
+			Map<String, String> restrictionsValues = new HashMap<String, String>();
+
+			this.property_name = this.sfp.getShortForm(property.getIRI());
+
+			restrictionsValues.put("objectHasValue", this.sfp.getShortForm(((OWLNamedIndividual)ce.getFiller()).getIRI()));
+
+			// If object property has object(s) in its range, we want to set references to the object class.
+			var obRangeAxioms = this.onto.getObjectPropertyRangeAxioms(property);
+			if (obRangeAxioms.isEmpty()) {
+				logger.warning("\tObject has value (named individual) but there is no associated class/reference for the value.  Ontology may have errors.");
+			} else {
+				obRangeAxioms.forEach((obRangeAxiom) -> {
+					obRangeAxiom.getRange().classesInSignature().forEach((owlClass) -> {
+						restrictionsValues.put("objectHasReference", this.sfp.getShortForm(owlClass.getIRI()));
+					});
+				});
+			}
+
+			this.restrictionsValuesFromClass.put(this.property_name, restrictionsValues);
+			this.propertiesFromObjectRestrictions.add(property);
 			ranges.add("defaultValue");
-			propertiesFromObjectRestrictions_ranges.put(property_name,ranges);
+			this.propertiesFromObjectRestrictions_ranges.put(this.property_name, ranges);
 		}
 	}
 	
 	@Override
 	public void visit( OWLObjectOneOf ce ) {	
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		List<String> ranges = new ArrayList<String>();
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		Stream<OWLObjectProperty> valores=ce.objectPropertiesInSignature();
+
 		if (!property_name.isEmpty()) {
-			for (OWLIndividual individual : ce.getIndividuals()) {
+			for (OWLIndividual individual: ce.getIndividuals()) {
 				ranges.add(individual.toString());
 			}
-			restrictionsValues.put("oneOf","someValuesFrom");
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
-			propertiesFromObjectRestrictions_ranges.put(property_name,ranges);
+
+			restrictionsValues.put("oneOf", "someValuesFrom");
+			this.restrictionsValuesFromClass.put(this.property_name, restrictionsValues);
+			this.propertiesFromObjectRestrictions_ranges.put(this.property_name, ranges);
 		}
 	}
 	
@@ -214,7 +264,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	 */
 	@Override
 	public void visit( OWLDataAllValuesFrom ce ) {		
-		logger.info( "\n Analized Class: " + this.cls+ " with axiom: "+ce);
+		logger.info( "\n Analyzed Class: " + this.cls+ " with axiom: "+ce);
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
 		for(OWLDataProperty property:ce.getDataPropertiesInSignature()) {        		   
 			propertiesFromDataRestrictions.add(property);
@@ -242,45 +292,51 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	 */
 	@Override
 	public void visit( OWLDataSomeValuesFrom ce ) {
-
-		logger.info( "\n Analized Class: " + this.cls+ " with axiom: "+ce);
+		logger.info( "\n Analyzed Class: " + this.cls + " with axiom: " + ce);
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for(OWLDataProperty property:ce.getDataPropertiesInSignature()) {        		   
-			propertiesFromDataRestrictions.add(property);
-			property_name = sfp.getShortForm(property.getIRI());        		
+		for(OWLDataProperty property: ce.getDataPropertiesInSignature()) {        		   
+			this.propertiesFromDataRestrictions.add(property);
+			this.property_name = this.sfp.getShortForm(property.getIRI());
 		}
-		if (ce.getFiller() instanceof OWLDataUnionOf || ce.getFiller() instanceof OWLDataIntersectionOf) {
+
+		OWLDataRange ceFiller = ce.getFiller();
+		if (ceFiller instanceof OWLDataUnionOf || ceFiller instanceof OWLDataIntersectionOf) {
 			restrictionsValues.put("someValuesFrom", "");			
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
+			this.restrictionsValuesFromClass.put(property_name, restrictionsValues);
 			ce.getFiller().accept(this);
 		} else {       	   
 			List<String> ranges = new ArrayList<String>();
-			ranges.add(sfp.getShortForm(ce.getFiller().asOWLDatatype().getIRI()));
-			if (ce.getFiller().asOWLDatatype().equals(owlThing)) {
-				logger.info("Ignoring owl:Thing range" + property_name);                       
-			}
-			else
-				propertiesFromDataRestrictions_ranges.put(property_name,ranges);        		  
+			ranges.add(this.sfp.getShortForm(ceFiller.asOWLDatatype().getIRI()));
 
-			restrictionsValues.put("someValuesFrom", "");			
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
+			if (ceFiller.asOWLDatatype().equals(owlThing)) {
+				logger.info("Ignoring owl:Thing range" + property_name);                       
+			} else {
+				propertiesFromDataRestrictions_ranges.put(property_name, ranges);  
+			}      		  
+
+			restrictionsValues.put("someValuesFrom", "");
+			this.restrictionsValuesFromClass.put(property_name, restrictionsValues);
 		}
 	}
 
 	@Override
 	public void visit( OWLDataUnionOf ce ) {
 		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
-		Set<OWLDataRange> ranges = ce.getOperands();
-		Set<OWLDataProperty> properties = ce.getDataPropertiesInSignature();
-		setBooleanCombinationDataProperties(ranges,  properties, "unionOf");
+		
+		// Loop through each item in the union and accept visits.
+		for (OWLDataRange e : ce.getOperands()) {
+			e.accept(this);
+		}
 	}
 	
 	@Override
 	public void visit( OWLDataIntersectionOf ce ) {
 		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
-		Set<OWLDataRange> ranges = ce.getOperands();
-		Set<OWLDataProperty> properties = ce.getDataPropertiesInSignature();
-		setBooleanCombinationDataProperties(ranges,  properties, "intersectionOf");		
+
+		// Loop through each item in the intersection and accept visits.
+		for (OWLDataRange e : ce.getOperands()) {
+			e.accept(this);
+		}
 	}
 	
 	@Override
@@ -303,44 +359,46 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit( OWLDataOneOf ce ) {	
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);	
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);	
 		List<String> ranges = new ArrayList<String>();
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for (OWLLiteral value : ce.getValues()) {
-			ranges.add(sfp.getShortForm(value.getDatatype().getIRI()));
-			valuesFromDataRestrictions_ranges.add(value.getLiteral());
+
+		for (OWLLiteral value: ce.getValues()) {
+			ranges.add(this.sfp.getShortForm(value.getDatatype().getIRI()));
+			this.valuesFromDataRestrictions_ranges.add(value.getLiteral());
+			restrictionsValues.put("oneOf", "");
+			this.restrictionsValuesFromClass.put(this.property_name, restrictionsValues);
+			this.propertiesFromDataRestrictions_ranges.put(this.property_name, ranges);
 		}
-		restrictionsValues.put("oneOf","");
-		restrictionsValuesFromClass.put(property_name, restrictionsValues);
-		propertiesFromDataRestrictions_ranges.put(property_name,ranges);
 	}
 
 	@Override
 	public void visit( OWLDataComplementOf ce ) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		List<String> ranges = new ArrayList<String>();
 		Map<String, String> restrictionsValues = new HashMap<String, String>();					
-		for (OWLDatatype value:ce.getDatatypesInSignature()){
-			ranges.add(sfp.getShortForm(value.getIRI()));
-			restrictionsValues.put("complementOf", "");	
-			restrictionsValuesFromClass.put(property_name, restrictionsValues);
-			propertiesFromDataRestrictions_ranges.put(property_name,ranges);
+		for (OWLDatatype value: ce.getDatatypesInSignature()) {
+			ranges.add(this.sfp.getShortForm(value.getIRI()));
+			restrictionsValues.put("complementOf", "");
+			restrictionsValuesFromClass.put(this.property_name, restrictionsValues);
+			propertiesFromDataRestrictions_ranges.put(this.property_name, ranges);
 		}
 	}
 	
 	@Override
 	public void visit( OWLDataHasValue ce ) {
-		logger.info("Analyzing restrictions of Class: " + this.cls+ " with axiom: "+ce);
+		logger.info("Analyzing restrictions of Class: " + this.cls + " with axiom: " + ce);
 		List<String> ranges = new ArrayList<String>();
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for(OWLDataProperty property:ce.getDataPropertiesInSignature()) {
-			property_name = sfp.getShortForm(property.getIRI());
+		for(OWLDataProperty property: ce.getDataPropertiesInSignature()) {
+			property_name = this.sfp.getShortForm(property.getIRI());
 			propertiesFromDataRestrictions.add(property);
-			restrictionsValues.put("dataHasValue",ce.getValue().getLiteral());	
+			restrictionsValues.put("dataHasValue", ce.getFiller().getLiteral());
 			restrictionsValuesFromClass.put(property_name, restrictionsValues);
-			for (OWLDatatype value:ce.getDatatypesInSignature()){
-				ranges.add(sfp.getShortForm(value.getIRI()));
-				propertiesFromDataRestrictions_ranges.put(property_name,ranges);
+			
+			for (OWLDatatype value: ce.getDatatypesInSignature()) {
+				ranges.add(this.sfp.getShortForm(value.getIRI()));
+				propertiesFromDataRestrictions_ranges.put(this.property_name, ranges);
 			}
 		}
 	}
@@ -373,24 +431,8 @@ public class RestrictionVisitor implements OWLObjectVisitor {
      * @param restriction string value of restriction e.g. "unionOf"
      */
 	public void setBooleanCombinationProperties( Set<OWLClassExpression> ranges, Set<OWLObjectProperty> properties, String restriction) {
-		Boolean inspect=true;
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for (OWLClassExpression value :ranges) {
-			//if operands from boolean restriction contain complex combinations the restriction on this property
-			// will be ignored                   		 
-			if (value instanceof OWLObjectIntersectionOf || value instanceof OWLObjectComplementOf || value instanceof OWLObjectSomeValuesFrom || value instanceof OWLObjectAllValuesFrom 
-					|| value instanceof OWLObjectHasValue) {                    			                    		        				
-				logger.warning("Ignoring complex range restriction of property "+ property_name);				
-				if (property_name!="") {
-					propertiesFromObjectRestrictions.remove(property_name);	
-					restrictionsValuesFromClass.remove(property_name);
-				}
-				inspect=false;
-			} 
-		}
-		// if there are not complex range restrictions inspect ce
-		if (inspect) {
-			//if the expression ce is not part of a composed expression (existencial or universal)
+			//if the expression ce is not part of a composed expression (existential or universal)
 			if (property_name.isEmpty()) {
 				for(OWLObjectProperty property:properties) {
 					propertiesFromObjectRestrictions.add(property);
@@ -410,7 +452,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 					} 					
 				}
 				
-				if (restrictionsValuesFromClass.size()!=0) {
+				if (!restrictionsValuesFromClass.isEmpty()) {
 					for (String j :  restrictionsValuesFromClass.keySet()) { 
 						if (j.equals(property_name)) {
 							Map<String,String> value = restrictionsValuesFromClass.get(property_name);
@@ -420,13 +462,11 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 							restrictionsValuesFromClass.put(property_name, restrictionsValues);
 						}
 					}
-				}
-				else {
+				} else {
 					restrictionsValues.put(restriction, "");			
 					restrictionsValuesFromClass.put(property_name, restrictionsValues);
 				}
-			}       
-		}
+			}
 	}
 	
 	 /**
@@ -436,24 +476,8 @@ public class RestrictionVisitor implements OWLObjectVisitor {
      * @param restriction string value of restriction e.g. "unionOf"
      */
 	public void setBooleanCombinationDataProperties( Set<OWLDataRange> ranges, Set<OWLDataProperty> properties, String restriction) {
-		Boolean inspect=true;
 		Map<String, String> restrictionsValues = new HashMap<String, String>();
-		for (OWLDataRange value :ranges) {
-			//if operands from boolean restriction contain complex combinations the restriction on this property
-			// will be ignored                   		 
-			if (value instanceof OWLDataIntersectionOf || value instanceof OWLDataComplementOf || value instanceof OWLDataSomeValuesFrom || value instanceof OWLDataAllValuesFrom 
-					|| value instanceof OWLDataHasValue) {                    			                    		        				
-				logger.warning("Ignoring complex range restriction of property "+ property_name);				
-				if (!property_name.equals("")) {
-					propertiesFromDataRestrictions.remove(property_name);	
-					restrictionsValuesFromClass.remove(property_name);
-				}
-				inspect=false;
-			} 
-		}
-		// if there are not complex range restrictions inspect ce
-		if (inspect) {
-			//if the expression ce is not part of a composed expression (existencial or universal)
+			//if the expression ce is not part of a composed expression (existential or universal)
 			if (property_name.equals("")) {
 				for(OWLDataProperty property:properties) {
 					propertiesFromDataRestrictions.add(property);
@@ -472,11 +496,11 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 						propertiesFromDataRestrictions_ranges.put(property_name,rangeList);							
 					} 					
 				}				
-				if (restrictionsValuesFromClass.size()!=0) {
+				if (!restrictionsValuesFromClass.isEmpty()) {
 					for (String j :  restrictionsValuesFromClass.keySet()) { 
 						if (j.equals(property_name)) {
 							Map<String,String> value = restrictionsValuesFromClass.get(property_name);
-							for (String i : value.keySet() ) {
+							for (String i : value.keySet()) {
 								restrictionsValues.put(restriction, i);
 							}
 							restrictionsValuesFromClass.put(property_name, restrictionsValues);
@@ -488,8 +512,7 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 					restrictionsValues.put(restriction, "");			
 					restrictionsValuesFromClass.put(property_name, restrictionsValues);
 				}
-			}       
-		}
+			}
 	}
 
 	public void setDataPropertiesWithCardinality(OWLDataCardinalityRestriction ce, String restriction) {
@@ -509,28 +532,35 @@ public class RestrictionVisitor implements OWLObjectVisitor {
 		restrictionsValuesFromClass.put(property_name, restrictionsValues);
 	}
 	
-	public Map<String, Map<String,String>> getRestrictionsValuesFromClass(){
-		return restrictionsValuesFromClass;
+	public Map<String, Map<String,String>> getRestrictionsValuesFromClass() {
+		return this.restrictionsValuesFromClass;
 	}
 
-	public List<OWLObjectProperty> getPropertiesFromObjectRestrictions(){
-		return propertiesFromObjectRestrictions;
+	public List<OWLObjectProperty> getPropertiesFromObjectRestrictions() {
+		return this.propertiesFromObjectRestrictions;
 	}
 
-	public Map<String, List<String>> getPropertiesFromObjectRestrictions_ranges(){
-		return  propertiesFromObjectRestrictions_ranges;
+	public Map<String, List<String>> getPropertiesFromObjectRestrictions_ranges() {
+		return this.propertiesFromObjectRestrictions_ranges;
 	}
 		
-	public List<OWLDataProperty> getPropertiesFromDataRestrictions(){
-		return propertiesFromDataRestrictions;
+	public List<OWLDataProperty> getPropertiesFromDataRestrictions() {
+		return this.propertiesFromDataRestrictions;
 	}
 	
-	public List<String> getValuesFromDataRestrictions_ranges(){
-		return valuesFromDataRestrictions_ranges;
+	public List<String> getValuesFromDataRestrictions_ranges() {
+		return this.valuesFromDataRestrictions_ranges;
 	}
 	
-	public Map<String, List<String>> getPropertiesFromDataRestrictions_ranges(){
-		return  propertiesFromDataRestrictions_ranges;
+	public Map<String, List<String>> getPropertiesFromDataRestrictions_ranges() {
+		return this.propertiesFromDataRestrictions_ranges;
 	}
 
+	public List<String> getEnums(IRI classIRI) {
+		return this.enums.get(classIRI);
+	}
+
+	public Map<IRI, List<String>> getAllEnums() {
+		return this.enums;
+    }
 }

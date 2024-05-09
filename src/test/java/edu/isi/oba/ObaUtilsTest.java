@@ -2,14 +2,14 @@ package edu.isi.oba;
 
 import static edu.isi.oba.ObaUtils.get_yaml_data;
 import edu.isi.oba.config.YamlConfig;
-import java.io.File;
-import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import org.json.JSONObject;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -19,7 +19,7 @@ public class ObaUtilsTest {
     @Test
     public void read_json_file() throws IOException {
         JSONObject actual = ObaUtils.read_json_file("json_one.json");
-        Assert.assertNotNull(actual.get("@context"));
+        Assertions.assertNotNull(actual.get("@context"));
     }
 
     @Test
@@ -27,8 +27,8 @@ public class ObaUtilsTest {
         JSONObject one = ObaUtils.read_json_file("json_one.json");
         JSONObject two = ObaUtils.read_json_file("json_two.json");
         JSONObject merge = ObaUtils.mergeJSONObjects(one, two);
-        Assert.assertNotNull(merge.get("@context"));
-        Assert.assertNotNull(merge.get("@context"));
+        Assertions.assertNotNull(merge.get("@context"));
+        Assertions.assertNotNull(merge.get("@context"));
     }
 
     @Test
@@ -39,9 +39,9 @@ public class ObaUtilsTest {
         JSONObject[] jsons = new JSONObject[]{ one, two, three};
         JSONObject merge = ObaUtils.concat_json_common_key(jsons, "@context");
         JSONObject o = (JSONObject) merge.get("@context");
-        assertNotNull(o.get("Entity"));
-        assertNotNull(o.get("Model"));
-        assertNotNull(o.get("Setup"));
+        Assertions.assertNotNull(o.get("Entity"));
+        Assertions.assertNotNull(o.get("Model"));
+        Assertions.assertNotNull(o.get("Setup"));
     }
     
     @Test
@@ -51,10 +51,10 @@ public class ObaUtilsTest {
         try {
             Mapper mapper = new Mapper(config_data);
             OWLClass planClass = mapper.manager.getOWLDataFactory().getOWLClass("http://purl.org/net/p-plan#Plan");
-            String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0));
-            assertNotEquals(desc, "");
+            String desc = ObaUtils.getDescription(planClass, mapper.ontologies.get(0), true);
+            Assertions.assertNotEquals(desc, "");
         }catch(Exception e){
-            fail();
+            Assertions.fail("Failed to get description.", e);
         }
     }
 
@@ -69,8 +69,7 @@ public class ObaUtilsTest {
         YamlConfig config_data = get_yaml_data(missing_file);
         try {
             Mapper mapper = new Mapper(config_data);
-            //if no exception is launched, fail test
-            fail();
+            Assertions.fail("Missing file: If no exception is launched, fail test");
         }catch(Exception e){
             //pass test if there is an exception
         }
@@ -78,8 +77,8 @@ public class ObaUtilsTest {
 
     @Test
     public void run() {
-        String ontology1 = "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.4.0/ontology.xml";
-        String ontology2 = "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.5.0/ontology.xml";
+        String ontology1 = "https://mintproject.github.io/Mint-ModelCatalog-Ontology/release/1.8.0/ontology.owl";
+        String ontology2 = "https://knowledgecaptureanddiscovery.github.io/SoftwareDescriptionOntology/release/1.9.0/ontology.owl";
         File ont1 = new File("ontology1");
         File ont2 = new File("ontology2");
         ObaUtils.downloadOntology(ontology1, ont1.getPath());
@@ -91,17 +90,17 @@ public class ObaUtilsTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         JSONObject o = (JSONObject) context.get("@context");
-        assertEquals(o.get("id"), "@id");
-        assertEquals(o.get("type"), "@type");
-        assertNotNull(o.get("Entity"));
-        assertNotNull(o.get("Model"));
+        Assertions.assertEquals(o.get("id"), "@id");
+        Assertions.assertEquals(o.get("type"), "@type");
+        Assertions.assertNotNull(o.get("Entity"));
+        Assertions.assertNotNull(o.get("Model"));
         try{
             java.nio.file.Files.delete(ont1.toPath());
             java.nio.file.Files.delete(ont2.toPath());
         }catch(Exception e){
         }
-
     }
 
 }

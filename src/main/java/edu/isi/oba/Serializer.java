@@ -1,20 +1,17 @@
 package edu.isi.oba;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.*;
 
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
-import org.openapitools.codegen.serializer.SerializerUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
+import org.openapitools.codegen.serializer.SerializerUtils;
 
 class Serializer {
   //TODO: validate the yaml
@@ -65,7 +62,7 @@ class Serializer {
     List<String> messageList = result.getMessages();
     Set<String> errors = new HashSet<>(messageList);
     Set<String> warnings = new HashSet<>();
-    if (errors.size() > 0) {
+    if (!errors.isEmpty()) {
       throw new Exception("Error when validating the API specification. " + errors.iterator().next());
     }
   }

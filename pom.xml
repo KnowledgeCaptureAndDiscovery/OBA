@@ -6,17 +6,17 @@
     <packaging>jar</packaging>
     <groupId>edu.isi.oba</groupId>
     <artifactId>oba</artifactId>
-    <version>3.6.1</version>
+    <version>3.9.0</version>
     <name>core</name>
     <url>https://github.com/KnowledgeCaptureAndDiscovery/OBA</url>
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <jdk.version>1.8</jdk.version>
-        <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
+        <maven.compiler.release>11</maven.compiler.release>
+        <jdk.version>11</jdk.version>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
+        <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
     </properties>
 
     <dependencies>
@@ -24,60 +24,68 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20190722</version>
+            <version>20240303</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
-            <groupId>com.github.jsonld-java</groupId>
-            <artifactId>jsonld-java</artifactId>
-            <version>0.11.1</version>
-        </dependency>
-
-
-        <!-- logging (Removed because it's not used) -->
-        <!-- https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j -->
-        <!--
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.28</version>
-        </dependency>
-        -->
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-compat-spec-parser -->
         <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-api</artifactId>
-            <version>5.1.10</version>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-compat-spec-parser</artifactId>
+            <version>1.0.70</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-models -->
         <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-apibinding</artifactId>
-            <version>5.1.10</version>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>2.2.21</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.swagger.parser.v3/swagger-parser -->
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>2.1.21</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.swagger.parser.v3/swagger-parser-core -->
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser-core</artifactId>
+            <version>2.1.21</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.openapitools/openapi-generator -->
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator</artifactId>
-            <version>4.0.0</version>
-            <!-- <version>4.3.1</version>-->
+            <version>7.4.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-api -->
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-compatibility</artifactId>
-            <version>5.1.10</version>
+            <artifactId>owlapi-api</artifactId>
+            <version>5.5.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-apibinding -->
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-apibinding</artifactId>
+            <version>5.5.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-impl -->
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-impl</artifactId>
+            <version>5.5.0</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>
             <groupId>org.yaml</groupId>
@@ -90,13 +98,21 @@
             <artifactId>maven-dependency-plugin</artifactId>
             <version>3.1.1</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.3.1</version>
+            <version>1.6.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <!-- "Unused dependency" - but it is called via SerializerUtils from org.openapitools/openapi-generator and throws an error if not included explicitly -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.17.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -106,24 +122,33 @@
             </resource>
         </resources>
         <plugins>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-eclipse-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.10</version>
                 <configuration>
                     <downloadSources>true</downloadSources>
                     <downloadJavadocs>false</downloadJavadocs>
                 </configuration>
             </plugin>
 
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${jdk.version}</source>
                     <target>${jdk.version}</target>
                 </configuration>
+            </plugin>
+
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
             </plugin>
 
             <!-- Make this jar executable -->

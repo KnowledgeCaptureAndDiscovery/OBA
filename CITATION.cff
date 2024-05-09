@@ -1,0 +1,25 @@
+title: "OBA: Ontology-Based APIs"
+license: Apache-2.0
+authors:
+  - family-names: Osorio
+    given-names: Maximiliano
+    orcid: "https://orcid.org/0000-0002-3611-6510"
+  - family-names: Garijo
+    given-names: Daniel
+    orcid: "https://orcid.org/0000-0003-0454-7145"
+cff-version: 1.2.0
+message: "If you use this software, please cite both the article from preferred-citation and the software itself."
+preferred-citation:
+  authors:
+    - family-names: Osorio
+      given-names: Maximiliano
+    - family-names: Garijo
+      given-names: Daniel
+  title: "OBA: An Ontology-Based Framework for Creating REST APIs for Knowledge Graphs"
+  type: article
+  year: 2021
+  doi: 10.1007/978-3-030-62466-8_4
+identifiers:
+  - description: "Collection of archived snapshots for OBA"
+    type: doi
+    value: 10.5281/zenodo.6639554
