@@ -93,7 +93,7 @@ class Oba {
   }
   
   private static void generate_context(YamlConfig config_data, String destination_dir) {
-    List<String> ontologies = config_data.getOntologies();
+    Set<String> ontologies = config_data.getOntologies();
     JSONObject context_json_object = null;
     JSONObject context_json_object_class = null;
     try {

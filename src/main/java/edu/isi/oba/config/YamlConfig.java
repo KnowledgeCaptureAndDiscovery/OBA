@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class YamlConfig {
   private final Map<CONFIG_FLAG, Boolean> configFlags = new HashMap<>(){{
@@ -27,14 +28,14 @@ public class YamlConfig {
   public OpenAPI openapi;
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
-  public List<String> paths;
-  public List<String> ontologies;
+  public Set<String> paths;
+  public Set<String> ontologies;
   private EndpointConfig endpoint;
   public AuthConfig auth;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
   private LinkedHashMap<String, PathItem> custom_paths = null;
-  public List<String> classes;
+  public Set<String> classes;
   public String custom_queries_directory;
 
   public Boolean getEnable_get_paths() {
@@ -101,19 +102,19 @@ public class YamlConfig {
     this.name = name;
   }
 
-  public List<String> getPaths() {
+  public Set<String> getPaths() {
     return paths;
   }
 
-  public void setPaths(List<String> paths) {
+  public void setPaths(Set<String> paths) {
     this.paths = paths;
   }
 
-  public List<String>  getOntologies() {
+  public Set<String>  getOntologies() {
     return ontologies;
   }
 
-  public void setOntologies(List<String> ontologies) {
+  public void setOntologies(Set<String> ontologies) {
     this.ontologies = ontologies;
   }
 
@@ -157,11 +158,11 @@ public class YamlConfig {
     this.openapi = openapi;
   }
 
-  public List<String> getClasses() {
+  public Set<String> getClasses() {
     return this.classes;
   }
 
-  public void setClasses(List<String> classes) {
+  public void setClasses(Set<String> classes) {
     this.classes = classes;
   }
 

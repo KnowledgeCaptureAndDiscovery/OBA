@@ -1,27 +1,26 @@
 package edu.isi.oba;
 
-import static edu.isi.oba.ObaUtils.get_yaml_data;
 import edu.isi.oba.config.AuthConfig;
 import edu.isi.oba.config.CONFIG_FLAG;
 import edu.isi.oba.config.YamlConfig;
+import static edu.isi.oba.Oba.logger;
+import static edu.isi.oba.ObaUtils.get_yaml_data;
 
-import java.io.File;
+import io.swagger.v3.oas.models.media.Schema;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import io.swagger.v3.oas.models.media.Schema;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import org.semanticweb.owlapi.model.OWLClass;
 
 public class MapperTest {
@@ -30,16 +29,14 @@ public class MapperTest {
         String config_test_file_path = "src/test/config/dbpedia.yaml";
         YamlConfig config_data = get_yaml_data(config_test_file_path);
         Mapper mapper = new Mapper(config_data);
-        List<String> config = config_data.getClasses();
-        List<OWLClass> classes = mapper.filter_classes();
-        List<String> filter_classes = new ArrayList();
+        Set<String> config = config_data.getClasses();
+        Set<OWLClass> classes = mapper.filter_classes();
+        Set<String> filter_classes = new HashSet<>();
         for (OWLClass _class : classes){
             filter_classes.add(_class.getIRI().getIRIString());
         }
-        Collections.sort(filter_classes);
-        Collections.sort(config);
-        Assertions.assertEquals(config, filter_classes);
 
+        Assertions.assertEquals(config, filter_classes);
     }
     
     /**
@@ -100,21 +97,20 @@ public class MapperTest {
         InputStream stream = Oba.class.getClassLoader().getResourceAsStream("logging.properties");
         try {
             LogManager.getLogManager().readConfiguration(stream);
-            edu.isi.oba.Oba.logger = Logger.getLogger(Oba.class.getName());
-
+            logger = Logger.getLogger(Oba.class.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        edu.isi.oba.Oba.logger.setLevel(Level.FINE);
-        edu.isi.oba.Oba.logger.addHandler(new ConsoleHandler());
+
+        logger.setLevel(Level.FINE);
+        logger.addHandler(new ConsoleHandler());
         String example_remote = "src/test/resources/complex_expr/config.yaml";
         YamlConfig config_data = get_yaml_data(example_remote);
-        String destination_dir = config_data.getOutput_dir() + File.separator + config_data.getName();
         config_data.setAuth(new AuthConfig());
         Mapper mapper = new Mapper(config_data);
         OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://businessontology.com/ontology/Person");
-        String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), Map.ofEntries(Map.entry(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true), Map.entry(CONFIG_FLAG.DEFAULT_PROPERTIES, true), Map.entry(CONFIG_FLAG.FOLLOW_REFERENCES, true)));
+        String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+        MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.stream().findFirst().get(), Map.ofEntries(Map.entry(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true), Map.entry(CONFIG_FLAG.DEFAULT_PROPERTIES, true), Map.entry(CONFIG_FLAG.FOLLOW_REFERENCES, true)));
         Schema schema = mapperSchema.getSchema();
         // The person schema must not be null.
         Assertions.assertNotNull(schema);
