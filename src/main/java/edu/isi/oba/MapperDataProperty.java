@@ -4,8 +4,9 @@ import static edu.isi.oba.Oba.logger;
 
 import io.swagger.v3.oas.models.media.*;
 
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Set;
 
 class MapperDataProperty {
   private final Map<String, String> dataTypes = Map.ofEntries(
@@ -72,33 +73,34 @@ class MapperDataProperty {
 
   final String name;
   final String description;
-  private List<String> type;
+  private Set<String> type;
   private Boolean array;
   private Boolean nullable;
   final Boolean isFunctional;
-  private Map<String,String> restrictions;
-  private List<String> valuesFromDataRestrictions_ranges;
+  private Map<String, String> restrictions;
+  private Set<String> valuesFromDataRestrictions_ranges;
 
-  public MapperDataProperty(String name, String description, Boolean isFunctional, Map<String, String> restrictions, List<String> valuesFromDataRestrictions_ranges, List<String> type, Boolean array, Boolean nullable) {
+  public MapperDataProperty(String name, String description, Boolean isFunctional, Map<String, String> restrictions, Set<String> valuesFromDataRestrictions_ranges, Set<String> type, Boolean array, Boolean nullable) {
     this.name = name;
     this.description = description;
     this.type = type;
     this.array = array;
     this.nullable = nullable;
-    this.isFunctional=isFunctional;
-    this.restrictions=restrictions;
-    this.valuesFromDataRestrictions_ranges=valuesFromDataRestrictions_ranges;
+    this.isFunctional = isFunctional;
+    this.restrictions = restrictions;
+    this.valuesFromDataRestrictions_ranges = valuesFromDataRestrictions_ranges;
   }
 
   public Schema getSchemaByDataProperty() {
 	  
-    if (this.type.isEmpty()) {
+    if (this.type == null || this.type.isEmpty()) {
       return (this.array) ? this.arraySchema(new StringSchema()) : this.nonArraySchema(new StringSchema());
     } else if (this.type.size() > 1) {
     	return (this.array) ? this.composedSchema() : this.nonArraySchema(new Schema());
     }
 
-    String schemaType = getDataType(this.type.get(0));
+    final String dataType = this.type.iterator().next();
+    String schemaType = this.getDataType(dataType);
     if (schemaType == null) {
       logger.severe("property " + this.name + " type " + this.type);
     }
@@ -115,7 +117,7 @@ class MapperDataProperty {
       case DATETIME_TYPE:
           return (this.array) ? this.arraySchema(new DateTimeSchema()) : this.nonArraySchema(new DateTimeSchema());
       default:
-        logger.warning("datatype mapping failed " + this.type.get(0));
+        logger.warning("datatype mapping failed " + dataType);
         return (this.array) ? this.arraySchema(new Schema()) : this.nonArraySchema(new Schema());
     }
   }
@@ -140,9 +142,9 @@ class MapperDataProperty {
 			  case STRING_TYPE:
 				  schema = new StringSchema();
 
-				  if (item.equals("anyURI")) {
+				  if ("anyURI".equals(item)) {
             schema.format("uri");
-          } else if (item.equals("byte")) {
+          } else if ("byte".equals(item)) {
             schema.format("byte");
           }
 
@@ -150,9 +152,9 @@ class MapperDataProperty {
 			  case NUMBER_TYPE:
 				  schema = new NumberSchema();
 
-				  if (item.equals("float")) {
+				  if ("float".equals(item)) {
             schema.format("double");
-          } else if (item.equals("double")) {
+          } else if ("double".equals(item)) {
             schema.format("double");
           } else {
             schema.format("number");
@@ -162,7 +164,15 @@ class MapperDataProperty {
 			  case INTEGER_TYPE:
 				  schema = new IntegerSchema();
 
-				  if (item.equals("long")) {
+          if ("nonPositiveInteger".equals(item)) {
+            schema.setMaximum(BigDecimal.ZERO);
+          }
+
+          if ("nonNegativeInteger".equals(item)) {
+            schema.setMinimum(BigDecimal.ZERO);
+          }
+
+				  if ("long".equals(item)) {
             schema.format("int64");
           }
 					  
@@ -174,20 +184,20 @@ class MapperDataProperty {
 				  schema = new DateTimeSchema();
 				  break;	       
 			  default:
-				  logger.warning("datatype mapping failed " + this.type.get(0));
+				  logger.warning("datatype mapping failed " + item);
 				  schema = new Schema();	  	
 			  }
 			  
 			  switch (restriction) {
 			  case "unionOf":
-				  if (value == "someValuesFrom") {
+				  if ("someValuesFrom".equals(value)) {
             this.nullable = false;
           }
 
 				  composedSchema.addAnyOfItem(schema); 
 				  break;
 			  case "intersectionOf":
-				  if (value == "someValuesFrom") {
+				  if ("someValuesFrom".equals(value)) {
             this.nullable = false;	
           }
 
@@ -227,8 +237,9 @@ class MapperDataProperty {
     if (this.restrictions.containsKey("complementOf")) {
       Schema schema = new Schema();
       Schema complementOf = new Schema();
-      complementOf.setType(this.getDataType(this.type.get(0)));
-      complementOf.setFormat(this.type.get(0));
+      final String dataType = this.type.iterator().next();
+      complementOf.setType(this.getDataType(dataType));
+      complementOf.setFormat(dataType);
       schema.setNot(complementOf);
       array.setNullable(this.nullable);
       array.setItems(schema);
@@ -281,7 +292,7 @@ class MapperDataProperty {
           //nothing to do
           break;
         case "oneOf":
-          if (value == "someValuesFrom") {
+          if ("someValuesFrom".equals(value)) {
             this.nullable = false;
           }
 

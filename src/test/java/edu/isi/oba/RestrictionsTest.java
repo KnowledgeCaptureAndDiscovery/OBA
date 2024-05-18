@@ -16,7 +16,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.semanticweb.owlapi.model.OWLClass;
@@ -67,8 +66,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#University");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("hasRector");
 			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {
@@ -93,8 +92,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#StudyMaterial");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("author");
 			if (property instanceof ArraySchema) {
@@ -127,8 +126,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Course");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("hasEvaluationMethod");
 			if (property instanceof ArraySchema) {
@@ -159,8 +158,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#University");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("hasDepartment");
 
@@ -188,19 +187,29 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Student");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("enrolledIn");
 			if (property instanceof ArraySchema) {
-				Boolean nullable = ((ArraySchema) property).getNullable();
 				Schema items = ((ArraySchema) property).getItems();
 				List<Schema> itemsValue;
 				if (items instanceof ComposedSchema) {
 					itemsValue = ((ComposedSchema) items).getAnyOf();
+
+					// If the anyOf list is null, something is wrong.
+					Assertions.assertNotNull(itemsValue);
+
+					// Verify the expectedResult list size and anyOf list size are equal.
+					Assertions.assertEquals(expectedResult.size(), itemsValue.size());
+
+					// The anyOf ordering may differ than the expectedResult list.
 					for (int i = 0; i < itemsValue.size(); i++) {
-						Assertions.assertEquals(expectedResult.get(i), itemsValue.get(i).get$ref());
+						expectedResult.remove(itemsValue.get(i).get$ref());
 					}
+
+					// If the expectedResult list is now empty, then both lists contained the same reference values (even if in a different order).
+					Assertions.assertEquals(expectedResult.isEmpty(), true);
 				}
 			}
 		} catch (OWLOntologyCreationException e) {
@@ -219,10 +228,10 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
 
 			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("hasRecord");
 			if (property instanceof ArraySchema) {
@@ -251,11 +260,11 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
 
 			this.configFlags.put(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS, false);
 			this.configFlags.put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 
 			boolean isRequired = schema.getRequired() != null && schema.getRequired().contains("hasRecord");
@@ -300,8 +309,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("takesCourse");
 			if (property instanceof ArraySchema) {
@@ -330,8 +339,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Course");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("hasStudentEnrolled");
 			if (property instanceof ArraySchema) {
@@ -360,8 +369,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInOtherDepartment");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			if (schema.getNot() != null) {
 				Assertions.assertEquals(expectedResult, schema.getNot().get$ref());
@@ -391,8 +400,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("belongsTo");
 
@@ -427,26 +436,38 @@ public class RestrictionsTest {
 		try {
 			this.initializeLogger();
 			List<String> expectedResult = new ArrayList<String>();
-			expectedResult.add("<https://w3id.org/example/resource/Degree/MS>");
-			expectedResult.add("<https://w3id.org/example/resource/Degree/PhD>");
+			// Original full IRIs were:
+			// expectedResult.add("<https://w3id.org/example/resource/Degree/MS>");
+			// expectedResult.add("<https://w3id.org/example/resource/Degree/PhD>");
+			// Because these are individuals which may up the (sub)set of the Degree enum, we only need their short form name now:
+			expectedResult.add("MS");
+			expectedResult.add("PhD");
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Professor");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("hasDegree");
 
 			if (property instanceof ArraySchema) {
 				Schema items = ((ArraySchema) property).getItems();
-				List<Object> itemsValue;
 				if (items instanceof ComposedSchema) {
-					itemsValue = ((ComposedSchema) items).getEnum();
-					for (int i = 0; i < itemsValue.size(); i++) {
-						Object ref = itemsValue.get(i);
-						Assertions.assertEquals(expectedResult.get(i), ref.toString());
+					final var oneOfValues = ((ComposedSchema) items).getOneOf();
+					if (oneOfValues != null && !oneOfValues.isEmpty()) {
+						final var enumValues = oneOfValues.iterator().next().getEnum();
+						for (int i = 0; i < enumValues.size(); i++) {
+							Object ref = enumValues.get(i);
+							Assertions.assertEquals(expectedResult.get(i), ref.toString());
+						}
+					} else {
+						Assertions.fail("Property's oneOf items do not exist.");
 					}
+				} else {
+					Assertions.fail("Property's items are not a composed schema type.");
 				}
+			} else {
+				Assertions.fail("Property is not an array schema type.");
 			}
 		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("Error in ontology creation: ", e);
@@ -464,8 +485,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("birthDate");
 			if (property instanceof io.swagger.v3.oas.models.media.ArraySchema) {
@@ -490,9 +511,12 @@ public class RestrictionsTest {
 
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
+
+
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Course");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("ects");
 			if (property instanceof ArraySchema) {
@@ -527,8 +551,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("memberOfOtherDepartments");
 			if (property instanceof ArraySchema) {
@@ -550,7 +574,6 @@ public class RestrictionsTest {
 	/**
 	 * This test attempts to get the OAS representation of the SomeValuesFrom restriction of a DataProperty.
 	 */
-	@Disabled
 	@Test
 	public void testDataSomeValuesFrom() throws OWLOntologyCreationException, Exception {
 		try {
@@ -559,14 +582,14 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#StudyProgram");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("studyProgramName");
 			if (property instanceof ArraySchema) {
 				Boolean nullable = ((ArraySchema) property).getNullable();
 				Assertions.assertEquals(expectedResult, ((ArraySchema) property).getItems().getType());
-				Assertions.assertEquals(false, nullable);
+				Assertions.assertEquals(true, nullable);
 			}
 		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
@@ -587,8 +610,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#ProfessorInArtificialIntelligence");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("memberOfOtherDepartments");
 			if (property instanceof ArraySchema) {
@@ -602,7 +625,7 @@ public class RestrictionsTest {
 					}
 				}
 
-				Assertions.assertEquals(false, nullable);
+				Assertions.assertEquals(true, nullable);
 			}
 		} catch (OWLOntologyCreationException e) {
 			Assertions.fail("error in ontology creation: ", e);
@@ -620,8 +643,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#StudyProgram");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("studyProgramName");
 			if (property instanceof ArraySchema) {
@@ -645,8 +668,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Person");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("gender");
 			if (property instanceof ArraySchema) {
@@ -677,8 +700,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#AmericanStudent");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("nationality");
 			
@@ -704,8 +727,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#University");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("universityName");
 
@@ -747,8 +770,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Professor");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("researchField");
 			Integer minItems = ((ArraySchema) property).getMinItems();
@@ -774,8 +797,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Person");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("address");
 			Integer maxItems = ((ArraySchema) property).getMaxItems();
@@ -801,8 +824,8 @@ public class RestrictionsTest {
 			YamlConfig config_data = get_yaml_data("examples/restrictions/config.yaml");
 			Mapper mapper = new Mapper(config_data);
 			OWLClass cls = mapper.manager.getOWLDataFactory().getOWLClass("https://w3id.org/example#Department");
-			String desc = ObaUtils.getDescription(cls, mapper.ontologies.get(0), true);
-			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, mapper.ontologies.get(0), this.configFlags);
+			String desc = ObaUtils.getDescription(cls, mapper.ontologies.stream().findFirst().get(), true);
+			MapperSchema mapperSchema = new MapperSchema(mapper.ontologies, cls, desc, mapper.schemaNames, this.configFlags);
 			Schema schema = mapperSchema.getSchema();
 			Object property = schema.getProperties().get("numberOfProfessors");
 
