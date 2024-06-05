@@ -5,11 +5,23 @@ import static edu.isi.oba.Oba.logger;
 import io.swagger.v3.oas.models.media.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.semanticweb.owlapi.model.OWLDataIntersectionOf;
+import org.semanticweb.owlapi.model.OWLDataRange;
+import org.semanticweb.owlapi.model.OWLDataUnionOf;
+import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLNaryDataRange;
+
+/**
+ * Class for generating an new data property {@link Schema} OR taking an existing one and updating it.
+ */
 class MapperDataProperty {
-  private final Map<String, String> dataTypes = Map.ofEntries(
+  private static final Map<String, String> DATA_TYPES = Map.ofEntries(
     Map.entry("ENTITIES", "string"),
     Map.entry("ENTITY", "string"),
     Map.entry("ID", "string"),
@@ -61,250 +73,367 @@ class MapperDataProperty {
     Map.entry("Literal", "string")
   );
 
-  private String getDataType(String key) {
-    return this.dataTypes.get(key);
-  }
+  public static final String STRING_TYPE = "string";
+  public static final String NUMBER_TYPE = "number";
+  public static final String INTEGER_TYPE = "integer";
+  public static final String BOOLEAN_TYPE = "boolean";
+  public static final String DATETIME_TYPE = "dateTime";
 
-  private static final String STRING_TYPE = "string";
-  private static final String NUMBER_TYPE = "number";
-  private static final String INTEGER_TYPE = "integer";
-  private static final String BOOLEAN_TYPE = "boolean";
-  private static final String DATETIME_TYPE = "dateTime";
+  /**
+   * Create a data property {@link Schema}.
+   * 
+   * @param name the data property's name.
+   * @param description the data property's description.
+   * @param datatypes a {@link Set} of {@link String} indicating the possible data types.
+   * @return a generated {@link Schema} for the data property.
+   */
+  public static Schema createDataPropertySchema(String name, String description, Set<String> datatypes) {
+    Schema propertySchema = new Schema();
+    propertySchema.setName(name);
+	  propertySchema.setDescription(description);
 
-  final String name;
-  final String description;
-  private Set<String> type;
-  private Boolean array;
-  private Boolean nullable;
-  final Boolean isFunctional;
-  private Map<String, String> restrictions;
-  private Set<String> valuesFromDataRestrictions_ranges;
+    // Do not set items unless datatypes contain something
+    if (datatypes != null && !datatypes.isEmpty()) {
+      if (datatypes.size() == 1) {
+        final var datatype = datatypes.iterator().next();
+        final var itemsSchema = MapperDataProperty.getTypeSchema(datatype);
+        itemsSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
+        propertySchema.setItems(itemsSchema);
+      } else {
+        final var composedSchema = new ComposedSchema();
+        datatypes.forEach((datatype) -> {
+          final var datatypeSchema = MapperDataProperty.getTypeSchema(datatype);
+          datatypeSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
+          composedSchema.addOneOfItem(datatypeSchema);
+        });
+        propertySchema.setItems(composedSchema);
+      }
 
-  public MapperDataProperty(String name, String description, Boolean isFunctional, Map<String, String> restrictions, Set<String> valuesFromDataRestrictions_ranges, Set<String> type, Boolean array, Boolean nullable) {
-    this.name = name;
-    this.description = description;
-    this.type = type;
-    this.array = array;
-    this.nullable = nullable;
-    this.isFunctional = isFunctional;
-    this.restrictions = restrictions;
-    this.valuesFromDataRestrictions_ranges = valuesFromDataRestrictions_ranges;
-  }
-
-  public Schema getSchemaByDataProperty() {
-	  
-    if (this.type == null || this.type.isEmpty()) {
-      return (this.array) ? this.arraySchema(new StringSchema()) : this.nonArraySchema(new StringSchema());
-    } else if (this.type.size() > 1) {
-    	return (this.array) ? this.composedSchema() : this.nonArraySchema(new Schema());
+      // All property schemas are array types by default, if they have any items.
+      propertySchema.setType("array");
+    } else {
+      // If no items, then the property's schema type should be "object" and not "array".  This might occur if the property has a complementOf value, but none of its own values.
+      propertySchema.setType("object");
     }
 
-    final String dataType = this.type.iterator().next();
-    String schemaType = this.getDataType(dataType);
-    if (schemaType == null) {
-      logger.severe("property " + this.name + " type " + this.type);
-    }
-    
-    switch (schemaType) {
+    // By default, set property to be nullable.
+	  propertySchema.setNullable(true);
+
+	  return propertySchema;
+  }
+
+  private static String getScrubbedDataType(OWLDatatype owlDatatype) {
+    return owlDatatype.toString().replaceFirst("owl:", "").replaceFirst("rdf:", "").replaceFirst("rdfs:", "").replaceFirst("xsd:", "");
+  }
+
+  private static String getScrubbedDataType(String owlDatatype) {
+    return owlDatatype.replaceFirst("owl:", "").replaceFirst("rdf:", "").replaceFirst("rdfs:", "").replaceFirst("xsd:", "");
+  }
+
+  /**
+   * Get the general datatype (i.e. string, integer, number, boolean, or data/time) of the OWL datatype.
+   * 
+   * @param owlDatatype an {@link OWLDatatype} (e.g. "xsd:integer").
+   * @return a {@link String} indicating the general datatype.
+   */
+  public static String getDataType(OWLDatatype owlDatatype) {
+    return MapperDataProperty.DATA_TYPES.get(MapperDataProperty.getScrubbedDataType(owlDatatype));
+  }
+
+  /**
+   * Get the general datatype (i.e. string, integer, number, boolean, or data/time) of the OWL datatype.
+   * 
+   * @param owlDatatype a {@link String} indicating the "raw" value of an OWL dataype (e.g. "xsd:integer").
+   * @return a {@link String} indicating the general datatype.
+   */
+  public static String getDataType(String owlDatatype) {
+    return MapperDataProperty.DATA_TYPES.get(MapperDataProperty.getScrubbedDataType(owlDatatype));
+  }
+
+  private static Schema getTypeSchema(String owlDatatype) {
+    switch (MapperDataProperty.getDataType(owlDatatype)) {
       case STRING_TYPE:
-        return (this.array) ? this.arraySchema(new StringSchema()) : this.nonArraySchema(new StringSchema());
+        return new StringSchema();
       case NUMBER_TYPE:
-        return (this.array) ? this.arraySchema(new NumberSchema()) : this.nonArraySchema(new NumberSchema());
+        return new NumberSchema();
       case INTEGER_TYPE:
-        return (this.array) ? this.arraySchema(new IntegerSchema()) : this.nonArraySchema(new IntegerSchema());
+        return new IntegerSchema();
       case BOOLEAN_TYPE:
-        return (this.array) ? this.arraySchema(new BooleanSchema()) : this.nonArraySchema(new BooleanSchema());
+        return new BooleanSchema();
       case DATETIME_TYPE:
-          return (this.array) ? this.arraySchema(new DateTimeSchema()) : this.nonArraySchema(new DateTimeSchema());
+          return new DateTimeSchema();
       default:
-        logger.warning("datatype mapping failed " + dataType);
-        return (this.array) ? this.arraySchema(new Schema()) : this.nonArraySchema(new Schema());
+        logger.warning("datatype mapping failed: " + owlDatatype);
+        return new Schema();
     }
   }
 
   /**
-   * Generate a range of multiple values depending on the range axiom
-   *
-   * @return An ArraySchema: including a composedSchema with a list of items for anyOf, allOf restrictions.
-   */ 
-  private ArraySchema composedSchema() {
-	  ArraySchema array = new ArraySchema();
-	  Schema schema;
-	  ComposedSchema composedSchema = new ComposedSchema();
-	  array.setDescription(description);
-	  array.setNullable(this.nullable);
+   * Get the format (if applicable) for an OWL datatype.
+   * 
+   * @param datatype
+   * @return a string indicating the specific format, if applicable.  Empty string otherwise.
+   */
+  private static String getFormatForDatatype(String owlDatatype) {
+    final var scrubbedDatatype = MapperDataProperty.getScrubbedDataType(owlDatatype);
+    switch (MapperDataProperty.getDataType(owlDatatype)) {
+      case STRING_TYPE:
+        if ("anyURI".equals(scrubbedDatatype)) {
+          return "uri";
+        } else if ("byte".equals(scrubbedDatatype)) {
+          return "byte";
+        }
 
-	  // Operations for managing boolean combinations 
-	  for (String restriction: this.restrictions.keySet()) { 
-		  String value = this.restrictions.get(restriction); 	  
-		  for (String item: this.type) {		  
-			  switch (this.getDataType(item)) {
-			  case STRING_TYPE:
-				  schema = new StringSchema();
-
-				  if ("anyURI".equals(item)) {
-            schema.format("uri");
-          } else if ("byte".equals(item)) {
-            schema.format("byte");
-          }
-
-				  break;
-			  case NUMBER_TYPE:
-				  schema = new NumberSchema();
-
-				  if ("float".equals(item)) {
-            schema.format("double");
-          } else if ("double".equals(item)) {
-            schema.format("double");
-          } else {
-            schema.format("number");
-          }
+        break;
+      case NUMBER_TYPE:
+        if ("float".equals(scrubbedDatatype)) {
+          return "double";
+        } else if ("double".equals(scrubbedDatatype)) {
+          return"double";
+        } else {
+          return "number";
+        }
+      case INTEGER_TYPE:
+        if ("long".equals(scrubbedDatatype)) {
+          return "int64";
+        }
           
-				  break;
-			  case INTEGER_TYPE:
-				  schema = new IntegerSchema();
+        return "int32";
+      case DATETIME_TYPE:
+        return "date-time";
+      case BOOLEAN_TYPE:
+        break;     
+      default:
+        logger.warning("Unknown OWLDatatype: " + owlDatatype);
+        break;
+      }
 
-          if ("nonPositiveInteger".equals(item)) {
-            schema.setMaximum(BigDecimal.ZERO);
-          }
-
-          if ("nonNegativeInteger".equals(item)) {
-            schema.setMinimum(BigDecimal.ZERO);
-          }
-
-				  if ("long".equals(item)) {
-            schema.format("int64");
-          }
-					  
-				  break;
-			  case BOOLEAN_TYPE:
-				  schema = new BooleanSchema();
-				  break;
-			  case DATETIME_TYPE:
-				  schema = new DateTimeSchema();
-				  break;	       
-			  default:
-				  logger.warning("datatype mapping failed " + item);
-				  schema = new Schema();	  	
-			  }
-			  
-			  switch (restriction) {
-			  case "unionOf":
-				  if ("someValuesFrom".equals(value)) {
-            this.nullable = false;
-          }
-
-				  composedSchema.addAnyOfItem(schema); 
-				  break;
-			  case "intersectionOf":
-				  if ("someValuesFrom".equals(value)) {
-            this.nullable = false;	
-          }
-
-				  composedSchema.addAllOfItem(schema);
-				  break;
-			  default:
-				  break;
-			  }
-		  }
-	  }
-
-	  array.setItems(composedSchema);
-    array.setNullable(this.nullable);
-
-	  if (isFunctional) {
-      array.setMaxItems(1);
-    }
-	     
-	  return array;
+      return "";
   }
 
-  private Schema nonArraySchema(Schema base) {
-    base.setDescription(this.description);
-    base.setNullable(this.nullable);
-
-    return this.getSchemaRestrictions(base);
+  private static String getFormatForDatatype(OWLDatatype owlDatatype) {
+    return MapperDataProperty.getFormatForDatatype(owlDatatype.toString());
   }
 
-  private ArraySchema arraySchema(Schema base) {
-	  ArraySchema array = new ArraySchema();
-	  array.setDescription(this.description);
+  /**
+   * Set the data property {@link Schema}'s complement.
+   * 
+   * @param dataPropertySchema a data property {@link Schema}.
+   * @param complementOfType an {@link OWLDatatype} value to set as the complement.
+   * @return an data property {@link Schema}
+   */
+  public static Schema setComplementOfForDataSchema(Schema dataPropertySchema, OWLDatatype complementOfType) {
+    final var complementDatatypeString = MapperDataProperty.getDataType(complementOfType.toString());
+    Schema complement = MapperDataProperty.getTypeSchema(complementDatatypeString);
+    complement.setFormat(MapperDataProperty.getFormatForDatatype(complementOfType));
+    dataPropertySchema.not(complement);
 
-	  if (this.isFunctional) {
-      array.setMaxItems(1);
-    }
-
-    if (this.restrictions.containsKey("complementOf")) {
-      Schema schema = new Schema();
-      Schema complementOf = new Schema();
-      final String dataType = this.type.iterator().next();
-      complementOf.setType(this.getDataType(dataType));
-      complementOf.setFormat(dataType);
-      schema.setNot(complementOf);
-      array.setNullable(this.nullable);
-      array.setItems(schema);
-      return array;
-    }
-
-    base = this.getSchemaRestrictions(base);
-
-    // Can this be done in a better way?
-    Integer minItemsInteger = base.getMinItems();
-    if (minItemsInteger != null) {
-      base.setMinItems(null);
-      array.setMinItems(minItemsInteger);
-    }
-
-    // Can this be done in a better way?
-    Integer maxItemsInteger = base.getMaxItems();
-    if (maxItemsInteger != null) {
-      base.setMaxItems(null);
-      array.setMaxItems(maxItemsInteger);
-    }
-
-	  array.setNullable(this.nullable);
-	  array.setItems(base);
-
-	  return array;
+    return dataPropertySchema;
   }
 
-  private Schema getSchemaRestrictions(Schema base) {
-    for (String restriction: this.restrictions.keySet()) { 
-      String value = restrictions.get(restriction);
-      switch (restriction) {
-        case "dataHasValue":
-          base.setDefault(value);
-          break;
-        case "maxCardinality":
-          base.setMaxItems(Integer.parseInt(value));
-          break;
-        case "minCardinality":
-          base.setMinItems(Integer.parseInt(value));
-          break;
-        case "exactCardinality":
-          base.setMaxItems(Integer.parseInt(value));
-          base.setMinItems(Integer.parseInt(value));
-          break;
-        case "someValuesFrom":
-          this.nullable = false;
-          break;
-        case "allValuesFrom":
-          //nothing to do
-          break;
-        case "oneOf":
-          if ("someValuesFrom".equals(value)) {
-            this.nullable = false;
-          }
+  /**
+   * Add an anyOf value to an data property {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param dataPropertySchema an data property {@link Schema}.
+   * @param dataRangeType a {@link String} value indicating the data range type.
+   * @return an data property {@link Schema}
+   */
+  public static Schema addAnyOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
+    Schema itemsSchema = null;
 
-          for (String rangeValue: this.valuesFromDataRestrictions_ranges) {
-            base.addEnumItemObject(rangeValue);
-          }
+    if (dataPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = dataPropertySchema.getItems();
+    }
 
-          break;
-        default:
+    // Only add anyOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add anyOf value if the value is not already included.
+      if (itemsSchema.getAnyOf() == null || !itemsSchema.getAnyOf().contains(dataRangeType)) {
+        final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
+
+        itemsSchema.addAnyOfItem(dataTypeSchema);
+
+        dataPropertySchema.setItems(itemsSchema);
+        dataPropertySchema.setNullable(false);
       }
     }
 
-    return base;
+    return dataPropertySchema;
   }
+
+  /**
+   * Add an allOf value to an data property {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param dataPropertySchema an data property {@link Schema}.
+   * @param dataRangeType a {@link String} value indicating the data range type.
+   * @return an data property {@link Schema}
+   */
+  public static Schema addAllOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
+    Schema itemsSchema = null;
+
+    if (dataPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = dataPropertySchema.getItems();
+    }
+
+    // Only add allOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add allOf value if the value is not already included.
+      if (itemsSchema.getAllOf() == null || !itemsSchema.getAllOf().contains(dataRangeType)) {
+        final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
+        
+        itemsSchema.addAllOfItem(dataTypeSchema);
+
+        dataPropertySchema.setItems(itemsSchema);
+        dataPropertySchema.setNullable(false);
+      }
+    }
+
+    return dataPropertySchema;
+  }
+
+  /**
+   * Add an oneOf value to an data property {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param dataPropertySchema an data property {@link Schema}.
+   * @param oneOfLiteral an {@link OWLLiteral} value to add
+   * @return an data property {@link Schema}
+   */
+  public static Schema addOneOfDataPropertySchema(Schema dataPropertySchema, OWLLiteral oneOfLiteral) {
+    Schema itemsSchema = null;
+
+    if (dataPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = dataPropertySchema.getItems();
+
+      // oneOf/enum takes priority over (and cannot co-occur with) allOf/anyOf.
+      itemsSchema.setAllOf(null);
+      itemsSchema.setAnyOf(null);
+    }
+
+    // Only add oneOf/enum value if the value is not already included.
+    if (itemsSchema.getEnum() == null || !((List<String>) itemsSchema.getEnum().stream().map(Object::toString).collect(Collectors.toList())).contains(oneOfLiteral.getLiteral())) {
+      final var datatype = MapperDataProperty.getDataType(oneOfLiteral.toString().substring(oneOfLiteral.toString().lastIndexOf(":") + 1));
+
+      switch (datatype) {
+        case NUMBER_TYPE:
+          itemsSchema.addEnumItemObject(Double.parseDouble(oneOfLiteral.getLiteral()));
+          break;
+        case INTEGER_TYPE:
+          itemsSchema.addEnumItemObject(Integer.parseInt(oneOfLiteral.getLiteral()));
+          break;
+        case BOOLEAN_TYPE:
+          itemsSchema.addEnumItemObject(Boolean.parseBoolean(oneOfLiteral.getLiteral()));
+          break;
+        case STRING_TYPE:
+        case DATETIME_TYPE:
+        default:
+          itemsSchema.addEnumItemObject(oneOfLiteral.getLiteral());
+          break;
+      }
+
+      itemsSchema.set$ref(null);
+      itemsSchema.setType(null);
+      
+      dataPropertySchema.setItems(itemsSchema);
+      dataPropertySchema.setType("array");
+      dataPropertySchema.setNullable(false);
+    }
+
+    return dataPropertySchema;
+  }
+
+  /**
+   * Recursive method to get/generate a {@link ComposedSchema} that may/may not be complex (i.e. contains nested unions/intersections).
+   * 
+   * @param dr a {@link OWLNaryDataRange} data range (i.e. {@link OWLDataUnionOf} or {@link OWLDataIntersectionOf})
+   * @return a {@link ComposedSchema} comprising an anyOf/allOf list of items.
+   */
+  public static ComposedSchema getComplexDataComposedSchema(OWLNaryDataRange dr) {
+		final var schema = new ComposedSchema();
+
+		final var isDataUnion = dr instanceof OWLDataUnionOf;
+		
+		// Loop through each item in the union/intersection and accept visits.
+		for (OWLDataRange e: dr.getOperands()) {
+			if (e.isOWLDatatype()) {
+				Schema dataTypeSchema = null;
+
+				final var owlDataType = e.asOWLDatatype().toString();
+				final var dataType = MapperDataProperty.getDataType(owlDataType);
+				switch (dataType) {
+					case MapperDataProperty.STRING_TYPE:
+						dataTypeSchema = new StringSchema();
+
+						if ("xsd:anyURI".equals(owlDataType)) {
+							dataTypeSchema.format("uri");
+						} else if ("xsd:byte".equals(owlDataType)) {
+							dataTypeSchema.format("byte");
+						}
+
+						break;
+					case MapperDataProperty.NUMBER_TYPE:
+						dataTypeSchema = new NumberSchema();
+
+						if ("xsd:float".equals(owlDataType)) {
+							dataTypeSchema.format("double");
+						} else if ("xsd:double".equals(owlDataType)) {
+							dataTypeSchema.format("double");
+						} else {
+							dataTypeSchema.format("number");
+						}
+
+						break;
+					case MapperDataProperty.INTEGER_TYPE:
+						dataTypeSchema = new IntegerSchema();
+
+						if ("xsd:nonPositiveInteger".equals(owlDataType)) {
+							dataTypeSchema.setMaximum(BigDecimal.ZERO);
+						}
+			
+						if ("xsd:nonNegativeInteger".equals(owlDataType)) {
+							dataTypeSchema.setMinimum(BigDecimal.ZERO);
+						}
+
+						if ("xsd:long".equals(owlDataType)) {
+							dataTypeSchema.format("int64");
+						}
+
+						break;
+					case MapperDataProperty.BOOLEAN_TYPE:
+						dataTypeSchema = new BooleanSchema();
+						break;
+					case MapperDataProperty.DATETIME_TYPE:
+						dataTypeSchema = new DateTimeSchema();
+						break;	       
+					default:
+						logger.warning("datatype mapping failed for:  " + owlDataType);
+						dataTypeSchema = new Schema();
+				}
+
+				if (isDataUnion) {
+					schema.addAnyOfItem(dataTypeSchema);
+				} else {
+					schema.addAllOfItem(dataTypeSchema);
+				}
+			} else if (e instanceof OWLNaryDataRange) {
+				if (isDataUnion) {
+					schema.addAnyOfItem(MapperDataProperty.getComplexDataComposedSchema((OWLNaryDataRange) e));
+				} else {
+					schema.addAllOfItem(MapperDataProperty.getComplexDataComposedSchema((OWLNaryDataRange) e));
+				}
+			} else {
+				logger.severe("Need to investigate how to handle this OWLClassExpression:  " + e);
+			}
+		}
+
+		return schema;
+	}
 }

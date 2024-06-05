@@ -4,261 +4,254 @@ import static edu.isi.oba.Oba.logger;
 
 import io.swagger.v3.oas.models.media.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-class MapperObjectProperty {
-  final String name;
-  final String description;
-  final private Set<String> ref;
-  private Boolean array;
-  private Boolean nullable;
-  final Boolean isFunctional;
-  
-  final Map<String,String> restrictions;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLNaryBooleanClassExpression;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectUnionOf;
+import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
-  public MapperObjectProperty(String name, String description, Boolean isFunctional, Map<String,String> restrictions, Set<String> ref) {
-    this.name = name;
-    this.description = description;
-    this.ref = (ref != null) ? ref : new HashSet<>();
-    this.array = true;
-    this.nullable = true;
-    this.isFunctional = isFunctional;
-    this.restrictions = (restrictions != null) ? restrictions : new HashMap<>();
-  }
+/**
+ * Class for generating an new object property {@link Schema} OR taking an existing one and updating it.
+ */
+public class MapperObjectProperty {
 
-  public MapperObjectProperty(String name, String description,  Boolean isFunctional, Map<String, String> restrictions, Set<String> ref, Boolean array, Boolean nullable) {
-    this.name = name;
-    this.description = description;
-    this.ref = (ref != null) ? ref : new HashSet<>();
-    this.array = array;
-    this.nullable = nullable;
-    this.isFunctional = isFunctional;
-    this.restrictions = (restrictions != null) ? restrictions : new HashMap<>();
-  }
+  /**
+   * Create an object property {@link Schema}.
+   * 
+   * @param name the object property's name.
+   * @param description the object property's description.
+   * @param references a {@link Set} of {@link String} references to other objects (i.e. the object property range(s)).
+   * @return a generated {@link Schema} for the object property.
+   */
+  public static Schema createObjectPropertySchema(String name, String description, Set<String> references) {
+    Schema propertySchema = new Schema();
+    propertySchema.setName(name);
+	  propertySchema.setDescription(description);
 
-  public Schema getSchemaByObjectProperty() {
-    if (this.ref == null || this.ref.isEmpty()){
-      return getComposedSchemaObject(this.ref, this.array, this.nullable);
-    }
-
-    if (this.ref.size() > 1){
-      return getComposedSchemaObject(this.ref, this.array, this.nullable);
-    } else {
-      return getObjectPropertiesByRef(this.ref.iterator().next(), this.array, this.nullable);
-    }
-  }
-
-  private Schema getObjectPropertiesByRef(String ref, boolean isArray, boolean isNullable) {
-    if (this.restrictions.isEmpty()) {
-      Schema object = new ObjectSchema();
-      object.set$ref(ref);
-
-      if (isArray) {
-        ArraySchema objects = new ArraySchema();
-        objects.setDescription(this.description);
-        objects.setNullable(isNullable);
-        objects.setItems(object);
-
-        if (this.isFunctional) {
-          objects.setMaxItems(1);
-        }
-
-        return objects;
+    // Do not set items unless references contain something
+    if (references != null && !references.isEmpty()) {
+      if (references.size() == 1) {
+        final var reference = references.iterator().next();
+        final var itemsSchema = new ObjectSchema();
+        itemsSchema.set$ref(reference);
+        propertySchema.setItems(itemsSchema);
       } else {
-        object.setDescription(this.description);
-        object.setNullable(isNullable);
-        object.setType("object");
-
-        if (this.isFunctional) {
-          object.setMaxItems(1);
-        }
-
-        return object;
+        final var composedSchema = new ComposedSchema();
+        references.forEach((reference) -> {
+          final var referenceSchema = new ObjectSchema();
+          referenceSchema.set$ref(reference);
+          composedSchema.addAnyOfItem(referenceSchema);
+        });
+        propertySchema.setItems(composedSchema);
       }
-    }
 
-    ArraySchema objects = new ArraySchema();
-    objects.setType("array");
-
-    // For OpenAPI v3.0, "$ref" cannot be used as a sibling with "default".
-    // see: https://swagger.io/docs/specification/using-ref/
-    // see: https://stackoverflow.com/a/77189463
-    // A workaround is to include both within "items" and as separate entries under "allOf".
-    // TODO: version check here (and elsewhere?) to differentiate the schema structure.  For v3.1+, it can support "$ref" and "default" as siblings.
-    ArraySchema allOfItems = new ArraySchema();
-    allOfItems.setType(null);
-
-    for (String restriction:  this.restrictions.keySet()) {
-      String value = this.restrictions.get(restriction);
-
-      switch (restriction) {
-        case "maxCardinality":
-          objects.setMaxItems(Integer.parseInt(value));
-          break;
-        case "minCardinality":
-          objects.setMinItems(Integer.parseInt(value));
-          break;
-        case "exactCardinality":
-          objects.setMaxItems(Integer.parseInt(value));
-          objects.setMinItems(Integer.parseInt(value));
-          break;
-        case "someValuesFrom":
-          isNullable = false;
-          break;
-        case "allValuesFrom":
-          //nothing to do in the Schema
-          break;
-        case "objectHasReference": {
-          Schema object = new ObjectSchema();
-          object.set$ref(value);
-          object.setType(null);
-          allOfItems.addAllOfItem(object);
-          break;
-        }
-        case "objectHasValue": {
-          Schema object = new ObjectSchema();
-          object.setDefault(value);
-          object.setType("string");
-          allOfItems.addAllOfItem(object);
-          break;
-        }
-        default:
-          break;
-      }
-    }
-
-    if (allOfItems.getAllOf() == null || allOfItems.getAllOf().isEmpty()) {
-      Schema object = new ObjectSchema();
-      object.set$ref(ref);
-      objects.items(object);
+      // All property schemas are array types by default, if they have any items.
+      propertySchema.setType("array");
     } else {
-      objects.items(allOfItems);
+      // If no items, then the property's schema type should be "object" and not "array".  This might occur if the property has a complementOf value, but none of its own values.
+      propertySchema.setType("object");
     }
 
-    if (this.isFunctional) {
-      objects.setMaxItems(1);
-    }
+    // By default, set property to be nullable.
+	  propertySchema.setNullable(true);
 
-    objects.setNullable(isNullable);
-
-    return objects;
+	  return propertySchema;
   }
 
-  private Schema getComposedSchemaObject(Set<String> refs, boolean array, boolean nullable) {
-    Schema object = new ObjectSchema();
-    ComposedSchema composedSchema = new ComposedSchema();
-    
-    object.setType("object");
-    object.setDescription(this.description);
+  /**
+   * This method is intented to add an enum value to a class's schema (cf. property's schema).
+   * 
+   * @param objectSchema an object {@link Schema}.
+   * @param enumItem a {@link String} value to add to the enum list.
+   * @return an object {@link Schema}
+   */
+  public static Schema addEnumValueToObjectSchema(Schema objectSchema, String enumItem) {
+    objectSchema.setProperties(null);
+    objectSchema.setType("string");
+    objectSchema.setItems(null);
+    objectSchema.setNullable(null);
 
-    if (array) {
-    	ArraySchema objects = new ArraySchema();
-    	objects.setDescription(this.description);
-    	
-    	if (this.isFunctional) {
-    		objects.setMaxItems(1);
-      }
+    objectSchema.addEnumItemObject(enumItem);
 
-    	for (String restriction:  this.restrictions.keySet()) { 
-        String value = this.restrictions.get(restriction);
-
-        for (String item: refs) {
-    			Schema objectRange = new ObjectSchema();
-    			objectRange.setType("object");
-    			objectRange.set$ref(item);
-
-    			switch (restriction) {
-    			case "unionOf":
-    				if ("someValuesFrom".equals(value)) {
-    					nullable = false;
-            }
-
-            if (composedSchema.getAnyOf() == null || !composedSchema.getAnyOf().contains(objectRange)) {
-              composedSchema.addAnyOfItem(objectRange);
-              objects.setItems(composedSchema);
-            }
-    				
-    				break;
-    			case "intersectionOf":
-    				if ("someValuesFrom".equals(value)) {
-    					nullable = false;
-            }
-
-            if (composedSchema.getAllOf() == null || !composedSchema.getAllOf().contains(objectRange)) {
-              composedSchema.addAllOfItem(objectRange);
-              objects.setItems(composedSchema);
-            }
-
-    				break;
-    			case "someValuesFrom":
-    				nullable = false;
-
-            if (composedSchema.getAnyOf() == null || !composedSchema.getAnyOf().contains(objectRange)) {
-              composedSchema.addAnyOfItem(objectRange);
-              objects.setItems(composedSchema);
-            }
-
-    				break;
-    			case "allValuesFrom":
-    				//nothing to do in the Schema
-    				break;
-    	    case "oneOf":
-            if ("someValuesFrom".equals(value)) {
-              nullable = false;
-            }
-
-            Schema enumSchema = new Schema();
-
-            if (composedSchema.getOneOf() == null || composedSchema.getOneOf().isEmpty()) {
-              enumSchema.addEnumItemObject(item);
-            } else {
-              enumSchema = composedSchema.getOneOf().iterator().next();
-              enumSchema.addEnumItemObject(item);
-              composedSchema = new ComposedSchema();
-            }
-
-            composedSchema.addOneOfItem(enumSchema);
-
-            objects.setItems(composedSchema);
-            break;
-          case "maxCardinality":
-            objects.setMaxItems(Integer.parseInt(value));
-            break;
-          case "minCardinality":
-            objects.setMinItems(Integer.parseInt(value));
-            break;
-          case "exactCardinality":
-            objects.setMaxItems(Integer.parseInt(value));
-            objects.setMinItems(Integer.parseInt(value));
-            break;
-    			default:
-    				//if the property range is complex it will be omitted   
-    				logger.warning("omitted complex restriction");
-    				objects.setItems(object);
-    			}
-    		}
-    	}
-
-      objects.setNullable(nullable);
-
-    	if (refs.isEmpty()) {
-        if (objects.getItems() != null && objects.getEnum() != null) {
-          objects.setItems(object);
-        } else {
-          objects.setType(null);
-          objects.setDescription(null);
-          objects.setItems(null);
-          objects.setNullable(null);
-        }
-      }
-
-    	return objects;
-    } else {
-      object.setNullable(nullable);
-      return object;
-    }
+    return objectSchema;
   }
+
+  /**
+   * Set the object {@link Schema}'s complement.
+   * 
+   * @param objectSchema an object {@link Schema}.
+   * @param complementOfReference a {@link String} value (i.e. OWLClass' short form name) to set as the complement.
+   * @return an object {@link Schema}
+   */
+  public static Schema setComplementOfForObjectSchema(Schema objectSchema, String complementOfReference) {
+    Schema complement = new ObjectSchema();
+    complement.set$ref(complementOfReference);
+    objectSchema.not(complement);
+
+    return objectSchema;
+  }
+
+  /**
+   * Add an anyOf value to an object property {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param objectPropertySchema an object property {@link Schema}.
+   * @param anyOfItem a {@link String} value (i.e. OWLClass' short form name) to add
+   * @return an object property {@link Schema}
+   */
+  public static Schema addAnyOfToObjectPropertySchema(Schema objectPropertySchema, String anyOfItem) {
+    Schema itemsSchema = null;
+
+    if (objectPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = objectPropertySchema.getItems();
+
+      // oneOf takes priority over (and cannot co-occur with) allOf/anyOf.
+      itemsSchema.setAllOf(null);
+      itemsSchema.setAnyOf(null);
+    }
+
+    // Only add anyOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add anyOf value if the value is not already included.
+      if (itemsSchema.getAnyOf() == null || !itemsSchema.getAnyOf().contains(anyOfItem)) {
+        // There are cases where the property has a range (i.e. the items schema has a ref), but class restrictions have been added which further restrict it with an anyOf.
+        // So, we need to unset the items reference first.
+        if (itemsSchema.get$ref() != null) {
+          itemsSchema.set$ref(null);
+        }
+
+        final var objSchema = new ObjectSchema();
+        objSchema.set$ref(anyOfItem);
+
+        itemsSchema.addAnyOfItem(objSchema);
+
+        objectPropertySchema.setItems(itemsSchema);
+        objectPropertySchema.setNullable(false);
+      }
+    }
+
+    return objectPropertySchema;
+  }
+
+  /**
+   * Add an allOf value to an object property {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param objectPropertySchema an object property {@link Schema}.
+   * @param allOfItem a {@link String} value (i.e. OWLClass' short form name) to add
+   * @return an object property {@link Schema}
+   */
+  public static Schema addAllOfToObjectPropertySchema(Schema objectPropertySchema, String allOfItem) {
+    Schema itemsSchema = null;
+
+    if (objectPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = objectPropertySchema.getItems();
+    }
+
+    // Only add allOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add allOf value if the value is not already included.
+      if (itemsSchema.getAllOf() == null || !itemsSchema.getAllOf().contains(allOfItem)) {
+        // There are cases where the property has a range (i.e. the items schema has a ref), but class restrictions have been added which further restrict it with an allOf.
+        // So, we need to unset the items reference first.
+        if (itemsSchema.get$ref() != null) {
+          itemsSchema.set$ref(null);
+        }
+
+        final var objSchema = new ObjectSchema();
+        objSchema.set$ref(allOfItem);
+        
+        itemsSchema.addAllOfItem(objSchema);
+
+        objectPropertySchema.setItems(itemsSchema);
+        objectPropertySchema.setNullable(false);
+      }
+    }
+
+    return objectPropertySchema;
+  }
+
+  /**
+   * Add an oneOf value to an object property {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param objectPropertySchema an object property {@link Schema}.
+   * @param oneOfItem a {@link String} value (i.e. OWLClass' short form name) to add
+   * @return an object property {@link Schema}
+   */
+  public static Schema addOneOfToObjectPropertySchema(Schema objectPropertySchema, String oneOfItem) {
+    Schema itemsSchema = null;
+
+    if (objectPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = objectPropertySchema.getItems();
+
+      // This may be the first restriction added and a reference may exist.  Clear it, to make sure.
+      itemsSchema.set$ref(null);
+
+      // oneOf takes priority over (and cannot co-occur with) allOf/anyOf.
+      itemsSchema.setAllOf(null);
+      itemsSchema.setAnyOf(null);
+    }
+
+    // Only add if no enums already OR it's not contained with the enums yet.
+    if (itemsSchema.getEnum() == null || !((List<String>) itemsSchema.getEnum().stream().map(Object::toString).collect(Collectors.toList())).contains(oneOfItem)) {
+      itemsSchema.addEnumItemObject(oneOfItem);
+      itemsSchema.setType(null);
+
+      objectPropertySchema.setItems(itemsSchema);
+      objectPropertySchema.setType("array");
+      objectPropertySchema.setNullable(false);
+    }
+
+    return objectPropertySchema;
+  }
+
+  /**
+   * Recursive method to get/generate a {@link ComposedSchema} that may/may not be complex (i.e. contains nested unions/intersections).
+   * 
+   * @param ce a {@link OWLNaryBooleanClassExpression} class expression (i.e. {@link OWLObjectUnionOf} or {@link OWLObjectIntersectionOf})
+   * @return a {@link ComposedSchema} comprising an anyOf/allOf list of items.
+   */
+  public static ComposedSchema getComplexObjectComposedSchema(OWLNaryBooleanClassExpression ce) {
+		final var schema = new ComposedSchema();
+
+		final var isObjectUnion = ce instanceof OWLObjectUnionOf;
+		
+		// Loop through each item in the union/intersection and accept visits.
+		for (OWLClassExpression e: ce.getOperands()) {
+			if (e.isOWLClass()) {
+				final var objSchema = new ObjectSchema();
+				objSchema.setType("object");
+
+        final var sfp = new SimpleIRIShortFormProvider();
+				objSchema.set$ref(sfp.getShortForm(e.asOWLClass().getIRI()));
+
+				if (isObjectUnion) {
+					schema.addAnyOfItem(objSchema);
+				} else {
+					schema.addAllOfItem(objSchema);
+				}
+			} else if (e instanceof OWLNaryBooleanClassExpression) {
+				if (isObjectUnion) {
+					schema.addAnyOfItem(MapperObjectProperty.getComplexObjectComposedSchema((OWLNaryBooleanClassExpression) e));
+				} else {
+					schema.addAllOfItem(MapperObjectProperty.getComplexObjectComposedSchema((OWLNaryBooleanClassExpression) e));
+				}
+			} else {
+				logger.severe("Need to investigate how to handle this OWLClassExpression:  " + e);
+			}
+		}
+
+		return schema;
+	}
 }
