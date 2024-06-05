@@ -2,6 +2,7 @@ package edu.isi.oba;
 
 import io.swagger.models.Method;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -109,18 +110,25 @@ class MapperOperation {
               .schema(new StringSchema()));
 
     switch (cardinality) {
-      case PLURAL:
+      case PLURAL: {
         summary = "List all instances of " + this.schemaName;
         description = "Gets a list of all instances of " + this.schemaName +
-                " (more information in " + this.schemaURI + ")";
+                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
         responseDescriptionOk = "Successful response - returns an array with the instances of " + schemaName + ".";
 
         //Set response
         ArraySchema schema = new ArraySchema();
         schema.setItems(this.schema);
+
+        var mediaType = new MediaType().schema(schema);
+        //mediaType.setExampleSetFlag(true);
+        var schemaExample = new Example();
+        schemaExample.$ref(this.schema.get$ref());
+        //mediaType.setExamples(Map.of(this.schemaName, schemaExample));
+        Content content = new Content().addMediaType("application/json", mediaType);
         responseOk = new ApiResponse()
                 .description(responseDescriptionOk)
-                .content(new Content().addMediaType("application/json", new MediaType().schema(schema)));
+                .content(content);
         apiResponses.addApiResponse("200", responseOk);
         parameters.add(new QueryParameter()
                 .name("label")
@@ -138,19 +146,38 @@ class MapperOperation {
                 .required(false)
                 .schema(new IntegerSchema()._default(100).maximum(BigDecimal.valueOf(200)).minimum(BigDecimal.valueOf(1))));
         break;
-      case SINGULAR:
+
+        // MediaType mediaType = new MediaType().schema(schema);
+        // //mediaType.setExampleSetFlag(true);
+        // var schemaExample = new Example();
+        // schemaExample.$ref(this.schema.get$ref());
+        // mediaType.setExamples(Map.of(this.schemaName, schemaExample));
+        // Content content = new Content().addMediaType("application/json", mediaType);
+        // requestBody.setContent(content);
+        // requestBody.setDescription(requestDescription);
+        //Set the response
+        // apiResponses.addApiResponse("201", new ApiResponse()
+        // .content(content)
+        // .description("Created")
+      }
+      case SINGULAR: {
         summary = "Get a single " + this.schemaName + " by its id";
         description = "Gets the details of a given " + this.schemaName +
-                " (more information in " + this.schemaURI + ")";
+                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
         responseDescriptionOk = "Gets the details of a given " + schemaName;
 
         //Set request
+        var mediaType = new MediaType().schema(schema);
+        //mediaType.setExampleSetFlag(true);
+        var schemaExample = new Example();
+        schemaExample.$ref(this.schema.get$ref());
+        //mediaType.setExamples(Map.of(this.schemaName, schemaExample));
         responseOk = new ApiResponse()
                 .description(responseDescriptionOk)
-                .content(new Content().addMediaType("application/json", new MediaType().schema(this.schema)));
+                .content(new Content().addMediaType("application/json", mediaType));
         apiResponses.addApiResponse("200", responseOk);
         break;
-
+      }
     }
   }
 
@@ -159,15 +186,19 @@ class MapperOperation {
   }
 
   private void setOperationPost() {
-    String requestDescription = "Information about the " + this.schemaName + "to be created";
+    String requestDescription = "Information about the " + this.schemaName + " to be created";
 
     //Edit global fields
     summary = "Create one " + this.schemaName;
     description = "Create a new instance of " + this.schemaName+
-                " (more information in " +this.schemaURI+")";
+                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
+    //mediaType.setExampleSetFlag(true);
+    var schemaExample = new Example();
+    schemaExample.$ref(this.schema.get$ref());
+    //mediaType.setExamples(Map.of(this.schemaName, schemaExample));
     Content content = new Content().addMediaType("application/json", mediaType);
     requestBody.setContent(content);
     requestBody.setDescription(requestDescription);
@@ -184,10 +215,15 @@ class MapperOperation {
 
     summary = "Update an existing " + this.schemaName;
     description = "Updates an existing " + this.schemaName +
-                " (more information in " + this.schemaURI + ")";
+                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
+    //mediaType.setExampleSetFlag(true);
+    var schemaExample = new Example();
+    schemaExample.$ref(this.schema.get$ref());
+    //mediaType.setExamples(Map.of(this.schemaName, schemaExample));
+
     Content content = new Content().addMediaType("application/json", mediaType);
     requestBody.setContent(content);
     requestBody.setDescription(requestDescription);
@@ -205,7 +241,7 @@ class MapperOperation {
   private void setOperationDelete() {
     summary = "Delete an existing " + this.schemaName;
     description = "Delete an existing " + this.schemaName +
-                " (more information in " + this.schemaURI + ")";
+                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
 
     //Set the response
     apiResponses
