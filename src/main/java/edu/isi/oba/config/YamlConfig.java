@@ -21,6 +21,7 @@ public class YamlConfig {
     put(CONFIG_FLAG.PATH_POST, false);
     put(CONFIG_FLAG.PATH_PUT, false);
     put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, false);
+    put(CONFIG_FLAG.USE_KEBAB_CASE_PATHS, false);
   }};
 
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
@@ -31,7 +32,7 @@ public class YamlConfig {
   public Set<String> paths;
   public Set<String> ontologies;
   private EndpointConfig endpoint;
-  public AuthConfig auth;
+  private AuthConfig auth;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
   private LinkedHashMap<String, PathItem> custom_paths = null;
@@ -79,7 +80,7 @@ public class YamlConfig {
   }
 
   public String getCustom_queries_directory() {
-    return custom_queries_directory;
+    return this.custom_queries_directory;
   }
 
   public void setCustom_queries_directory(String custom_queries_directory) {
@@ -87,7 +88,7 @@ public class YamlConfig {
   }
 
   public String getOutput_dir() {
-    return output_dir;
+    return this.output_dir;
   }
 
   public void setOutput_dir(String output_dir) {
@@ -95,7 +96,7 @@ public class YamlConfig {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(String name) {
@@ -103,7 +104,7 @@ public class YamlConfig {
   }
 
   public Set<String> getPaths() {
-    return paths;
+    return this.paths;
   }
 
   public void setPaths(Set<String> paths) {
@@ -111,7 +112,7 @@ public class YamlConfig {
   }
 
   public Set<String>  getOntologies() {
-    return ontologies;
+    return this.ontologies;
   }
 
   public void setOntologies(Set<String> ontologies) {
@@ -119,7 +120,7 @@ public class YamlConfig {
   }
 
   public EndpointConfig getEndpoint() {
-    return endpoint;
+    return this.endpoint;
   }
 
   public void setEndpoint(EndpointConfig endpoint) {
@@ -127,7 +128,7 @@ public class YamlConfig {
   }
 
   public FirebaseConfig getFirebase() {
-    return firebase;
+    return this.firebase;
   }
 
   public void setFirebase(FirebaseConfig firebase) {
@@ -135,7 +136,7 @@ public class YamlConfig {
   }
 
   public Map<String, List<RelationConfig>> getRelations() {
-    return relations;
+    return this.relations;
   }
 
   public void setRelations(Map<String, List<RelationConfig>> relations) {
@@ -143,7 +144,7 @@ public class YamlConfig {
   }
 
   public LinkedHashMap<String, PathItem> getCustom_paths() {
-    return custom_paths;
+    return this.custom_paths;
   }
 
   public void setCustom_paths(LinkedHashMap<String, PathItem> custom_paths) {
@@ -151,7 +152,7 @@ public class YamlConfig {
   }
 
   public OpenAPI getOpenapi() {
-    return openapi;
+    return this.openapi;
   }
 
   public void setOpenapi(OpenAPI openapi) {
@@ -206,8 +207,16 @@ public class YamlConfig {
     this.configFlags.put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, required_properties_from_cardinality);
   }
 
+  public Boolean getUse_kebab_case_paths() {
+    return this.configFlags.get(CONFIG_FLAG.USE_KEBAB_CASE_PATHS);
+  }
+
+  public void setUse_kebab_case_paths(Boolean use_kebab_case_paths) {
+    this.configFlags.put(CONFIG_FLAG.USE_KEBAB_CASE_PATHS, use_kebab_case_paths);
+  }
+
   public AuthConfig getAuth() {
-    return auth;
+    return this.auth;
   }
 
   public void setAuth(AuthConfig auth) {
