@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 
-import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 
@@ -27,8 +27,8 @@ class Serializer {
 
     Components components = new Components();
     Paths paths = new Paths();
-    mapper.paths.forEach((k, v) -> paths.addPathItem(k, v));
-    mapper.schemas.forEach((k, v) -> components.addSchemas(k, v));
+    mapper.getPaths().forEach((k, v) -> paths.addPathItem(k, v));
+    mapper.getSchemas().forEach((k, v) -> components.addSchemas(k, v));
     components.securitySchemes(securitySchemes);
 
     //add custom paths
@@ -58,13 +58,18 @@ class Serializer {
   private void validate() throws Exception {
     ParseOptions options = new ParseOptions();
     options.setResolve(true);
-    SwaggerParseResult result = new OpenAPIParser().readLocation(openapi_path, null, options);
+    SwaggerParseResult result = new OpenAPIV3Parser().readLocation(openapi_path, null, options);
     List<String> messageList = result.getMessages();
     Set<String> errors = new HashSet<>(messageList);
     Set<String> warnings = new HashSet<>();
-    if (!errors.isEmpty()) {
-      throw new Exception("Error when validating the API specification. " + errors.iterator().next());
-    }
+    errors.forEach((errorMessage) -> {
+      if (errorMessage.contains(".$ref target #/components/schemas/") 
+          && errorMessage.contains("is not of expected type Examples")) {
+        // Ignore.  The validator complains because the reference is to a Schemas item (which is valid) instead of an Examples item.
+      } else {
+        throw new RuntimeException(errorMessage);
+      }
+    });
   }
 
   private SecurityScheme getSecurityScheme(Map<String, Object> extensions) {
