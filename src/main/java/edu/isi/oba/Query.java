@@ -1,46 +1,48 @@
 package edu.isi.oba;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 class Query {
 
-  private String query_directory;
-  private static final String get_all_query_file = "/queries/get_all.rq";
-  private static final String get_all_graph_query_file = "/queries/get_all_user.rq";
+  private String queryDirectory;
 
-  private static final String get_one_query_file = "/queries/get_one.rq";
-  private static final String get_one_graph_query_file = "/queries/get_one_user.rq";
+  private static final String GET_ALL_QUERY_FILE = "/queries/get_all.rq";
+  private static final String GET_ALL_GRAPH_QUERY_FILE = "/queries/get_all_user.rq";
 
-  private static final String get_all_search_query_file = "/queries/get_all_search.rq";
-  private static final String get_all_search_graph_query_file = "/queries/get_all_search_user.rq";
+  private static final String GET_ONE_QUERY_FILE = "/queries/get_one.rq";
+  private static final String GET_ONE_GRAPH_QUERY_FILE = "/queries/get_one_user.rq";
+
+  private static final String GET_ALL_SEARCH_QUERY_FILE = "/queries/get_all_search.rq";
+  private static final String GET_ALL_SEARCH_GRAPH_QUERY_FILE = "/queries/get_all_search_user.rq";
 
 
-  public Query(String query_directory) {
-    this.query_directory = query_directory + File.separator + "queries";
+  public Query(String queryDirectory) {
+    this.queryDirectory = queryDirectory + File.separator + "queries";
   }
 
-  public void get_all(String schema_name) throws Exception {
-    String dir_path = query_directory + File.separator + schema_name + File.separator;
-    write_query(get_all_query_file, schema_name);
-    write_query(get_all_graph_query_file, schema_name);
-    write_query(get_one_query_file, schema_name);
-    write_query(get_one_graph_query_file, schema_name);
-    write_query(get_all_search_query_file, schema_name);
-    write_query(get_all_search_graph_query_file, schema_name);
+  public void getAll(String schema_name) throws Exception {
+    writeQuery(GET_ALL_QUERY_FILE, schema_name);
+    writeQuery(GET_ALL_GRAPH_QUERY_FILE, schema_name);
+    writeQuery(GET_ONE_QUERY_FILE, schema_name);
+    writeQuery(GET_ONE_GRAPH_QUERY_FILE, schema_name);
+    writeQuery(GET_ALL_SEARCH_QUERY_FILE, schema_name);
+    writeQuery(GET_ALL_SEARCH_GRAPH_QUERY_FILE, schema_name);
   }
 
-  public void write_readme(String schema_name) {
-    String dir_path = query_directory + File.separator + schema_name + File.separator;
-    String file_path = dir_path + File.separator + "README";
-    File directory = new File(dir_path);
+  public void writeReadme(String schema_name) {
+    final var dirPath = this.queryDirectory + File.separator + schema_name + File.separator;
+    final var filePath = dirPath + File.separator + "README";
+    final var directory = new File(dirPath);
     if (! directory.exists()){
       directory.mkdirs();
     }
 
-
     BufferedWriter writer = null;
     try {
-      writer = new BufferedWriter(new FileWriter(file_path));
+      writer = new BufferedWriter(new FileWriter(filePath));
       writer.write("To modify the query from this class, edit this file");
       writer.close();
     } catch (IOException e) {
@@ -48,15 +50,16 @@ class Query {
     }
   }
 
-  private void write_query(String query_file_name, String schema_name) throws Exception {
-    String dir_path = query_directory + File.separator + schema_name + File.separator;
-    File directory = new File(dir_path);
-    if (! directory.exists()){
+  private void writeQuery(String queryFileName, String schemaName) throws Exception {
+    final var dirPath = this.queryDirectory + File.separator + schemaName + File.separator;
+    final var directory = new File(dirPath);
+    if (!directory.exists()){
       directory.mkdirs();
     }
-    File resource = new File(ObaUtils.class.getResource(query_file_name).getFile());
-    InputStream query_file = ObaUtils.class.getResourceAsStream(query_file_name);
-    File file_path = new File(dir_path + File.separator + resource.getName());
-    ObaUtils.copy(query_file, file_path);
+
+    final var resource = new File(ObaUtils.class.getResource(queryFileName).getFile());
+    final var queryFile = ObaUtils.class.getResourceAsStream(queryFileName);
+    final var filePath = new File(dirPath + File.separator + resource.getName());
+    ObaUtils.copy(queryFile, filePath);
   }
 }
