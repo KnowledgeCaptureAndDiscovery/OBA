@@ -401,26 +401,23 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @return A Map where key is property name and value is the property's Swagger/OpenAPI Schema
      */
     private Map<String, Schema> getDefaultProperties() {
-		// // Add some typical default properties (e.g. id, lable, type, and description)
-        // final var idProperty = new MapperDataProperty("id", "identifier", true, null, null, new HashSet<String>(){{add("integer");}}, false, false);
-        // final var labelProperty = new MapperDataProperty("label", "short description of the resource", false, null, null, new HashSet<String>(){{add("string");}}, false, true);
-        // final var typeProperty = new MapperDataProperty("type", "type(s) of the resource", false, null, null, new HashSet<String>(){{add("string");}}, true, true);
-		// final var descriptionProperty = new MapperDataProperty("description", "small description", false, null, null, new HashSet<String>(){{add("string");}}, false, true);
-		
-		// // Also add some default property examples of different types (e.g. a date/time, a boolean, and a float)
-		// final var eventDateTimeProperty = new MapperDataProperty("eventDateTime", "a date/time of the resource", false, null, null, new HashSet<String>(){{add("dateTime");}}, false, true);
-		// final var isBoolProperty = new MapperDataProperty("isBool", "a boolean indicator of the resource", false, null, null, new HashSet<String>(){{add("boolean");}}, false, true);
-		// final var quantityProperty = new MapperDataProperty("quantity", "a number quantity of the resource", false, null, null, new HashSet<String>(){{add("float");}}, false, true);
 		// Add some typical default properties (e.g. id, lable, type, and description)
         final var idPropertySchema = MapperDataProperty.createDataPropertySchema("id", "identifier", new HashSet<String>(){{add("integer");}});
+		MapperProperty.setNullableValueForPropertySchema(idPropertySchema, false);
         final var labelPropertySchema = MapperDataProperty.createDataPropertySchema("label", "short description of the resource", new HashSet<String>(){{add("string");}});
+		MapperProperty.setNullableValueForPropertySchema(labelPropertySchema, true);
         final var typePropertySchema = MapperDataProperty.createDataPropertySchema("type", "type(s) of the resource", new HashSet<String>(){{add("string");}});
+		MapperProperty.setNullableValueForPropertySchema(typePropertySchema, true);
 		final var descriptionPropertySchema = MapperDataProperty.createDataPropertySchema("description", "small description", new HashSet<String>(){{add("string");}});
+		MapperProperty.setNullableValueForPropertySchema(descriptionPropertySchema, true);
 		
 		// Also add some default property examples of different types (e.g. a date/time, a boolean, and a float)
 		final var eventDateTimePropertySchema = MapperDataProperty.createDataPropertySchema("eventDateTime", "a date/time of the resource", new HashSet<String>(){{add("dateTime");}});
+		MapperProperty.setNullableValueForPropertySchema(eventDateTimePropertySchema, true);
 		final var isBoolPropertySchema = MapperDataProperty.createDataPropertySchema("isBool", "a boolean indicator of the resource", new HashSet<String>(){{add("boolean");}});
+		MapperProperty.setNullableValueForPropertySchema(isBoolPropertySchema, true);
 		final var quantityPropertySchema = MapperDataProperty.createDataPropertySchema("quantity", "a number quantity of the resource", new HashSet<String>(){{add("float");}});
+		MapperProperty.setNullableValueForPropertySchema(quantityPropertySchema, true);
 
 		return Map.ofEntries(
 			Map.entry(idPropertySchema.getName(), idPropertySchema),
