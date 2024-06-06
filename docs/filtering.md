@@ -79,17 +79,19 @@ components:
           type: array
 ```
 
-The option `follow_references` enables to follow the references.
-Let's enable the option for the previous example.
+The option `follow_references` enables OBA to follow the references when generating the OpenAPI spec.
 
-Now, you have the whole information:
+For comparison, let's enable the option for the previous example.
+
+Assume the following information is true for the ontology:
 
 - A city has 423 properties.
-- One property is the leaderName and a leaderName is Person.
-- A person has 285.
+- One property is `leaderName` and a `leaderName` is Person reference.
+- A person has 285 properties.
+- (this is **a lot** of properties to process)
 
 !!! warning
-For large ontologies, we don't recommend use the option because the result can be too heavy.
+For large ontologies, we don't recommend using the `follow_references` option because the result can be too heavy/large.
 
 ```yaml
 components:
@@ -150,6 +152,14 @@ components:
           nullable: true
           type: array
         hairColour:
+          items:
+            type: string
+          nullable: true
+          type: array
+        ...
+        ...etc..
+        ...
+        finalProperty:
           items:
             type: string
           nullable: true
