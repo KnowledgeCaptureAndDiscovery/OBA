@@ -104,6 +104,10 @@ public class MapperObjectProperty {
    * @return an object property {@link Schema}
    */
   public static Schema addAnyOfToObjectPropertySchema(Schema objectPropertySchema, String anyOfItem) {
+    // Always set nullable to false for owl:someValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#someValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(objectPropertySchema, false);
+
     Schema itemsSchema = null;
 
     if (objectPropertySchema.getItems() == null) {
@@ -148,6 +152,10 @@ public class MapperObjectProperty {
    * @return an object property {@link Schema}
    */
   public static Schema addAllOfToObjectPropertySchema(Schema objectPropertySchema, String allOfItem) {
+    // Always set nullable to true for owl:allValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#allValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(objectPropertySchema, true);
+
     Schema itemsSchema = null;
 
     if (objectPropertySchema.getItems() == null) {

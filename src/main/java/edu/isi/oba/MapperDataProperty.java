@@ -240,6 +240,10 @@ class MapperDataProperty {
    * @return an data property {@link Schema}
    */
   public static Schema addAnyOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
+    // Always set nullable to false for owl:someValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#someValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, false);
+
     Schema itemsSchema = null;
 
     if (dataPropertySchema.getItems() == null) {
@@ -273,6 +277,10 @@ class MapperDataProperty {
    * @return an data property {@link Schema}
    */
   public static Schema addAllOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
+    // Always set nullable to true for owl:allValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#allValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, true);
+
     Schema itemsSchema = null;
 
     if (dataPropertySchema.getItems() == null) {
