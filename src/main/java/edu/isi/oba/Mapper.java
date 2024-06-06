@@ -215,7 +215,7 @@ class Mapper {
             final var mappedSchema = this.getSchema(query, cls);
             
             //Add the OpenAPI paths
-            if (isTopLevel) {
+            if (isTopLevel && this.getClassesAllowedByYamlConfig().contains(cls)) {
                 this.addPath(pathGenerator, mappedSchema, cls.getIRI());
             }
         } catch (Exception e) {
