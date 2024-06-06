@@ -14,6 +14,20 @@ import io.swagger.v3.oas.models.media.*;
 public class MapperProperty {
 
   /**
+   * Set the nullable value for a property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param isNullable a boolean value indicating nullable or not.
+   * @return the {@link Schema} with new/updated nullable value set.
+   */
+  public static Schema setNullableValueForPropertySchema(Schema propertySchema, Boolean isNullable) {
+    propertySchema.setNullable(isNullable);
+
+    return propertySchema;
+  }
+
+  /**
    * Convert the class {@link Schema} so that any properties that can be converted from arrays to non-arrays will be converted.
    * Some properties cannot be converted (e.g. if they require multiple values) -> these properties are no converted.
    * 
