@@ -63,6 +63,17 @@ public class MapperProperty {
 						propertySchema.setFormat(itemsSchema.getFormat());
 						// Anything else?
 
+            // Because non-arrays are allowed by the configuration, we do not need min/max items for an exact configuration of one.
+            // NOTE: These values should only be removed if the property is marked as required (via the configuration file).
+            //        The property *should* be marked required (if applicable) before calling this method!
+            if (classSchemaToConvert.getRequired() != null && classSchemaToConvert.getRequired().contains(propertyName)) {
+              if (propertySchema.getMinItems() != null && propertySchema.getMinItems() == 1
+                  && propertySchema.getMaxItems() != null && propertySchema.getMaxItems() == 1) {
+                propertySchema.setMaxItems(null);
+                propertySchema.setMinItems(null);
+              }
+            }
+
 						// Now clear out the original items.
 						propertySchema.setItems(null);
 					}
@@ -164,6 +175,7 @@ public class MapperProperty {
    * @return the {@link Schema} with added cardinality value.
    */
   public static Schema setFunctionalForPropertySchema(Schema propertySchema) {
+    MapperProperty.setNullableValueForPropertySchema(propertySchema, false);
     return MapperProperty.addMaxCardinalityToPropertySchema(propertySchema, Integer.valueOf(1));
   }
 }
