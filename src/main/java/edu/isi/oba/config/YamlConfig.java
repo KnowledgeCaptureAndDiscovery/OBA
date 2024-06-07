@@ -15,6 +15,7 @@ public class YamlConfig {
     put(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true);
     put(CONFIG_FLAG.DEFAULT_PROPERTIES, true);
     put(CONFIG_FLAG.FOLLOW_REFERENCES, true);
+    put(CONFIG_FLAG.GENERATE_JSON_FILE, false);
     put(CONFIG_FLAG.PATH_DELETE, false);
     put(CONFIG_FLAG.PATH_GET, true);
     put(CONFIG_FLAG.PATH_PATCH, false);
@@ -213,6 +214,14 @@ public class YamlConfig {
 
   public void setUse_kebab_case_paths(Boolean use_kebab_case_paths) {
     this.configFlags.put(CONFIG_FLAG.USE_KEBAB_CASE_PATHS, use_kebab_case_paths);
+  }
+
+  public Boolean getGenerate_json_file() {
+    return this.configFlags.get(CONFIG_FLAG.GENERATE_JSON_FILE);
+  }
+
+  public void setGenerate_json_file(Boolean generate_json_file) {
+    this.configFlags.put(CONFIG_FLAG.GENERATE_JSON_FILE, generate_json_file);
   }
 
   public AuthConfig getAuth() {

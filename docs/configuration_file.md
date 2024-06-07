@@ -99,6 +99,18 @@ Example:
 output_dir: outputs
 ```
 
+Te generate the OpenAPI spec files as JSON, use the `generate_json_file` flag set to `true`.
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `False`   |
+
+```yaml
+generate_json_file: true
+```
+
 ### OpenAPI
 
 Basic information of API using OpenAPI Spec.

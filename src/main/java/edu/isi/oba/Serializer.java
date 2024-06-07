@@ -14,11 +14,11 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.openapitools.codegen.serializer.SerializerUtils;
 
 class Serializer {
-  //TODO: validate the yaml
   String openapi_path;
-  public  Serializer(Mapper mapper, java.nio.file.Path dir, OpenAPI openAPI, LinkedHashMap<String, PathItem> custom_paths) throws Exception {
+
+  public  Serializer(Mapper mapper, java.nio.file.Path dir, OpenAPI openAPI, LinkedHashMap<String, PathItem> custom_paths, Boolean saveAsJSON) throws Exception {
     Map<String, Object> extensions = new HashMap<String, Object>();
-    final String openapi_file = "openapi.yaml";
+    final String openapi_file = Optional.ofNullable(saveAsJSON).orElse(false) ? "openapi.json" : "openapi.yaml";
 
     //Generate security schema
     Map<String, SecurityScheme> securitySchemes = new HashMap<String, SecurityScheme>();
@@ -46,7 +46,7 @@ class Serializer {
     openAPI.components(components);
 
     //write the filename
-    String content = SerializerUtils.toYamlString(openAPI);
+    final var content = Optional.ofNullable(saveAsJSON).orElse(false) ? SerializerUtils.toJsonString(openAPI) : SerializerUtils.toYamlString(openAPI);
     this.openapi_path = dir + File.separator + openapi_file;
     File file = new File(openapi_path);
     BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));

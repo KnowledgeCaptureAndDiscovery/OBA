@@ -80,7 +80,7 @@ class Oba {
         //copy base project
         ObaUtils.unZipIt(Oba.SERVERS_ZIP, destination_dir);
         //get schema and paths
-        generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths);
+        generate_openapi_spec(openapi_base, mapper, destination_dir, custom_paths, config_data.getConfigFlagValue(CONFIG_FLAG.GENERATE_JSON_FILE));
         generate_openapi_template(mapper, destination_dir, config_data, selected_language);
         generate_context(config_data, destination_dir);
         copy_custom_queries(custom_queries_dir, destination_dir);
@@ -139,10 +139,10 @@ class Oba {
   private static void generate_openapi_spec(OpenAPI openapi_base,
                                             Mapper mapper,
                                             String dir,
-                                            LinkedHashMap<String, PathItem> custom_paths
-                                            ) throws Exception {
+                                            LinkedHashMap<String, PathItem> custom_paths,
+                                            Boolean saveAsJSON) throws Exception {
     String destinationProjectDirectory = dir + File.separator + Oba.SERVERS_DIRECTORY;
     Path destinationProject = Paths.get(destinationProjectDirectory);
-    new Serializer(mapper, destinationProject, openapi_base, custom_paths);
+    new Serializer(mapper, destinationProject, openapi_base, custom_paths, saveAsJSON);
   }
 }
