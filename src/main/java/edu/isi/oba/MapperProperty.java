@@ -3,6 +3,7 @@ package edu.isi.oba;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class MapperProperty {
    * @param functionalProperties a {@link Set} of {@link String} indicating the (short form) names of properties which are functional.
    * @return a {@link Schema} with all possible non-array properties converted.
    */
-  public static Schema convertNonArrayPropertySchemas(Schema classSchemaToConvert, Set<String> functionalProperties) {
+  public static Schema convertArrayToNonArrayPropertySchemas(Schema classSchemaToConvert, Set<String> functionalProperties) {
 		final Map<String, Schema> propertySchemas = classSchemaToConvert.getProperties() == null ? new HashMap<>() : classSchemaToConvert.getProperties();
 
 		// Loop through all of the properties and convert as necessary.
@@ -46,19 +47,19 @@ public class MapperProperty {
 				final var itemsSchema = propertySchema.getItems();
 
 				if (itemsSchema != null) {
-					boolean isArray = !(functionalProperties != null && functionalProperties.contains(propertyName))
-                            && ((propertySchema.getMinItems() != null && propertySchema.getMinItems() > 1)
-                              || (propertySchema.getMaxItems() != null && propertySchema.getMaxItems() > 1));
+					boolean shouldBeArray = !(functionalProperties != null && functionalProperties.contains(propertyName))
+                            && (Objects.requireNonNullElse(propertySchema.getMinItems(), -1) > 1
+                              || Objects.requireNonNullElse(propertySchema.getMaxItems(), -1) > 1);
 					
 					// Keep as array (even if only one item exists), if there is a single reference or allOf/anyOf/oneOf/enum composed schemas are contained within the property's item.
-					isArray |= itemsSchema != null && (itemsSchema.get$ref() != null
+					shouldBeArray |= itemsSchema != null && (itemsSchema.get$ref() != null
 														|| (itemsSchema.getAllOf() != null && !itemsSchema.getAllOf().isEmpty())
 														|| (itemsSchema.getAnyOf() != null && !itemsSchema.getAnyOf().isEmpty())
 														|| (itemsSchema.getOneOf() != null && !itemsSchema.getOneOf().isEmpty())
 														|| (itemsSchema.getEnum() != null && !itemsSchema.getEnum().isEmpty()));
 					
 					// By default, everything is an array.  If this property is not, then convert it from an array to a single item.
-					if (!isArray) {
+					if (!shouldBeArray) {
 						propertySchema.setType(itemsSchema.getType());
 						propertySchema.setFormat(itemsSchema.getFormat());
 						// Anything else?
@@ -67,8 +68,8 @@ public class MapperProperty {
             // NOTE: These values should only be removed if the property is marked as required (via the configuration file).
             //        The property *should* be marked required (if applicable) before calling this method!
             if (classSchemaToConvert.getRequired() != null && classSchemaToConvert.getRequired().contains(propertyName)) {
-              if (propertySchema.getMinItems() != null && propertySchema.getMinItems() == 1
-                  && propertySchema.getMaxItems() != null && propertySchema.getMaxItems() == 1) {
+              if (Objects.requireNonNullElse(propertySchema.getMinItems(), -1) == 1
+                  && Objects.requireNonNullElse(propertySchema.getMaxItems(), -1) == 1) {
                 propertySchema.setMaxItems(null);
                 propertySchema.setMinItems(null);
               }
