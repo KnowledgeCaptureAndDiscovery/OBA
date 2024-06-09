@@ -86,7 +86,8 @@ class Mapper {
 		logger.info("--->Beginning schema mapping for class \"" + cls + "\".");
 
         // Convert from OWL Class to OpenAPI Schema.
-		final var objVisitor = new ObjectVisitor(cls, this.ontologies, this.configData);
+		//final var objVisitor = new ObjectVisitor(cls, this.ontologies, this.configData);
+        final var objVisitor = new ObjectVisitor(this.ontologies, this.configData);
 		cls.accept(objVisitor);
 
         final var mappedSchema = objVisitor.getClassSchema();
