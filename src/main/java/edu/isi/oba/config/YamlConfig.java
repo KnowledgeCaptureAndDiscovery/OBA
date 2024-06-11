@@ -22,6 +22,7 @@ public class YamlConfig {
     put(CONFIG_FLAG.PATH_POST, false);
     put(CONFIG_FLAG.PATH_PUT, false);
     put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, false);
+    put(CONFIG_FLAG.USE_INHERITANCE_REFERENCES, false);
     put(CONFIG_FLAG.USE_KEBAB_CASE_PATHS, false);
   }};
 
@@ -182,6 +183,14 @@ public class YamlConfig {
 
   public void setFollow_references(Boolean follow_references) {
     this.configFlags.put(CONFIG_FLAG.FOLLOW_REFERENCES, follow_references);
+  }
+
+  public Boolean getUse_inheritance_references() {
+    return this.configFlags.get(CONFIG_FLAG.USE_INHERITANCE_REFERENCES);
+  }
+
+  public void setUse_inheritance_references(Boolean use_inheritance_references) {
+    this.configFlags.put(CONFIG_FLAG.USE_INHERITANCE_REFERENCES, use_inheritance_references);
   }
 
   public Boolean getDefault_descriptions() {

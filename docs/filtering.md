@@ -166,6 +166,71 @@ components:
           type: array
 ```
 
+#### Using inheritance references
+
+Enabling option `use_inheritance_references` only works if `follow_references` is also enabled (which it is by default - see above). Whereas `follow_references` allows `$ref` to be used to reference other schemas, `use_inheritance_references` allows references to parent/super classes to be used via the `allOf:` option for a class schema. This option can reduce the size of the OpenAPI spec at the cost of added OpenAPI parser/UI processing time.
+
+For example, lets say that a `Doctor` is a subclass of a `Person`. The `Doctor` has one property `licenseDetails` and inherits all other properties from `Person`. If `use_inheritance_references` is disabled, then its schema will look like:
+
+```yaml
+components:
+  schemas:
+    Doctor:
+      properties:
+        licenseDetails:
+          items:
+            type: object
+          nullable: true
+          type: array
+        firstPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+        ...
+        ...etc..
+        ...
+        finalPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+```
+
+Enabling option `use_inheritance_references` allows the `Person` schema to be referenced completely, so that the `Person`-specific properties only appear on the `Person` schema. The result looks like:
+
+```yaml
+components:
+  schemas:
+    Doctor:
+      allOf:
+        - type: object
+        - $ref: "#components/schemas/Person"
+      properties:
+        licenseDetails:
+          items:
+            type: object
+          nullable: true
+          type: array
+    Person:
+      properties:
+        firstPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+        ...
+        ...etc..
+        ...
+        finalPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+```
+
+In some cases, the subclass inherits a property and then has additional restrictions for the inherited property that do not exist on the parent/super class. In these situations, the entire property _will_ be copied to the subclass with all of the parent/super class property information _and_ the subclass's restrictions.
+
 ### Including default schema descriptions
 
 It is generally good practice to include a high-level description for a schema. By default, a placeholder description is included with the text `Description not available`. For example:

@@ -308,6 +308,20 @@ For more information, go to [filtering classes](filtering.md#following-reference
 follow_references: false
 ```
 
+### use_inheritance_references
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `False`   |
+
+For more information, go to [filtering classes](filtering.md#use_inheritance_references)
+
+```yaml
+use_inheritance_references: false
+```
+
 ### default_descriptions
 
 Enable/disable generation of a default description for each schema.
