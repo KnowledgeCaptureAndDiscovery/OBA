@@ -163,6 +163,9 @@ public class MapperProperty {
       propertySchema.setItems(itemsSchema);
     }
 
+    // Need to make sure the property's type is "array" because it has items.
+    propertySchema.setType("array");
+
     return propertySchema;
   }
 
