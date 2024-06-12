@@ -53,7 +53,11 @@ classes:
   - http://dbpedia.org/ontology/Genre
   - http://dbpedia.org/ontology/Band
 
+## REFERENCES
+### Enable/disable schema references.  This can be recursive and cause multiple depths/levels of reference.
 follow_references: false
+### Enable/disable use of references for class/schema inheritance.
+use_inheritance_references: false
 
 ## Enable/disable generation of a default description for each schema
 default_descriptions: true
