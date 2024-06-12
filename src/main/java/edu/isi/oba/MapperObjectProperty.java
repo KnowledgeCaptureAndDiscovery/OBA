@@ -12,7 +12,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLNaryBooleanClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
-import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
 /**
  * Class for generating an new object property {@link Schema} OR taking an existing one and updating it.
@@ -240,9 +239,7 @@ public class MapperObjectProperty {
 			if (e.isOWLClass()) {
 				final var objSchema = new ObjectSchema();
 				objSchema.setType("object");
-
-        final var sfp = new SimpleIRIShortFormProvider();
-				objSchema.set$ref(sfp.getShortForm(e.asOWLClass().getIRI()));
+				objSchema.set$ref(e.asOWLClass().getIRI().getShortForm());
 
 				if (isObjectUnion) {
 					schema.addAnyOfItem(objSchema);

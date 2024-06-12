@@ -21,8 +21,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
-import org.semanticweb.owlapi.util.IRIShortFormProvider;
-import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
 /**
  * Visits existential restrictions and collects the properties which are restricted.
@@ -49,8 +47,6 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	private final Set<OWLClass> referencedClasses = new HashSet<>();
 	private final Set<OWLClass> processedClasses = new HashSet<>();
 	private final Set<OWLClass> processedRestrictionClasses = new HashSet<>();
-
-	//private final IRIShortFormProvider sfp = new SimpleIRIShortFormProvider();
 
 	// Used to keep track of a property being visited.  Necessary for complex visits which can involve recursion, because the property name is not passable. 
 	private String currentlyProcessedPropertyName = null;
