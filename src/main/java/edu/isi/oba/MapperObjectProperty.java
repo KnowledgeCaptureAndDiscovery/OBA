@@ -135,6 +135,7 @@ public class MapperObjectProperty {
         itemsSchema.addAnyOfItem(objSchema);
 
         objectPropertySchema.setItems(itemsSchema);
+        objectPropertySchema.setType("array");
         objectPropertySchema.setNullable(false);
       }
     }
@@ -179,6 +180,7 @@ public class MapperObjectProperty {
         itemsSchema.addAllOfItem(objSchema);
 
         objectPropertySchema.setItems(itemsSchema);
+        objectPropertySchema.setType("array");
         objectPropertySchema.setNullable(false);
       }
     }

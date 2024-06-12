@@ -261,6 +261,7 @@ class MapperDataProperty {
         itemsSchema.addAnyOfItem(dataTypeSchema);
 
         dataPropertySchema.setItems(itemsSchema);
+        dataPropertySchema.setType("array");
         dataPropertySchema.setNullable(false);
       }
     }
@@ -298,6 +299,7 @@ class MapperDataProperty {
         itemsSchema.addAllOfItem(dataTypeSchema);
 
         dataPropertySchema.setItems(itemsSchema);
+        dataPropertySchema.setType("array");
         dataPropertySchema.setNullable(false);
       }
     }
