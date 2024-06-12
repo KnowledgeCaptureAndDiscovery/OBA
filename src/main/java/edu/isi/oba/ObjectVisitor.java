@@ -604,6 +604,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
 
 		currentPropertySchema.setItems(MapperObjectProperty.getComplexObjectComposedSchema(ce));
+		currentPropertySchema.setType("array");
 
 		// Make sure to update the class's property schema.
 		this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
@@ -759,6 +760,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
 
 		currentPropertySchema.setItems(MapperDataProperty.getComplexDataComposedSchema(ce));
+		currentPropertySchema.setType("array");
 
 		// Make sure to update the class's property schema.
 		this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
