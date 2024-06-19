@@ -3,10 +3,11 @@ package edu.isi.oba;
 import static edu.isi.oba.Oba.logger;
 import edu.isi.oba.config.CONFIG_FLAG;
 import edu.isi.oba.config.YamlConfig;
-
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,8 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	private OWLClass owlThing; // TODO: is this needed anymore??
 
 	private final Map<String, Schema> basePropertiesMap = new HashMap<>();
-	private final Map<String, Schema> inheritedPropertiesMap = new HashMap<>();
+	//private final Map<String, Schema> inheritedPropertiesMap = new HashMap<>();
+	private final Map<IRI, Map<String, Schema>> inheritedPropertiesMap = new HashMap<>();
 
 	private final Set<String> propertyNames = new HashSet<>();
 	private final Set<String> requiredProperties = new HashSet<>();
@@ -50,6 +52,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 
 	// Used to keep track of a property being visited.  Necessary for complex visits which can involve recursion, because the property name is not passable. 
 	private String currentlyProcessedPropertyName = null;
+	private IRI currentlyProcessedClassIRI = null;
 
 	/**
 	 * Constructor for object visitor.
@@ -116,89 +119,15 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @return a {@link Schema} for the entire class
 	 */
 	public Schema getClassSchema() {
-		return this.classSchema;
-	}
-
-	/**
-	 * Get all the classes referenced directly or indirectly (potentially through inheritance) by the base class.
-	 * 
-	 * @return a {@link Set} of {@link OWLClass}
-	 */
-	public Set<OWLClass> getAllReferencedClasses() {
-		return this.referencedClasses;
-	}
-
-	/**
-	 * 
-	 * @param ce an {@link OWLClass} to be visited by this visitor class.
-	 */
-	@Override
-	public void visit(@Nonnull OWLClass ce) {
-		// If the base class is null when this OWLClass is visited, then treat it as the base class and set up this Visitor class with its basic details.
-		if (this.baseClass == null) {
-			this.initializeBaseClass(ce);
-		}
-
-		// Avoid cycles and accept visits from super classes for the purpose of getting all properties.
-		if (!this.processedClasses.contains(ce)) {
-			// If we are processing inherited restrictions then we recursively visit named supers.
-			this.processedClasses.add(ce);
-
-			// Loop through the ontologies to use the one relevant for the current OWLClass.
-			for (OWLOntology ontology: this.ontologies) {
-				// Search the ontology for this OWLClass.
-				// If it has subclass axioms, then loop through each to accept visits for all super classes.
-				ontology.subClassAxiomsForSubClass(ce).forEach(ax -> {
-					// Only traverse super classes for inheriting properties.  Restrictions handled via generatePropertySchemasWithRestrictions() below.
-					if (ax.getSuperClass().isOWLClass()) {
-						ax.getSuperClass().accept(this);
-					}
-				});
-			}
-
-			// Only include properties from the base class OR we are not following references (because all properties need to be copied to the base class in this case).
-			// Inherited details should be determined via references.
-			if (this.baseClass.equals(ce) || !this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES)) {
-				// Get all non-inherited object and data properties.
-				this.basePropertiesMap.putAll(this.getObjectPropertySchemasForClass(ce));
-				this.basePropertiesMap.putAll(this.getDataPropertySchemasForClass(ce));
-
-				final var propertiesMap = new HashMap<String, Schema>(this.basePropertiesMap);
-				if (this.classSchema.getProperties() != null) {
-					propertiesMap.putAll(this.classSchema.getProperties());
-				}
-				this.classSchema.setProperties(propertiesMap);
-				
-			} else {
-				// Get all inherited object and data properties.
-				this.inheritedPropertiesMap.putAll(this.getObjectPropertySchemasForClass(ce));
-				this.inheritedPropertiesMap.putAll(this.getDataPropertySchemasForClass(ce));
-
-				if (this.configData.getConfigFlagValue(CONFIG_FLAG.USE_INHERITANCE_REFERENCES)) {
-					// If the class has a type (likely "object" - are there any other possibilities??), it needs to be removed and added to the "allOf" entries.
-					this.classSchema.setType(null);
-
-					// If adding for the first time, need to include a "type: object" entry.
-					if (this.classSchema.getAllOf() == null || this.classSchema.getAllOf().isEmpty()) {
-						final var objSchema = new ObjectSchema();
-						this.classSchema.addAllOfItem(objSchema);
-					}
-				} else {
-					final var propertiesMap = new HashMap<String, Schema>(this.inheritedPropertiesMap);
-					if (this.classSchema.getProperties() != null) {
-						propertiesMap.putAll(this.classSchema.getProperties());
-					}
-					this.classSchema.setProperties(propertiesMap);
-				}
-			}
-		}
-		
 		// Generate restrictions for all properties of this class, regardless of following references or not.
-		this.generatePropertySchemasWithRestrictions(ce);
+		//this.generatePropertySchemasWithRestrictions(this.baseClass);
 
 		// Only generate required properties and/or convert non-array properties for a base class.
 		// (Not) Following references automatically handles inherited properties for these two operations.
-		if (this.baseClass.equals(ce)) {
+		//if (this.baseClass.equals(ce)) {
+			// Generate restrictions for all properties of this class, regardless of following references or not.
+			//this.generatePropertySchemasWithRestrictions(ce);
+
 			// Generate the required properties for the class, if applicable.
 			if (this.configData.getConfigFlagValue(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY)) {
 				this.generateRequiredPropertiesForClassSchemas();
@@ -215,6 +144,15 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			//		We only need to inherit from Student [which automatically inherits everything from Person also].)
 			if (this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES) 
 				&& this.configData.getConfigFlagValue(CONFIG_FLAG.USE_INHERITANCE_REFERENCES)) {
+				
+				// If the class has a type (likely "object" - are there any other possibilities??), it needs to be removed and added to the "allOf" entries.
+				this.classSchema.setType(null);
+
+				// If adding for the first time, need to include a "type: object" entry.
+				if (this.classSchema.getAllOf() == null || this.classSchema.getAllOf().isEmpty()) {
+					final var objSchema = new ObjectSchema();
+					this.classSchema.addAllOfItem(objSchema);
+				}
 
 				// All processed classes, minus the base class, are the super classes.
 				final var superClasses = new HashSet<OWLClass>(this.processedClasses);
@@ -239,7 +177,175 @@ public class ObjectVisitor implements OWLObjectVisitor {
 					this.classSchema.addAllOfItem(refSchema);
 				});
 			}
+		//}
+
+		return this.classSchema;
+	}
+
+	/**
+	 * Get all the classes referenced directly or indirectly (potentially through inheritance) by the base class.
+	 * 
+	 * @return a {@link Set} of {@link OWLClass}
+	 */
+	public Set<OWLClass> getAllReferencedClasses() {
+		return this.referencedClasses;
+	}
+
+	/**
+	 * 
+	 * @param ce an {@link OWLClass} to be visited by this visitor class.
+	 */
+	@Override
+	public void visit(@Nonnull OWLClass ce) {
+		//logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~789789   " + ce + "  + this.baseClass == null ("+(this.baseClass == null)+")  +  this.baseClass.equals(ce) ("+(this.baseClass == null ? "true" : this.baseClass.equals(ce))+")");
+		// If the base class is null when this OWLClass is visited, then treat it as the base class and set up this Visitor class with its basic details.
+		if (this.baseClass == null) {
+			this.initializeBaseClass(ce);
 		}
+
+		//logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~123123   " + ce + "  + this.baseClass == null ("+(this.baseClass == null)+")  +  this.baseClass.equals(ce) ("+(this.baseClass == null ? "true" : this.baseClass.equals(ce))+")");
+
+		// Avoid cycles and accept visits from super classes for the purpose of getting all properties.
+		if (!this.processedClasses.contains(ce)) {
+			// If we are processing inherited restrictions then we recursively visit named supers.
+			this.processedClasses.add(ce);
+
+			// Loop through the ontologies to use the one relevant for the current OWLClass.
+			for (OWLOntology ontology: this.ontologies) {
+				// Only traverse this OWLClass's super classes, if it is contained in the ontology.
+				if (ontology.containsClassInSignature(ce.getIRI())) {
+					// If it has subclass axioms, then loop through each to accept visits for all super classes.
+					ontology.subClassAxiomsForSubClass(ce).forEach(ax -> {
+						// Only traverse super classes for inheriting properties.  Restrictions handled via generatePropertySchemasWithRestrictions() below.
+						if (ax.getSuperClass().isOWLClass()) {
+							ax.getSuperClass().accept(this);
+						}
+					});
+				}
+			}
+		}
+
+		// Only include properties from the base class OR we are not following references (because all properties need to be copied to the base class in this case).
+		// Inherited details should be determined via references.
+		//if (this.baseClass.equals(ce) || !this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES)) {
+		if (this.baseClass.equals(ce)) {
+			// Get all non-inherited object and data properties.
+			this.basePropertiesMap.putAll(this.getObjectPropertySchemasForClass(ce));
+			this.basePropertiesMap.putAll(this.getDataPropertySchemasForClass(ce));
+
+			// final var propertiesMap = new HashMap<String, Schema>(this.basePropertiesMap);
+			// if (this.classSchema.getProperties() != null) {
+			// 	propertiesMap.putAll(this.classSchema.getProperties());
+			// }
+			// this.classSchema.setProperties(propertiesMap);
+			// Not using setProperties(), because it creates immutability which breaks unit tests.
+			this.basePropertiesMap.forEach((schemaName, schema) -> {
+				this.classSchema.addProperty(schemaName, schema);
+			});
+			//this.classSchema.addProperty()
+
+			//if (this.baseClass.equals(ce) || !this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES)) {
+				//if ("TransactionDocumentItem".equals(ce.getIRI().getShortForm())) {//transactionItemFor
+					//logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1111   " + this.classSchema.getProperties().get("updatedOn"));
+					//testBool
+				//}
+			
+		} else {
+			// Get all inherited object and data properties.
+			// this.inheritedPropertiesMap.putAll(this.getObjectPropertySchemasForClass(ce));
+			// this.inheritedPropertiesMap.putAll(this.getDataPropertySchemasForClass(ce));
+			//this.inheritedPropertiesMap.putAll(this.getObjectPropertySchemasForClass(ce));
+			//this.inheritedPropertiesMap.putAll(this.getDataPropertySchemasForClass(ce));
+			//this.getObjectPropertySchemasForClass(ce).forEach(this.inheritedPropertiesMap::putIfAbsent);
+			//this.getDataPropertySchemasForClass(ce).forEach(this.inheritedPropertiesMap::putIfAbsent);
+			this.inheritedPropertiesMap.put(ce.getIRI(), this.getObjectPropertySchemasForClass(ce));
+			this.inheritedPropertiesMap.put(ce.getIRI(), this.getDataPropertySchemasForClass(ce));
+			//this.getObjectPropertySchemasForClass(ce).forEach(this.inheritedPropertiesMap::putIfAbsent);
+			//this.getDataPropertySchemasForClass(ce).forEach(this.inheritedPropertiesMap::putIfAbsent);
+
+			//if ("TransactionDocumentItem".equals(ce.getIRI().getShortForm())) {//transactionItemFor
+			// if (this.inheritedPropertiesMap.containsKey(ce.getIRI())) {
+			// 	logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2222   " + this.inheritedPropertiesMap.get(ce.getIRI()).get("updatedOn"));
+			// }	
+			//}
+
+			/*if (this.configData.getConfigFlagValue(CONFIG_FLAG.USE_INHERITANCE_REFERENCES)) {
+				// If the class has a type (likely "object" - are there any other possibilities??), it needs to be removed and added to the "allOf" entries.
+				this.classSchema.setType(null);
+
+				// If adding for the first time, need to include a "type: object" entry.
+				if (this.classSchema.getAllOf() == null || this.classSchema.getAllOf().isEmpty()) {
+					final var objSchema = new ObjectSchema();
+					this.classSchema.addAllOfItem(objSchema);
+				}
+			} else {
+				final var propertiesMap = new HashMap<String, Schema>(this.inheritedPropertiesMap);
+				if (this.classSchema.getProperties() != null) {
+					propertiesMap.putAll(this.classSchema.getProperties());
+				}
+				this.classSchema.setProperties(propertiesMap);
+			}*/
+		}
+
+		// Generate restrictions for all properties of this class, regardless of following references or not.
+		this.generatePropertySchemasWithRestrictions(ce);
+
+		// logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1111 class name   " + ce.getIRI().getShortForm());
+		// logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1111   " + this.classSchema.getProperties().get("updatedOn"));
+		// if (this.inheritedPropertiesMap.containsKey(ce.getIRI())) {
+		// 	logger.severe("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2222   " + this.inheritedPropertiesMap.get(ce.getIRI()).get("updatedOn"));
+		// }
+		
+		// // Generate restrictions for all properties of this class, regardless of following references or not.
+		// this.generatePropertySchemasWithRestrictions(ce);
+
+		// // Only generate required properties and/or convert non-array properties for a base class.
+		// // (Not) Following references automatically handles inherited properties for these two operations.
+		// if (this.baseClass.equals(ce)) {
+		// 	// Generate restrictions for all properties of this class, regardless of following references or not.
+		// 	//this.generatePropertySchemasWithRestrictions(ce);
+
+		// 	// Generate the required properties for the class, if applicable.
+		// 	if (this.configData.getConfigFlagValue(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY)) {
+		// 		this.generateRequiredPropertiesForClassSchemas();
+		// 	}
+
+		// 	// Convert non-array property items, if applicable.
+		// 	if (!this.configData.getConfigFlagValue(CONFIG_FLAG.ALWAYS_GENERATE_ARRAYS)) {
+		// 		MapperProperty.convertArrayToNonArrayPropertySchemas(this.classSchema, this.functionalProperties);
+		// 	}
+
+		// 	// If following references AND use inheritance references (for the class), we do not want to inherit/reference the same class multiple times accidentally.
+		// 	// (e.g. if we have Person > Student > ExchangeStudent, Student already inherits everything from Person.
+		// 	// 		For ExchangeStudent, we do not want to inherit from Person AND Student.
+		// 	//		We only need to inherit from Student [which automatically inherits everything from Person also].)
+		// 	if (this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES) 
+		// 		&& this.configData.getConfigFlagValue(CONFIG_FLAG.USE_INHERITANCE_REFERENCES)) {
+
+		// 		// All processed classes, minus the base class, are the super classes.
+		// 		final var superClasses = new HashSet<OWLClass>(this.processedClasses);
+		// 		superClasses.remove(this.baseClass);
+
+		// 		// Make a copy of the super classes.
+		// 		// Loop through all super classes and remove any super-super-classes that are being inherited by a nearer/more direct super class to the base class.
+		// 		final var directSuperClasses = new HashSet<OWLClass>(superClasses);
+		// 		for (OWLClass superClassA : superClasses) {
+		// 			for (OWLClass superClassB : superClasses) {
+		// 				if (!superClassA.equals(superClassB) && this.reasoner.getSuperClasses(superClassA, false).containsEntity(superClassB)) {
+		// 					directSuperClasses.remove(superClassB);
+		// 				}
+		// 			}
+		// 		}
+
+		// 		// Add all direct superclasses to allOf list.
+		// 		directSuperClasses.stream().forEach(superClass -> {
+		// 			final var refSchema = new ObjectSchema();
+		// 			refSchema.set$ref(superClass.getIRI().getShortForm());
+
+		// 			this.classSchema.addAllOfItem(refSchema);
+		// 		});
+		// 	}
+		// }
 	}
 
 	/**
@@ -258,6 +364,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		if (!this.processedRestrictionClasses.contains(owlClass)) {
 			// If we are processing inherited restrictions then we recursively visit named supers.
 			this.processedRestrictionClasses.add(owlClass);
+			this.currentlyProcessedClassIRI = owlClass.getIRI();
 
 			// Loop through the ontologies to use the one relevant for the current OWLClass.
 			for (OWLOntology ontology: this.ontologies) {
@@ -309,6 +416,9 @@ public class ObjectVisitor implements OWLObjectVisitor {
 					eqClsAx.accept(this);
 				});
 			}
+
+			// Clear out the processing class's IRI.
+			this.currentlyProcessedClassIRI = null;
 		}
 	}
 
@@ -540,31 +650,91 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @return a {@link Schema} for the property.
 	 */
 	private Schema getPropertySchemaForRestrictionVisit(String propertyName) {
-		Schema currentPropertySchema = null;
+		//Schema currentPropertySchema = null;
+		Schema currentPropertySchema = this.classSchema.getProperties() == null ? null : (Schema) this.classSchema.getProperties().get(propertyName);
 
 		// If the class inherits this property from a super class AND the base class does not already contain this property,
 		// then use the inherited property schema.  Otherwise, use the base class's chema (or new Schema, if neither yet).
-		if (this.inheritedPropertiesMap.containsKey(propertyName)
-			&& (!this.basePropertiesMap.containsKey(propertyName))) {
+		//if (this.inheritedPropertiesMap.containsKey(propertyName) && !this.basePropertiesMap.containsKey(propertyName)) {
+			
+		/*if (this.inheritedPropertiesMap.containsKey(propertyName)) {
+			logger.severe("!!!!!!!!@@@@@###############inheritedPropertiesMap 1111:  " + propertyName);
 			currentPropertySchema = this.inheritedPropertiesMap.get(propertyName);
-		} else {
-			currentPropertySchema = this.classSchema.getProperties() == null ? new Schema() : (Schema) this.classSchema.getProperties().get(propertyName);
-		}
+
+			if 
+
+			//this.classSchema.addProperty()
+		}*/ /*else {
+			//currentPropertySchema = this.classSchema.getProperties() == null ? new Schema() : (Schema) this.classSchema.getProperties().get(propertyName);
+			currentPropertySchema = this.classSchema.getProperties() == null ? null : (Schema) this.classSchema.getProperties().get(propertyName);
+			//currentPropertySchema = this.basePropertiesMap.get(propertyName);
+		}*/
 
 		// In certain cases, a property was not set up with domains/ranges but has a restriction.
 		// This property will not exist in the map of property names + schemas yet, so add it and set it up with basic info.
 		if (currentPropertySchema == null) {
-			currentPropertySchema = new ObjectSchema();
+			currentPropertySchema = new ArraySchema();
 			currentPropertySchema.setName(propertyName);
 
 			final var propertyDescription = this.configData.getConfigFlagValue(CONFIG_FLAG.DEFAULT_DESCRIPTIONS) ? ObaUtils.DEFAULT_DESCRIPTION : null;
 			currentPropertySchema.setDescription(propertyDescription);
 
+			//final var junk = new ObjectSchema();
+			//final var junk = new ArraySchema();
+			//junk.addType({});
+			//junk.setDefault(new ArrayList<String>());
+			//currentPropertySchema.setItems(new ObjectSchema());
+			//junk.addType(propertyName)
+			//currentPropertySchema.setItems(junk);
+			//currentPropertySchema.setItems(null);
+			//currentPropertySchema.setDefault(new ArrayList<String>());
+
 			// If this was a new property schema, need to make sure it's added.
 			this.classSchema.addProperty(propertyName, currentPropertySchema);
 		}
 
+		if (this.inheritedPropertiesMap.containsKey(this.currentlyProcessedClassIRI) && this.inheritedPropertiesMap.get(this.currentlyProcessedClassIRI).containsKey(propertyName)) {
+			final var inheritedPropertySchema = this.inheritedPropertiesMap.get(this.currentlyProcessedClassIRI).get(propertyName);
+			this.mergeFirstSchemaIntoSecondSchema(inheritedPropertySchema, currentPropertySchema);
+		}
+
+		/*if (this.basePropertiesMap.containsKey(propertyName)) {
+			final var basePropertySchema = this.basePropertiesMap.get(propertyName);
+			this.mergeFirstSchemaIntoSecondSchema(basePropertySchema, currentPropertySchema);
+		}*/
+		//this.basePropertiesMap.get(propertyName)
+
 		return currentPropertySchema;
+	}
+
+	private void mergeFirstSchemaIntoSecondSchema(Schema firstSchema, Schema secondSchema) {
+		if (firstSchema.getAllOf() != null && secondSchema.getAllOf() == null) {
+			secondSchema.setAllOf(firstSchema.getAllOf());
+		}
+
+		if (firstSchema.getAnyOf() != null && secondSchema.getAnyOf() == null) {
+			secondSchema.setAnyOf(firstSchema.getAnyOf());
+		}
+
+		if (firstSchema.getOneOf() != null && secondSchema.getOneOf() == null) {
+			secondSchema.setOneOf(firstSchema.getOneOf());
+		}
+
+		if (firstSchema.getItems() != null && secondSchema.getItems() == null) {
+			secondSchema.setItems(firstSchema.getItems());
+		}
+
+		if (firstSchema.getMinItems() != null && secondSchema.getMinItems() == null) {
+			secondSchema.setMinItems(firstSchema.getMinItems());
+		}
+
+		if (firstSchema.getMaxItems() != null && secondSchema.getMaxItems() == null) {
+			secondSchema.setMaxItems(firstSchema.getMaxItems());
+		}
+
+		if (firstSchema.getDescription() != null && secondSchema.getDescription() == null) {
+			secondSchema.setDescription(firstSchema.getDescription());
+		}
 	}
 
 	/**
@@ -607,7 +777,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		currentPropertySchema.setType("array");
 
 		// Make sure to update the class's property schema.
-		this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+		//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 	}
 		
 	@Override
@@ -646,15 +816,15 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			} else if (or instanceof OWLObjectAllValuesFrom) {
 				MapperObjectProperty.addAllOfToObjectPropertySchema(currentPropertySchema, objRestrictionRange);
 			} else if (or instanceof OWLObjectMinCardinality) {
-				MapperProperty.addMinCardinalityToPropertySchema(currentPropertySchema, restrictionValue);
+				MapperObjectProperty.addMinCardinalityToPropertySchema(currentPropertySchema, restrictionValue, objRestrictionRange);
 			} else if (or instanceof OWLObjectMaxCardinality) {
-				MapperProperty.addMaxCardinalityToPropertySchema(currentPropertySchema, restrictionValue);
+				MapperObjectProperty.addMaxCardinalityToPropertySchema(currentPropertySchema, restrictionValue, objRestrictionRange);
 			} else if (or instanceof OWLObjectExactCardinality) {
-				MapperProperty.addExactCardinalityToPropertySchema(currentPropertySchema, restrictionValue);
+				MapperObjectProperty.addExactCardinalityToPropertySchema(currentPropertySchema, restrictionValue, objRestrictionRange);
 			}
 
 			// Make sure to update the class's property schema.
-			this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+			//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 		}
 	}
 
@@ -705,7 +875,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			MapperObjectProperty.setComplementOfForObjectSchema(currentPropertySchema, ce.getOperand().asOWLClass().getIRI().getShortForm());
 
 			// Make sure to update the class's property schema.
-			this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+			//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 		}
  	}
 	
@@ -719,7 +889,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		MapperProperty.addHasValueOfPropertySchema(currentPropertySchema, ((OWLNamedIndividual) ce.getFiller()).getIRI().getShortForm());
 
 		// Make sure to update the class's property schema.
-		this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+		//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 	}
 	
 	@Override
@@ -743,7 +913,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 				MapperObjectProperty.addOneOfToObjectPropertySchema(currentPropertySchema, individual.asOWLNamedIndividual().getIRI().getShortForm());
 
 				// Make sure to update the class's property schema.
-				this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+				//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 			}
 		}
 	}
@@ -763,7 +933,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		currentPropertySchema.setType("array");
 
 		// Make sure to update the class's property schema.
-		this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+		//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 	}
 
 	@Override
@@ -803,15 +973,15 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			} else if (dr instanceof OWLDataAllValuesFrom) {
 				MapperDataProperty.addAllOfDataPropertySchema(currentPropertySchema, dataRestrictionRange);
 			} else if (dr instanceof OWLDataMinCardinality) {
-				MapperProperty.addMinCardinalityToPropertySchema(currentPropertySchema, restrictionValue);
+				MapperDataProperty.addMinCardinalityToPropertySchema(currentPropertySchema, restrictionValue, dataRestrictionRange);
 			} else if (dr instanceof OWLDataMaxCardinality) {
-				MapperProperty.addMaxCardinalityToPropertySchema(currentPropertySchema, restrictionValue);
+				MapperDataProperty.addMaxCardinalityToPropertySchema(currentPropertySchema, restrictionValue, dataRestrictionRange);
 			} else if (dr instanceof OWLDataExactCardinality) {
-				MapperProperty.addExactCardinalityToPropertySchema(currentPropertySchema, restrictionValue);
+				MapperDataProperty.addExactCardinalityToPropertySchema(currentPropertySchema, restrictionValue, dataRestrictionRange);
 			}
 
 			// Make sure to update the class's property schema.
-			this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+			//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 		}
 	}
 
@@ -859,7 +1029,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			MapperDataProperty.addOneOfDataPropertySchema(currentPropertySchema, oneOfValue);
 
 			// Make sure to update the class's property schema.
-			this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+			//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 		});
 	}
 
@@ -874,7 +1044,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			MapperDataProperty.setComplementOfForDataSchema(currentPropertySchema, complementOfDatatype);
 
 			// Make sure to update the class's property schema.
-			this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+			//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 		});
 	}
 	
@@ -888,6 +1058,6 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		MapperProperty.addHasValueOfPropertySchema(currentPropertySchema, ce.getFiller().getLiteral());
 
 		// Make sure to update the class's property schema.
-		this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
+		//this.classSchema.addProperty(this.currentlyProcessedPropertyName, currentPropertySchema);
 	}
 }
