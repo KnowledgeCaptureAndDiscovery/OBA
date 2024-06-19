@@ -361,6 +361,64 @@ class MapperDataProperty {
   }
 
   /**
+   * Add a minimum cardinality value to the property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt an exact cardinality value.
+   * @param dataRangeType a {@link String} value indicating the data range type.
+   * @return the {@link Schema} with added cardinality value.
+   */
+  public static Schema addMinCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
+    propertySchema.setMinItems(cardinalityInt);
+
+    final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
+    propertySchema.setItems(dataTypeSchema);
+    propertySchema.setType("array");
+
+    return propertySchema;
+  }
+
+  /**
+   * Add a maximum cardinality value to the property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt a maximum cardinality value.
+   * @param dataRangeType a {@link String} value indicating the data range type.
+   * @return the {@link Schema} with added cardinality value.
+   */
+  public static Schema addMaxCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
+    propertySchema.setMaxItems(cardinalityInt);
+
+    final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
+    propertySchema.setItems(dataTypeSchema);
+    propertySchema.setType("array");
+
+    return propertySchema;
+  }
+
+  /**
+   * Add an exact cardinality value to the property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt an exact cardinality value.
+   * @param dataRangeType a {@link String} value indicating the data range type.
+   * @return the {@link Schema} with added cardinality value.
+   */
+   public static Schema addExactCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
+    propertySchema.setMinItems(cardinalityInt);
+    propertySchema.setMaxItems(cardinalityInt);
+
+    final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
+    propertySchema.setItems(dataTypeSchema);
+    propertySchema.setType("array");
+
+    return propertySchema;
+  }
+
+  /**
    * Recursive method to get/generate a {@link ComposedSchema} that may/may not be complex (i.e. contains nested unions/intersections).
    * 
    * @param dr a {@link OWLNaryDataRange} data range (i.e. {@link OWLDataUnionOf} or {@link OWLDataIntersectionOf})

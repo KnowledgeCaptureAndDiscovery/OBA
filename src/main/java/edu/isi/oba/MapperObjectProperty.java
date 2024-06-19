@@ -226,6 +226,67 @@ public class MapperObjectProperty {
   }
 
   /**
+   * Add a minimum cardinality value to the property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt a minimum cardinality value.
+   * @param objectRange a {@link String} value (i.e. OWLClass' short form name) to add
+   * @return the {@link Schema} with added cardinality value.
+   */
+  public static Schema addMinCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String objectRange) {
+    propertySchema.setMinItems(cardinalityInt);
+
+    final var objSchema = new ObjectSchema();
+    objSchema.setType("object");
+    objSchema.set$ref(objectRange);
+    propertySchema.setItems(objSchema);
+
+    return propertySchema;
+  }
+
+  /**
+   * Add a maximum cardinality value to the property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt a maximum cardinality value.
+   * @param objectRange a {@link String} value (i.e. OWLClass' short form name) to add
+   * @return the {@link Schema} with added cardinality value.
+   */
+  public static Schema addMaxCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String objectRange) {
+    propertySchema.setMaxItems(cardinalityInt);
+
+    final var objSchema = new ObjectSchema();
+    objSchema.setType("object");
+    objSchema.set$ref(objectRange);
+    propertySchema.setItems(objSchema);
+
+    return propertySchema;
+  }
+
+  /**
+   * Add an exact cardinality value to the property's {@link Schema}.
+   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt an exact cardinality value.
+   * @param objectRange a {@link String} value (i.e. OWLClass' short form name) to add
+   * @return the {@link Schema} with added cardinality value.
+   */
+  public static Schema addExactCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String objectRange) {
+    propertySchema.setMinItems(cardinalityInt);
+    propertySchema.setMaxItems(cardinalityInt);
+
+    final var objSchema = new ObjectSchema();
+    objSchema.setType("object");
+    objSchema.set$ref(objectRange);
+    propertySchema.setItems(objSchema);
+
+    return propertySchema;
+  }
+
+  /**
    * Recursive method to get/generate a {@link ComposedSchema} that may/may not be complex (i.e. contains nested unions/intersections).
    * 
    * @param ce a {@link OWLNaryBooleanClassExpression} class expression (i.e. {@link OWLObjectUnionOf} or {@link OWLObjectIntersectionOf})
