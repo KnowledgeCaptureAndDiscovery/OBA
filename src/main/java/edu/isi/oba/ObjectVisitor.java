@@ -96,9 +96,9 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 */
 	private Schema getBaseClassBasicSchema() {
 		var basicClassSchema = new Schema();
-		basicClassSchema.setName(this.getBaseClassName());
-		basicClassSchema.setDescription(ObaUtils.getDescription(this.baseClass, this.ontologies, this.configData.getConfigFlagValue(CONFIG_FLAG.DEFAULT_DESCRIPTIONS)));
-		basicClassSchema.setType("object");
+		MapperProperty.setSchemaName(basicClassSchema, this.getBaseClassName());
+		MapperProperty.setSchemaDescription(basicClassSchema, ObaUtils.getDescription(this.baseClass, this.ontologies, this.configData.getConfigFlagValue(CONFIG_FLAG.DEFAULT_DESCRIPTIONS)));
+		MapperProperty.setSchemaType(basicClassSchema, "object");
 		
 		if (this.configData.getConfigFlagValue(CONFIG_FLAG.DEFAULT_PROPERTIES)) {
 			// Not using setProperties(), because it creates immutability which breaks unit tests.
@@ -136,7 +136,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			&& this.configData.getConfigFlagValue(CONFIG_FLAG.USE_INHERITANCE_REFERENCES)) {
 			
 			// If the class has a type (likely "object" - are there any other possibilities??), it needs to be removed and added to the "allOf" entries.
-			this.classSchema.setType(null);
+			MapperProperty.setSchemaType(this.classSchema, null);
 
 			// If adding for the first time, need to include a "type: object" entry.
 			if (this.classSchema.getAllOf() == null || this.classSchema.getAllOf().isEmpty()) {
@@ -646,10 +646,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		// This property will not exist in the map of property names + schemas yet, so add it and set it up with basic info.
 		if (currentPropertySchema == null) {
 			currentPropertySchema = new ArraySchema();
-			currentPropertySchema.setName(propertyName);
+			MapperProperty.setSchemaName(currentPropertySchema, propertyName);
 
 			final var propertyDescription = this.configData.getConfigFlagValue(CONFIG_FLAG.DEFAULT_DESCRIPTIONS) ? ObaUtils.DEFAULT_DESCRIPTION : null;
-			currentPropertySchema.setDescription(propertyDescription);
+			MapperProperty.setSchemaDescription(currentPropertySchema, propertyDescription);
 
 			// If this was a new property schema, need to make sure it's added.
 			this.classSchema.addProperty(propertyName, currentPropertySchema);
@@ -718,15 +718,23 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	private void visitOWLQuantifiedObjectRestriction(@Nonnull OWLQuantifiedObjectRestriction or) {
 		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + or);
 
+		// If no existing property schema, then create empty schema for it.
+		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
+
 		final var ce = or.getFiller();
-		if (ce instanceof OWLObjectUnionOf || ce instanceof OWLObjectIntersectionOf || ce instanceof OWLObjectOneOf) {
+		if (ce instanceof OWLObjectOneOf) {
 			ce.accept(this);
+		} else if (ce instanceof OWLObjectUnionOf || ce instanceof OWLObjectIntersectionOf) {
+			final var complexObjectRange = MapperObjectProperty.getComplexObjectComposedSchema((OWLNaryBooleanClassExpression) ce, this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES));
+
+			if (or instanceof OWLObjectSomeValuesFrom) {
+				MapperObjectProperty.addAnyOfToObjectPropertySchema(currentPropertySchema, complexObjectRange);
+			} else if (or instanceof OWLObjectAllValuesFrom) {
+				MapperObjectProperty.addAllOfToObjectPropertySchema(currentPropertySchema, complexObjectRange);
+			}
 		} else {
 			final Integer restrictionValue = (or instanceof OWLObjectCardinalityRestriction) ? ((OWLObjectCardinalityRestriction) or).getCardinality() : null;
 			final var objRestrictionRange = this.configData.getConfigFlagValue(CONFIG_FLAG.FOLLOW_REFERENCES) ? ce.asOWLClass().getIRI().getShortForm() : null;
-
-			// If no existing property schema, then create empty schema for it.
-			final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
 
 			// Update current property schema with the appropriate restriction range/value.
 			if (or instanceof OWLObjectSomeValuesFrom) {
@@ -865,8 +873,16 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		Integer restrictionValue = (dr instanceof OWLDataCardinalityRestriction) ? ((OWLDataCardinalityRestriction) dr).getCardinality() : null;
 
 		final var ce = dr.getFiller();
-		if (ce instanceof OWLDataUnionOf || ce instanceof OWLDataIntersectionOf || ce instanceof OWLDataOneOf) {
+		if (ce instanceof OWLDataOneOf) {
 			ce.accept(this);
+		} else if (ce instanceof OWLDataUnionOf || ce instanceof OWLDataIntersectionOf) {
+			final var complexDataRange = MapperDataProperty.getComplexDataComposedSchema((OWLNaryDataRange) ce);
+
+			if (dr instanceof OWLDataSomeValuesFrom) {
+				MapperDataProperty.addAnyOfDataPropertySchema(currentPropertySchema, complexDataRange);
+			} else if (dr instanceof OWLDataAllValuesFrom) {
+				MapperDataProperty.addAllOfDataPropertySchema(currentPropertySchema, complexDataRange);
+			}
 		} else {
 			final var dataRestrictionRange = ce.asOWLDatatype().getIRI().getShortForm();
 
