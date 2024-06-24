@@ -45,6 +45,16 @@ public class MapperProperty {
   }
 
   /**
+   * Sets the {@link Schema}'s format.
+   * 
+   * @param schema a {@link Schema}
+   * @param format a {@link String} indicating {@link Schema}'s format.
+   */
+  public static void setSchemaFormat(Schema schema, String format) {
+    schema.setFormat(format);
+  }
+
+  /**
    * Set the nullable value for a property's {@link Schema}.
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
@@ -89,8 +99,8 @@ public class MapperProperty {
 					
 					// By default, everything is an array.  If this property is not, then convert it from an array to a single item.
 					if (!shouldBeArray) {
-						propertySchema.setType(itemsSchema.getType());
-						propertySchema.setFormat(itemsSchema.getFormat());
+            MapperProperty.setSchemaFormat(propertySchema, itemsSchema.getType());
+            MapperProperty.setSchemaFormat(propertySchema, itemsSchema.getFormat());
 						// Anything else?
 
             // Because non-arrays are allowed by the configuration, we do not need min/max items for an exact configuration of one.
@@ -187,13 +197,13 @@ public class MapperProperty {
     // Only add if no enums already OR it's not contained with the enums yet.
     if (itemsSchema.getEnum() == null || !((List<String>) itemsSchema.getEnum().stream().map(Object::toString).collect(Collectors.toList())).contains(hasValue)) {
       itemsSchema.addEnumItemObject(hasValue);
-      itemsSchema.setType(null);
+      MapperProperty.setSchemaType(itemsSchema, null);
 
       propertySchema.setItems(itemsSchema);
     }
 
     // Need to make sure the property's type is "array" because it has items.
-    propertySchema.setType("array");
+    MapperProperty.setSchemaType(propertySchema, "array");
   }
 
   /**
