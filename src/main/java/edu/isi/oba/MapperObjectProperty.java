@@ -131,6 +131,48 @@ public class MapperObjectProperty extends MapperProperty {
   }
 
   /**
+   * Add an anyOf value to an object property {@link Schema}.
+   * 
+   * @param objectPropertySchema an object property {@link Schema}.
+   * @param complexObjRangeSchema a {@link Schema} containing one or more object range references.
+   */
+  public static void addAnyOfToObjectPropertySchema(Schema objectPropertySchema, Schema complexObjRangeSchema) {
+    // Always set nullable to false for owl:someValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#someValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(objectPropertySchema, false);
+
+    Schema itemsSchema = null;
+
+    if (objectPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = objectPropertySchema.getItems();
+
+      // oneOf takes priority over (and cannot co-occur with) allOf/anyOf.
+      itemsSchema.setAllOf(null);
+      itemsSchema.setAnyOf(null);
+    }
+
+    // Only add anyOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add anyOf value if the value is not already included.
+      if (itemsSchema.getAnyOf() == null || !itemsSchema.getAnyOf().contains(complexObjRangeSchema)) {
+        // There are cases where the property has a range (i.e. the items schema has a ref), but class restrictions have been added which further restrict it with an anyOf.
+        // So, we need to unset the items reference first.
+        if (itemsSchema.get$ref() != null) {
+          itemsSchema.set$ref(null);
+        }
+
+        itemsSchema.addAnyOfItem(complexObjRangeSchema);
+        MapperProperty.setSchemaType(itemsSchema, null);
+
+        objectPropertySchema.setItems(itemsSchema);
+        MapperProperty.setSchemaType(objectPropertySchema, "array");
+      }
+    }
+  }
+
+  /**
    * Add an allOf value to an object property {@link Schema}.
    * 
    * @param objectPropertySchema an object property {@link Schema}.
@@ -163,6 +205,44 @@ public class MapperObjectProperty extends MapperProperty {
         objSchema.set$ref(allOfItem);
         
         itemsSchema.addAllOfItem(objSchema);
+        MapperProperty.setSchemaType(itemsSchema, null);
+
+        objectPropertySchema.setItems(itemsSchema);
+        MapperProperty.setSchemaType(objectPropertySchema, "array");
+      }
+    }
+  }
+
+  /**
+   * Add an allOf value to an object property {@link Schema}.
+   * 
+   * @param objectPropertySchema an object property {@link Schema}.
+   * @param complexObjRangeSchema a {@link Schema} containing one or more object range references.
+   */
+  public static void addAllOfToObjectPropertySchema(Schema objectPropertySchema, Schema complexObjRangeSchema) {
+    // Always set nullable to true for owl:allValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#allValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(objectPropertySchema, true);
+
+    Schema itemsSchema = null;
+
+    if (objectPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = objectPropertySchema.getItems();
+    }
+
+    // Only add allOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add allOf value if the value is not already included.
+      if (itemsSchema.getAllOf() == null || !itemsSchema.getAllOf().contains(complexObjRangeSchema)) {
+        // There are cases where the property has a range (i.e. the items schema has a ref), but class restrictions have been added which further restrict it with an allOf.
+        // So, we need to unset the items reference first.
+        if (itemsSchema.get$ref() != null) {
+          itemsSchema.set$ref(null);
+        }
+        
+        itemsSchema.addAllOfItem(complexObjRangeSchema);
         MapperProperty.setSchemaType(itemsSchema, null);
 
         objectPropertySchema.setItems(itemsSchema);

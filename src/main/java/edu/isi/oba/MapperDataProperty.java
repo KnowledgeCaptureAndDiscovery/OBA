@@ -96,13 +96,13 @@ class MapperDataProperty extends MapperProperty {
     if (datatypes != null && datatypes.size() == 1) {
       final var datatype = datatypes.iterator().next();
       final var itemsSchema = MapperDataProperty.getTypeSchema(datatype);
-      itemsSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
+      MapperDataProperty.setSchemaFormat(itemsSchema, MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
       propertySchema.setItems(itemsSchema);
     } else {
       final var composedSchema = new ComposedSchema();
       datatypes.forEach((datatype) -> {
         final var datatypeSchema = MapperDataProperty.getTypeSchema(datatype);
-        datatypeSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
+        MapperDataProperty.setSchemaFormat(datatypeSchema, MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
         composedSchema.addOneOfItem(datatypeSchema);
       });
       propertySchema.setItems(composedSchema);
@@ -219,7 +219,7 @@ class MapperDataProperty extends MapperProperty {
   public static void setComplementOfForDataSchema(Schema dataPropertySchema, OWLDatatype complementOfType) {
     final var complementDatatypeString = MapperDataProperty.getDataType(complementOfType.toString());
     Schema complement = MapperDataProperty.getTypeSchema(complementDatatypeString);
-    complement.setFormat(MapperDataProperty.getFormatForDatatype(complementOfType));
+    MapperDataProperty.setSchemaFormat(complement, MapperDataProperty.getFormatForDatatype(complementOfType));
     dataPropertySchema.not(complement);
   }
 
@@ -258,6 +258,40 @@ class MapperDataProperty extends MapperProperty {
   }
 
   /**
+   * Add an anyOf value to an data property {@link Schema}.
+   * NOTE: the complex data range schema (intended to be union of / intersection of) should be generated via getComplexDataComposedSchema() before calling this method.
+   * 
+   * @param dataPropertySchema an data property {@link Schema}.
+   * @param complexDataRangeSchema a {@link Schema} containing one or more data range types.
+   */
+  public static void addAnyOfDataPropertySchema(Schema dataPropertySchema, Schema complexDataRangeSchema) {
+    // Always set nullable to false for owl:someValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#someValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, false);
+
+    Schema itemsSchema = null;
+
+    if (dataPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = dataPropertySchema.getItems();
+    }
+
+    // Only add anyOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add anyOf value if the value is not already included.
+      if (itemsSchema.getAnyOf() == null || !itemsSchema.getAnyOf().contains(complexDataRangeSchema)) {
+        itemsSchema.addAnyOfItem(complexDataRangeSchema);
+        MapperProperty.setSchemaType(itemsSchema, null);
+        MapperProperty.setSchemaFormat(itemsSchema, null);
+
+        dataPropertySchema.setItems(itemsSchema);
+        MapperProperty.setSchemaType(dataPropertySchema, "array");
+      }
+    }
+  }
+
+  /**
    * Add an allOf value to an data property {@link Schema}.
    * 
    * @param dataPropertySchema an data property {@link Schema}.
@@ -284,6 +318,40 @@ class MapperDataProperty extends MapperProperty {
         
         itemsSchema.addAllOfItem(dataTypeSchema);
         MapperProperty.setSchemaType(itemsSchema, null);
+
+        dataPropertySchema.setItems(itemsSchema);
+        MapperProperty.setSchemaType(dataPropertySchema, "array");
+      }
+    }
+  }
+
+  /**
+   * Add an allOf value to an data property {@link Schema}.
+   * NOTE: the complex data range schema (intended to be union of / intersection of) should be generated via getComplexDataComposedSchema() before calling this method.
+   * 
+   * @param dataPropertySchema an data property {@link Schema}.
+   * @param complexDataRangeSchema a {@link Schema} containing one or more data range types.
+   */
+  public static void addAllOfDataPropertySchema(Schema dataPropertySchema, Schema complexDataRangeSchema) {
+    // Always set nullable to true for owl:allValuesFrom
+    // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#allValuesFromExample
+    MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, true);
+
+    Schema itemsSchema = null;
+
+    if (dataPropertySchema.getItems() == null) {
+      itemsSchema = new ComposedSchema();
+    } else {
+      itemsSchema = dataPropertySchema.getItems();
+    }
+
+    // Only add allOf value if there are no enum values.
+    if (itemsSchema.getEnum() == null || itemsSchema.getEnum().isEmpty()) {
+      // Only add allOf value if the value is not already included.
+      if (itemsSchema.getAllOf() == null || !itemsSchema.getAllOf().contains(complexDataRangeSchema)) {
+        itemsSchema.addAllOfItem(complexDataRangeSchema);
+        MapperProperty.setSchemaType(itemsSchema, null);
+        MapperProperty.setSchemaFormat(itemsSchema, null);
 
         dataPropertySchema.setItems(itemsSchema);
         MapperProperty.setSchemaType(dataPropertySchema, "array");
