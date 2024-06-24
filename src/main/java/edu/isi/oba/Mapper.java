@@ -195,16 +195,12 @@ class Mapper {
 
     private void addUserPath(PathGenerator pathGenerator) {
         //User schema
-        final var userProperties = new HashMap<String, Schema>();
-        final var username = new StringSchema();
-        final var password = new StringSchema();
-        userProperties.put("username", username);
-        userProperties.put("password", password);
-
         final var userSchema = new Schema();
         userSchema.setName("User");
         userSchema.setType("object");
-        userSchema.setProperties(userProperties);
+        // Not using setProperties(), because it creates immutability which breaks unit tests.
+        userSchema.addProperty("username", new StringSchema());
+        userSchema.addProperty("password", new StringSchema());
 
         this.schemas.put("User", userSchema);
 
