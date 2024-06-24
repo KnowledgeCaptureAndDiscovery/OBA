@@ -20,7 +20,7 @@ import org.semanticweb.owlapi.model.OWLNaryDataRange;
 /**
  * Class for generating an new data property {@link Schema} OR taking an existing one and updating it.
  */
-class MapperDataProperty {
+class MapperDataProperty extends MapperProperty {
   private static final Map<String, String> DATA_TYPES = Map.ofEntries(
     Map.entry("ENTITIES", "string"),
     Map.entry("ENTITY", "string"),
@@ -89,35 +89,30 @@ class MapperDataProperty {
    */
   public static Schema createDataPropertySchema(String name, String description, Set<String> datatypes) {
     Schema propertySchema = new Schema();
-    propertySchema.setName(name);
-	  propertySchema.setDescription(description);
+    MapperProperty.setSchemaName(propertySchema, name);
+    MapperProperty.setSchemaDescription(propertySchema, description);
 
-    // Do not set items unless datatypes contain something
-    if (datatypes != null && !datatypes.isEmpty()) {
-      if (datatypes.size() == 1) {
-        final var datatype = datatypes.iterator().next();
-        final var itemsSchema = MapperDataProperty.getTypeSchema(datatype);
-        itemsSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
-        propertySchema.setItems(itemsSchema);
-      } else {
-        final var composedSchema = new ComposedSchema();
-        datatypes.forEach((datatype) -> {
-          final var datatypeSchema = MapperDataProperty.getTypeSchema(datatype);
-          datatypeSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
-          composedSchema.addOneOfItem(datatypeSchema);
-        });
-        propertySchema.setItems(composedSchema);
-      }
-
-      // All property schemas are array types by default, if they have any items.
-      propertySchema.setType("array");
+    // For one item, set items.  For multiple items, set items with a oneOf array with the items array.
+    if (datatypes != null && datatypes.size() == 1) {
+      final var datatype = datatypes.iterator().next();
+      final var itemsSchema = MapperDataProperty.getTypeSchema(datatype);
+      itemsSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
+      propertySchema.setItems(itemsSchema);
     } else {
-      // If no items, then the property's schema type should be "object" and not "array".  This might occur if the property has a complementOf value, but none of its own values.
-      propertySchema.setType("object");
+      final var composedSchema = new ComposedSchema();
+      datatypes.forEach((datatype) -> {
+        final var datatypeSchema = MapperDataProperty.getTypeSchema(datatype);
+        datatypeSchema.setFormat(MapperDataProperty.getFormatForDatatype(datatype).isBlank() ? null : MapperDataProperty.getFormatForDatatype(datatype));
+        composedSchema.addOneOfItem(datatypeSchema);
+      });
+      propertySchema.setItems(composedSchema);
     }
 
+    // All property schemas are array types by default, if they have any items.
+    MapperProperty.setSchemaType(propertySchema, "array");
+
     // By default, set property to be nullable.
-	  propertySchema.setNullable(true);
+    MapperProperty.setNullableValueForPropertySchema(propertySchema, true);
 
 	  return propertySchema;
   }
@@ -220,26 +215,21 @@ class MapperDataProperty {
    * 
    * @param dataPropertySchema a data property {@link Schema}.
    * @param complementOfType an {@link OWLDatatype} value to set as the complement.
-   * @return an data property {@link Schema}
    */
-  public static Schema setComplementOfForDataSchema(Schema dataPropertySchema, OWLDatatype complementOfType) {
+  public static void setComplementOfForDataSchema(Schema dataPropertySchema, OWLDatatype complementOfType) {
     final var complementDatatypeString = MapperDataProperty.getDataType(complementOfType.toString());
     Schema complement = MapperDataProperty.getTypeSchema(complementDatatypeString);
     complement.setFormat(MapperDataProperty.getFormatForDatatype(complementOfType));
     dataPropertySchema.not(complement);
-
-    return dataPropertySchema;
   }
 
   /**
    * Add an anyOf value to an data property {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param dataPropertySchema an data property {@link Schema}.
    * @param dataRangeType a {@link String} value indicating the data range type.
-   * @return an data property {@link Schema}
    */
-  public static Schema addAnyOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
+  public static void addAnyOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
     // Always set nullable to false for owl:someValuesFrom
     // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#someValuesFromExample
     MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, false);
@@ -259,25 +249,21 @@ class MapperDataProperty {
         final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
 
         itemsSchema.addAnyOfItem(dataTypeSchema);
+        MapperProperty.setSchemaType(itemsSchema, null);
 
         dataPropertySchema.setItems(itemsSchema);
-        dataPropertySchema.setType("array");
-        dataPropertySchema.setNullable(false);
+        MapperProperty.setSchemaType(dataPropertySchema, "array");
       }
     }
-
-    return dataPropertySchema;
   }
 
   /**
    * Add an allOf value to an data property {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param dataPropertySchema an data property {@link Schema}.
    * @param dataRangeType a {@link String} value indicating the data range type.
-   * @return an data property {@link Schema}
    */
-  public static Schema addAllOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
+  public static void addAllOfDataPropertySchema(Schema dataPropertySchema, String dataRangeType) {
     // Always set nullable to true for owl:allValuesFrom
     // @see https://owl-to-oas.readthedocs.io/en/latest/mapping/#allValuesFromExample
     MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, true);
@@ -297,25 +283,21 @@ class MapperDataProperty {
         final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
         
         itemsSchema.addAllOfItem(dataTypeSchema);
+        MapperProperty.setSchemaType(itemsSchema, null);
 
         dataPropertySchema.setItems(itemsSchema);
-        dataPropertySchema.setType("array");
-        dataPropertySchema.setNullable(false);
+        MapperProperty.setSchemaType(dataPropertySchema, "array");
       }
     }
-
-    return dataPropertySchema;
   }
 
   /**
    * Add an oneOf value to an data property {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param dataPropertySchema an data property {@link Schema}.
    * @param oneOfLiteral an {@link OWLLiteral} value to add
-   * @return an data property {@link Schema}
    */
-  public static Schema addOneOfDataPropertySchema(Schema dataPropertySchema, OWLLiteral oneOfLiteral) {
+  public static void addOneOfDataPropertySchema(Schema dataPropertySchema, OWLLiteral oneOfLiteral) {
     Schema itemsSchema = null;
 
     if (dataPropertySchema.getItems() == null) {
@@ -335,87 +317,76 @@ class MapperDataProperty {
       switch (datatype) {
         case NUMBER_TYPE:
           itemsSchema.addEnumItemObject(Double.parseDouble(oneOfLiteral.getLiteral()));
+          MapperProperty.setSchemaType(itemsSchema, "number");
           break;
         case INTEGER_TYPE:
           itemsSchema.addEnumItemObject(Integer.parseInt(oneOfLiteral.getLiteral()));
+          MapperProperty.setSchemaType(itemsSchema, "integer");
           break;
         case BOOLEAN_TYPE:
           itemsSchema.addEnumItemObject(Boolean.parseBoolean(oneOfLiteral.getLiteral()));
+          MapperProperty.setSchemaType(itemsSchema, "boolean");
           break;
         case STRING_TYPE:
         case DATETIME_TYPE:
         default:
           itemsSchema.addEnumItemObject(oneOfLiteral.getLiteral());
+          MapperProperty.setSchemaType(itemsSchema, "string");
           break;
       }
 
       itemsSchema.set$ref(null);
-      itemsSchema.setType(null);
       
       dataPropertySchema.setItems(itemsSchema);
-      dataPropertySchema.setType("array");
-      dataPropertySchema.setNullable(false);
+      MapperProperty.setSchemaType(dataPropertySchema, "array");
+      MapperProperty.setNullableValueForPropertySchema(dataPropertySchema, false);
     }
-
-    return dataPropertySchema;
   }
 
   /**
    * Add a minimum cardinality value to the property's {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param cardinalityInt an exact cardinality value.
    * @param dataRangeType a {@link String} value indicating the data range type.
-   * @return the {@link Schema} with added cardinality value.
    */
-  public static Schema addMinCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
-    propertySchema.setMinItems(cardinalityInt);
+  public static void addMinCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
+    MapperProperty.addMinCardinalityToPropertySchema(propertySchema, cardinalityInt);
 
     final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
     propertySchema.setItems(dataTypeSchema);
-    propertySchema.setType("array");
-
-    return propertySchema;
+    MapperProperty.setSchemaType(propertySchema, "array");
   }
 
   /**
    * Add a maximum cardinality value to the property's {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param cardinalityInt a maximum cardinality value.
    * @param dataRangeType a {@link String} value indicating the data range type.
-   * @return the {@link Schema} with added cardinality value.
    */
-  public static Schema addMaxCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
-    propertySchema.setMaxItems(cardinalityInt);
+  public static void addMaxCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
+    MapperProperty.addMaxCardinalityToPropertySchema(propertySchema, cardinalityInt);
 
     final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
     propertySchema.setItems(dataTypeSchema);
-    propertySchema.setType("array");
-
-    return propertySchema;
+    MapperProperty.setSchemaType(propertySchema, "array");
   }
 
   /**
    * Add an exact cardinality value to the property's {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param cardinalityInt an exact cardinality value.
    * @param dataRangeType a {@link String} value indicating the data range type.
-   * @return the {@link Schema} with added cardinality value.
    */
-   public static Schema addExactCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
+   public static void addExactCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt, String dataRangeType) {
     propertySchema.setMinItems(cardinalityInt);
     propertySchema.setMaxItems(cardinalityInt);
 
     final var dataTypeSchema = MapperDataProperty.getTypeSchema(dataRangeType);
     propertySchema.setItems(dataTypeSchema);
-    propertySchema.setType("array");
-
-    return propertySchema;
+    MapperProperty.setSchemaType(propertySchema, "array");
   }
 
   /**
