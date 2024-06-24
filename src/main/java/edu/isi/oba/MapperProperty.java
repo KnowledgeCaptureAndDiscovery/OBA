@@ -15,17 +15,43 @@ import io.swagger.v3.oas.models.media.*;
 public class MapperProperty {
 
   /**
+   * Sets the {@link Schema}'s name.
+   * 
+   * @param schema a {@link Schema}
+   * @param name a {@link String} indicating the {@link Schema}'s name.
+   */
+  public static void setSchemaName(Schema schema, String name) {
+    schema.setName(name);
+  }
+
+  /**
+   * Sets the {@link Schema}'s description.
+   * 
+   * @param schema a {@link Schema}
+   * @param description a {@link String} indicating the {@link Schema}'s name.
+   */
+  public static void setSchemaDescription(Schema schema, String description) {
+    schema.setDescription(description);
+  }
+
+  /**
+   * Sets the {@link Schema}'s type.
+   * 
+   * @param schema a {@link Schema}
+   * @param type a {@link String} indicating {@link Schema}'s type.
+   */
+  public static void setSchemaType(Schema schema, String type) {
+    schema.setType(type);
+  }
+
+  /**
    * Set the nullable value for a property's {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param isNullable a boolean value indicating nullable or not.
-   * @return the {@link Schema} with new/updated nullable value set.
    */
-  public static Schema setNullableValueForPropertySchema(Schema propertySchema, Boolean isNullable) {
+  public static void setNullableValueForPropertySchema(Schema propertySchema, Boolean isNullable) {
     propertySchema.setNullable(isNullable);
-
-    return propertySchema;
   }
 
   /**
@@ -36,7 +62,7 @@ public class MapperProperty {
    * @param functionalProperties a {@link Set} of {@link String} indicating the (short form) names of properties which are functional.
    * @return a {@link Schema} with all possible non-array properties converted.
    */
-  public static Schema convertArrayToNonArrayPropertySchemas(Schema classSchemaToConvert, Set<String> functionalProperties) {
+  public static void convertArrayToNonArrayPropertySchemas(Schema classSchemaToConvert, Set<String> functionalProperties) {
 		final Map<String, Schema> propertySchemas = classSchemaToConvert.getProperties() == null ? new HashMap<>() : classSchemaToConvert.getProperties();
 
 		// Loop through all of the properties and convert as necessary.
@@ -88,32 +114,58 @@ public class MapperProperty {
 			}
 		});
 
-    return classSchemaToConvert;
+    // Not using setProperties(), because it creates immutability which breaks unit tests.
+    propertySchemas.forEach((schemaName, schema) -> {
+      classSchemaToConvert.addProperty(schemaName, schema);
+    });
 	}
+
+    /**
+   * Add a minimum cardinality value to the property's {@link Schema}.
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt a minimum cardinality value.
+   */
+  protected static void addMinCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt) {
+    propertySchema.setMinItems(cardinalityInt);
+
+    if (cardinalityInt > 0) {
+      MapperProperty.setNullableValueForPropertySchema(propertySchema, false);
+    }
+  }
 
   /**
    * Add a maximum cardinality value to the property's {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param cardinalityInt a maximum cardinality value.
-   * @return the {@link Schema} with added cardinality value.
    */
-  public static Schema addMaxCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt) {
+  protected static void addMaxCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt) {
     propertySchema.setMaxItems(cardinalityInt);
 
-    return propertySchema;
+    if (cardinalityInt.intValue() < 2) {
+      MapperProperty.setNullableValueForPropertySchema(propertySchema, true);
+    }
+  }
+
+    /**
+   * Add an exact cardinality value to the property's {@link Schema}.
+   * 
+   * @param propertySchema a (data / object) property {@link Schema}.
+   * @param cardinalityInt an exact cardinality value.
+   */
+  protected static void addExactCardinalityToPropertySchema(Schema propertySchema, Integer cardinalityInt) {
+    propertySchema.setMinItems(cardinalityInt);
+    propertySchema.setMaxItems(cardinalityInt);
   }
 
   /**
    * Add a "hasValue" value to the property's {@link Schema}.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param cardinalityInt a minimum cardinality value.
-   * @return the {@link Schema} with added cardinality value.
    */
-  public static Schema addHasValueOfPropertySchema(Schema propertySchema, String hasValue) {
+  public static void addHasValueOfPropertySchema(Schema propertySchema, String hasValue) {
     Schema itemsSchema = null;
 
     if (propertySchema.getItems() == null) {
@@ -142,21 +194,17 @@ public class MapperProperty {
 
     // Need to make sure the property's type is "array" because it has items.
     propertySchema.setType("array");
-
-    return propertySchema;
   }
 
   /**
    * Set the property's {@link Schema} to indicate that it is functional.
    * NOTE: This is basically a convenience method for calling {@link #addMaxCardinalityToPropertySchema(Schema, Integer)} with {@link Integer} value of 1.
-   * TODO: determine whether the return value can be removed, because it updates the Schema by reference anyway
    * 
    * @param propertySchema a (data / object) property {@link Schema}.
    * @param cardinalityInt a minimum cardinality value.
-   * @return the {@link Schema} with added cardinality value.
    */
-  public static Schema setFunctionalForPropertySchema(Schema propertySchema) {
+  public static void setFunctionalForPropertySchema(Schema propertySchema) {
     MapperProperty.setNullableValueForPropertySchema(propertySchema, false);
-    return MapperProperty.addMaxCardinalityToPropertySchema(propertySchema, Integer.valueOf(1));
+    MapperProperty.addMaxCardinalityToPropertySchema(propertySchema, Integer.valueOf(1));
   }
 }
