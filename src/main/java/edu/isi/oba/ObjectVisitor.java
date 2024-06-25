@@ -253,9 +253,17 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 */
 	private void generatePropertySchemasWithRestrictions(OWLClass owlClass) {
 		if (owlClass != null && owlClass.equals(this.baseClass)) {
-			logger.info("  =============================Generating restrictions for:  " + this.baseClass);
+			logger.info("--------------------------------------------------");
+			logger.info("\tGenerating restrictions for:");
+			logger.info("\t\t" + this.baseClass);
+			logger.info("--------------------------------------------------");
 		} else {
-			logger.info("  =============================Generating restrictions for:  " + this.baseClass + "  where were inherited from:  " + owlClass);
+			logger.info("--------------------------------------------------");
+			logger.info("\tGenerating restrictions for:");
+			logger.info("\t\t" + this.baseClass);
+			logger.info("\twhich were inherited from:");
+			logger.info("\t\t" + owlClass);
+			logger.info("--------------------------------------------------");
 		}
 
 		// Avoid cycles and accept visits from super classes for the purpose of getting all properties.
@@ -284,15 +292,19 @@ public class ObjectVisitor implements OWLObjectVisitor {
 								// Add the object complement reference class.
 								this.referencedClasses.addAll(ax.getSuperClass().getClassesInSignature());
 
-								logger.info("\t" + this.getBaseClassName() + " has an object complement of axiom.  This is not for a property, so do not set property name.  Axiom:   " + ax);
+								logger.info("\t" + this.getBaseClassName() + " has an object complement of axiom.  This is not for a property, so do not set property name.");
+								logger.info("\t\taxiom:  " + ax);
 							} else {
-								logger.severe("\t" + this.getBaseClassName() + " has unknown restriction.  Axiom:   " + ax);
+								logger.severe("\t" + this.getBaseClassName() + " has unknown restriction.");
+								logger.severe("\t\taxiom:  " + ax);
 								shouldSkipVisits = true;
 							}
 						} else if (ax.getSuperClass() instanceof OWLObjectOneOf) {
-							logger.info("\t" + this.getBaseClassName() + " is an ObjectOneOf set containing one or more Individuals.  Not setting propety name, to treat it like an enum.  Axiom:  " + ax);
+							logger.info("\t" + this.getBaseClassName() + " is an ObjectOneOf set containing one or more Individuals.  Not setting propety name, to treat it like an enum.");
+							logger.info("\t\taxiom:  " + ax);
 						} else {
-							logger.info("\t" + this.getBaseClassName() + " is a subclass of " + ax.getSuperClass().asOWLClass().getIRI().getShortForm() + ".  No restrictions to process.  Axiom:  " + ax);
+							logger.info("\t" + this.getBaseClassName() + " is a subclass of " + ax.getSuperClass().asOWLClass().getIRI().getShortForm() + ".  No restrictions to process.");
+							logger.info("\t\taxiom:  " + ax);
 							shouldSkipVisits = true;
 						}
 
@@ -304,7 +316,8 @@ public class ObjectVisitor implements OWLObjectVisitor {
 						// Clear out the property name.
 						this.currentlyProcessedPropertyName = null;
 					} else {
-						logger.severe("\t" + this.getBaseClassName() + " has unknown restriction.  Axiom:   " + ax);
+						logger.severe("\t" + this.getBaseClassName() + " has unknown restriction.");
+						logger.severe("\t\taxiom:  " + ax);
 					}
 				});
 
@@ -360,7 +373,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		this.propertyNames.add(propertyName);
 		this.currentlyProcessedPropertyName = propertyName;
 
-		logger.info( "\t\tClass: \"" + this.getBaseClassName() + "\"  -  Property: \"" + propertyName + "\"");
+		logger.info("\thas property:\t\"" + propertyName + "\"");
 
 		final var propertyRanges = new HashSet<String>();
 		final var complexObjectRanges = new HashSet<OWLClassExpression>();
@@ -393,6 +406,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			} else if (objPropRangeAxiom.getRange() instanceof OWLObjectUnionOf
 						|| objPropRangeAxiom.getRange() instanceof OWLObjectIntersectionOf
 						|| objPropRangeAxiom.getRange() instanceof OWLObjectOneOf) {
+				logger.info("\t\t...has complex range -> proceeding to its restrictions immediately...");
 				objPropRangeAxiom.getRange().accept(this);
 			} else {
 				complexObjectRanges.add(objPropRangeAxiom.getRange());
@@ -405,6 +419,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		} else {
 			logger.info( "\t\tProperty range(s): " + propertyRanges);
 		}
+		logger.info("");
 
 		// In cases, such as unionOf/intersectionOf/oneOf , the property schema may already be set.  Get it, if so.
 		var objPropertySchema = this.classSchema.getProperties() == null ? null : (Schema) this.classSchema.getProperties().get(propertyName);
@@ -465,8 +480,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 
 			// If this (sub-)property (under owl:topObjectProperty) has a domain of the current owlClass, then get its schema.
 			if (!objPropDomains.isEmpty()) {
+				final var propertyName = objPropExpr.asOWLObjectProperty().getIRI().getShortForm();
+
 				// Save object property schema to class's schema.
-				objPropertiesMap.put(objPropExpr.asOWLObjectProperty().getIRI().getShortForm(), this.getObjectPropertySchema(objPropExpr, objPropRanges));
+				objPropertiesMap.put(propertyName, this.getObjectPropertySchema(objPropExpr, objPropRanges));
 			}
 			
 			// Loop through all subproperties of this property.
@@ -485,8 +502,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 
 				// If this (sub-)property has a domain of the current owlClass, then get its schema.
 				if (!subObjPropDomains.isEmpty()) {
+					final var subPropertyName = subObjPropExpr.asOWLObjectProperty().getIRI().getShortForm();
+
 					// Save object property schema to class's schema.
-					objPropertiesMap.put(subObjPropExpr.asOWLObjectProperty().getIRI().getShortForm(), this.getObjectPropertySchema(subObjPropExpr, subObjPropRanges));
+					objPropertiesMap.put(subPropertyName, this.getObjectPropertySchema(subObjPropExpr, subObjPropRanges));
 				}
 			});
 		});
@@ -512,8 +531,6 @@ public class ObjectVisitor implements OWLObjectVisitor {
 		
 		// For the class's properties, check each axiom where the axiom's domain is a class AND the current class equals the domain.
 		dataPropDomainAxioms.stream().filter(dataPropDomainAx -> dataPropDomainAx.getDomain().getClassesInSignature().contains(owlClass)).forEach((dataPropDomainAx) -> {
-			logger.info( "\tParsing data property domain axiom: " + dataPropDomainAx.toString());
-
 			// Get set of all data properties and subproperties.
 			final var dataProperties = dataPropDomainAx.getDataPropertiesInSignature();
 			for (final var topLevelDataProperty: dataProperties) {
@@ -531,7 +548,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 				this.propertyNames.add(propertyName);
 				this.currentlyProcessedPropertyName = propertyName;
 
-				logger.info( "\t\tClass: \"" + this.getBaseClassName() + "\"  -  Property: \"" + propertyName + "\"");
+				logger.info("\thas property:  \"" + propertyName + "\"");
 
 				final var propertyRanges = new HashSet<String>();
 				final var complexDataRanges = new HashSet<OWLDataRange>();
@@ -541,6 +558,7 @@ public class ObjectVisitor implements OWLObjectVisitor {
 					} else if (dataPropRangeAxiom.getRange() instanceof OWLDataUnionOf
 								|| dataPropRangeAxiom.getRange() instanceof OWLDataIntersectionOf
 								|| dataPropRangeAxiom.getRange() instanceof OWLDataOneOf) {
+						logger.info("\t\t...has complex range -> proceeding to its restrictions immediately...");
 						dataPropRangeAxiom.getRange().accept(this);
 					} else {
 						complexDataRanges.add(dataPropRangeAxiom.getRange());
@@ -588,6 +606,8 @@ public class ObjectVisitor implements OWLObjectVisitor {
 						e.printStackTrace();
 					}
 				}
+
+				logger.info("");
 
 				this.currentlyProcessedPropertyName = null;
 			}
@@ -664,7 +684,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 
 	@Override
 	public void visit(@Nonnull OWLEquivalentClassesAxiom ax) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ax);
+		logger.info("\t-- analyzing OWLEquivalentClassesAxiom restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ax);
+		logger.info("");
 
 		// If equivalent class axiom AND contains owl:oneOf, then we're looking at an ENUM class.
 		ax.classExpressions().filter((e) -> e instanceof OWLObjectOneOf).forEach((oneOfObj) -> {
@@ -689,7 +712,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @param ce the OWLNaryBooleanClassExpression object
 	 */
 	private void visitOWLNaryBooleanClassExpression(@Nonnull OWLNaryBooleanClassExpression ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLNaryBooleanClassExpression restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		// If no existing property schema, then create empty schema for it.
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
@@ -716,7 +742,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @param ce the {@link OWLQuantifiedObjectRestriction} object
 	 */
 	private void visitOWLQuantifiedObjectRestriction(@Nonnull OWLQuantifiedObjectRestriction or) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + or);
+		logger.info("\t-- analyzing OWLQuantifiedObjectRestriction restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + or);
+		logger.info("");
 
 		// If no existing property schema, then create empty schema for it.
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
@@ -786,7 +815,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit(@Nonnull OWLObjectComplementOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLObjectComplementOf restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		// ComplementOf can occur either for OWLClass or for one of its object properties.  If the property name is null, assume it is a class's complement (and not a property's complement).
 		if (this.currentlyProcessedPropertyName == null) {
@@ -801,7 +833,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit(@Nonnull OWLObjectHasValue ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLObjectHasValue restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		// If no existing property schema, then create empty schema for it.
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
@@ -811,7 +846,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit(@Nonnull OWLObjectOneOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLObjectOneOf restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		// ObjectOneOf can occur either for OWLClass or for one of its object properties.  If the property name is null, assume it the class is actually an enum.
 		if (this.currentlyProcessedPropertyName == null) {
@@ -838,7 +876,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @param ce the OWLNaryDataRange object
 	 */
 	private void visitOWLNaryDataRange(@Nonnull OWLNaryDataRange ce) {
-		logger.info("Analyzing OWLNaryDataRange restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLNaryDataRange restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		// If no existing property schema, then create empty schema for it.
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
@@ -865,7 +906,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @param ce the {@link OWLQuantifiedDataRestriction} object
 	 */
 	private void visitOWLQuantifiedDataRestriction(@Nonnull OWLQuantifiedDataRestriction dr) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + dr);
+		logger.info("\t-- analyzing OWLQuantifiedDataRestriction restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + dr);
+		logger.info("");
 
 		// If no existing property schema, then create empty schema for it.
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
@@ -936,7 +980,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit(@Nonnull OWLDataOneOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLDataOneOf restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		ce.values().forEach((oneOfValue) -> {
 			// If no existing property schema, then create empty schema for it.
@@ -948,7 +995,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 
 	@Override
 	public void visit(@Nonnull OWLDataComplementOf ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLDataComplementOf restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		ce.datatypesInSignature().forEach((complementOfDatatype) -> {
 			// If no existing property schema, then create empty schema for it.
@@ -960,7 +1010,10 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	
 	@Override
 	public void visit(@Nonnull OWLDataHasValue ce) {
-		logger.info("Analyzing restrictions of Class: " + this.baseClass + " with axiom: " + ce);
+		logger.info("\t-- analyzing OWLDataHasValue restrictions --");
+		logger.info("\t   class:  " + this.baseClass);
+		logger.info("\t   axiom:  " + ce);
+		logger.info("");
 
 		// If no existing property schema, then create empty schema for it.
 		final var currentPropertySchema = this.getPropertySchemaForRestrictionVisit(this.currentlyProcessedPropertyName);
