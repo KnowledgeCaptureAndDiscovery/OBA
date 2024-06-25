@@ -99,7 +99,7 @@ public class MapperProperty {
 					
 					// By default, everything is an array.  If this property is not, then convert it from an array to a single item.
 					if (!shouldBeArray) {
-            MapperProperty.setSchemaFormat(propertySchema, itemsSchema.getType());
+            MapperProperty.setSchemaType(propertySchema, itemsSchema.getType());
             MapperProperty.setSchemaFormat(propertySchema, itemsSchema.getFormat());
 						// Anything else?
 
