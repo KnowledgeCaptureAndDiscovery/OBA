@@ -147,7 +147,7 @@ class Mapper {
      * Obtain Schemas using the ontology classes
      * The schemas includes all (object and data) properties.
      *
-     * @param destination_dir a {@link String> indicating the filesystem's directory to write the final results
+     * @param destinationDir a {@link String} indicating the filesystem's directory to write the final results.
      */
     public void createSchemas(String destinationDir) {
         final var query = new Query(destinationDir);
@@ -228,6 +228,11 @@ class Mapper {
         }
     }
 
+    /**
+     * Set the {@link Map} of schema names to link {@link IRI} with its (short form) name.
+     * 
+     * @param classes a {@link Set} of {@link OWLClass}es from an ontology.
+     */
     private void setSchemaNames(Set<OWLClass> classes) {
         for (OWLClass cls: classes) {
             this.schemaNames.put(cls.getIRI(), cls.getIRI().getShortForm());
@@ -269,20 +274,27 @@ class Mapper {
         final var nameTools = new DefaultNameConverter();
 
         // Pluralize the schema name.  Also convert to kebab-case if the configuration specifies it.
-        String pluralName = "/";
-        if (this.configData.getConfigFlagValue(CONFIG_FLAG.USE_KEBAB_CASE_PATHS)) { // "kebab-case" -> All lowercase and separate words with a dash/hyphen.
-            pluralName += nameTools.pluralize(ObaUtils.pascalCaseToKebabCase(mappedSchema.getName()));
-        } else { // "flatcase" -> This is the current/original version (all lower case, no spaces/dashes/underscores) of endpoint naming.
-        pluralName += nameTools.pluralize(mappedSchema.getName().toLowerCase());
+        var pluralPathName = "/";
+        if (this.configData.getConfigFlagValue(CONFIG_FLAG.USE_KEBAB_CASE_PATHS)) {
+            // "kebab-case" -> All lowercase and separate words with a dash/hyphen.
+            pluralPathName += nameTools.pluralize(ObaUtils.pascalCaseToKebabCase(mappedSchema.getName()));
+        } else {
+            // "flatcase" -> This is the current/original version (all lower case, no spaces/dashes/underscores) of endpoint naming.
+            pluralPathName += nameTools.pluralize(mappedSchema.getName().toLowerCase());
         }
 
         //Create the plural paths: for example: /models/
-        this.paths.addPathItem(pluralName, pathGenerator.generate_plural(mappedSchema.getName(), classIRI.getIRIString()));
+        this.paths.addPathItem(pluralPathName, pathGenerator.generate_plural(mappedSchema.getName(), classIRI.getIRIString()));
 
         //Create the plural paths: for example: /models/id
-        this.paths.addPathItem(pluralName + "/{id}", pathGenerator.generate_singular(mappedSchema.getName(), classIRI.getIRIString()));
+        this.paths.addPathItem(pluralPathName + "/{id}", pathGenerator.generate_singular(mappedSchema.getName(), classIRI.getIRIString()));
     }
 
+    /**
+     * Get set of allowed classes.  Returns all classes, if no restrictions in configuration file.
+     * 
+     * @return a {@link Set} of {@link OWLClass}es that are allowed by the config file.
+     */
     private Set<OWLClass> getClassesAllowedByYamlConfig() {
         final var allowedClassesByIRI = this.configData.getClasses();
         final var allowedClasses = new HashSet<OWLClass>();
