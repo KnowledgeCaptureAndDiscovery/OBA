@@ -82,11 +82,13 @@ class Mapper {
     }
 
     private Schema getSchema(Query query, OWLClass cls) {
-        logger.info("");
-		logger.info("--->Beginning schema mapping for class \"" + cls + "\".");
+        logger.info("=======================================================================");
+        logger.info("##############################################");
+        logger.info("###  Beginning schema mapping for class:");
+        logger.info("###\t" + cls);
+        logger.info("##############################################");
 
         // Convert from OWL Class to OpenAPI Schema.
-		//final var objVisitor = new ObjectVisitor(cls, this.ontologies, this.configData);
         final var objVisitor = new ObjectVisitor(this.ontologies, this.configData);
 		cls.accept(objVisitor);
 
@@ -99,7 +101,10 @@ class Mapper {
         query.writeReadme(mappedSchema.getName());
 
         // Create the OpenAPI schema
-        logger.info("--->SAVING SCHEMA \"" + mappedSchema.getName() + "\".");
+        logger.info("");
+        logger.info("--->  SAVING SCHEMA:  \"" + mappedSchema.getName() + "\"");
+        logger.info("=======================================================================");
+        logger.info("");
         this.schemas.put(mappedSchema.getName(), mappedSchema);
 
         return mappedSchema;
@@ -125,7 +130,7 @@ class Mapper {
                 }
             }
 
-            System.out.println(destinationPath);
+            logger.info("Loaded working ontology file:  " + destinationPath.replace("\\", "/"));
             ontologyPaths.add(destinationPath);
 
             // Set to silent so missing imports don't make the program fail.
@@ -134,6 +139,8 @@ class Mapper {
             this.manager.loadOntologyFromOntologyDocument(new FileDocumentSource(new File(destinationPath)), loadingConfig);
             i++;
         }
+
+        logger.info("");
     }
 
     /**
