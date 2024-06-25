@@ -145,6 +145,22 @@ class MapperDataProperty extends MapperProperty {
     return MapperDataProperty.DATA_TYPES.get(MapperDataProperty.getScrubbedDataType(owlDatatype));
   }
 
+  /**
+   * Get a new {@link Schema} based on the OWL data type.
+   * 
+   * @param owlDatatype an {@link OWLDataType}.
+   * @return a new {@link Schema} for the given data type.
+   */
+  public static Schema getTypeSchema(OWLDatatype owlDatatype) {
+    return MapperDataProperty.getTypeSchema(owlDatatype.toString());
+  }
+
+  /**
+   * Get a new {@link Schema} based on the OWL data type.
+   * 
+   * @param owlDatatype a {@link String} representation of an {@link OWLDataType}.
+   * @return a new {@link Schema} for the given data type.
+   */
   private static Schema getTypeSchema(String owlDatatype) {
     switch (MapperDataProperty.getDataType(owlDatatype)) {
       case STRING_TYPE:
@@ -152,7 +168,16 @@ class MapperDataProperty extends MapperProperty {
       case NUMBER_TYPE:
         return new NumberSchema();
       case INTEGER_TYPE:
-        return new IntegerSchema();
+        final var integerSchema = new IntegerSchema();
+        if ("nonNegativeInteger".equals(MapperDataProperty.getScrubbedDataType(owlDatatype))
+            || "positiveInteger".equals(MapperDataProperty.getScrubbedDataType(owlDatatype))) {
+          integerSchema.setMinimum(BigDecimal.ZERO);
+        } else if ("nonPositiveInteger".equals(MapperDataProperty.getScrubbedDataType(owlDatatype))
+                  || "negativeInteger".equals(MapperDataProperty.getScrubbedDataType(owlDatatype))) {
+          integerSchema.setMaximum(BigDecimal.ZERO);
+        }
+
+        return integerSchema;
       case BOOLEAN_TYPE:
         return new BooleanSchema();
       case DATETIME_TYPE:
@@ -217,8 +242,7 @@ class MapperDataProperty extends MapperProperty {
    * @param complementOfType an {@link OWLDatatype} value to set as the complement.
    */
   public static void setComplementOfForDataSchema(Schema dataPropertySchema, OWLDatatype complementOfType) {
-    final var complementDatatypeString = MapperDataProperty.getDataType(complementOfType.toString());
-    Schema complement = MapperDataProperty.getTypeSchema(complementDatatypeString);
+    Schema complement = MapperDataProperty.getTypeSchema(complementOfType);
     MapperDataProperty.setSchemaFormat(complement, MapperDataProperty.getFormatForDatatype(complementOfType));
     dataPropertySchema.not(complement);
   }
