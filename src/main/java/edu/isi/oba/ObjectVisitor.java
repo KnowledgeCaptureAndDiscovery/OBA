@@ -118,6 +118,20 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @return a {@link Schema} for the entire class
 	 */
 	public Schema getClassSchema() {
+
+		// There are cases where a property has ComplementOf set (i.e. "not: ...") but no items.
+		// Because the schema is an array, it will have problems.
+		// Need to either change it to "type: object" OR add empty items list (i.e. "items: {}").
+		// Using the former approach because 1) it renders in Swagger UI correctly and 2) unclear if empty items plus complement is a valid use case.
+		final var classProperties = this.classSchema == null ? null : this.classSchema.getProperties();
+		if (classProperties != null) {
+			classProperties.values().forEach((propertySchema) -> {
+				if (((Schema) propertySchema).getItems() == null) {
+					MapperProperty.setSchemaType((Schema) propertySchema, "object");
+				}
+			});
+		}
+
 		// Generate the required properties for the class, if applicable.
 		if (this.configData.getConfigFlagValue(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY)) {
 			this.generateRequiredPropertiesForClassSchemas();
@@ -405,7 +419,8 @@ public class ObjectVisitor implements OWLObjectVisitor {
 				}
 			} else if (objPropRangeAxiom.getRange() instanceof OWLObjectUnionOf
 						|| objPropRangeAxiom.getRange() instanceof OWLObjectIntersectionOf
-						|| objPropRangeAxiom.getRange() instanceof OWLObjectOneOf) {
+						|| objPropRangeAxiom.getRange() instanceof OWLObjectOneOf
+						|| objPropRangeAxiom.getRange() instanceof OWLObjectComplementOf) {
 				logger.info("\t\t...has complex range -> proceeding to its restrictions immediately...");
 				objPropRangeAxiom.getRange().accept(this);
 			} else {
@@ -557,7 +572,8 @@ public class ObjectVisitor implements OWLObjectVisitor {
 						propertyRanges.add(((OWLDatatype) dataPropRangeAxiom.getRange()).getIRI().getShortForm());
 					} else if (dataPropRangeAxiom.getRange() instanceof OWLDataUnionOf
 								|| dataPropRangeAxiom.getRange() instanceof OWLDataIntersectionOf
-								|| dataPropRangeAxiom.getRange() instanceof OWLDataOneOf) {
+								|| dataPropRangeAxiom.getRange() instanceof OWLDataOneOf
+								|| dataPropRangeAxiom.getRange() instanceof OWLDataComplementOf) {
 						logger.info("\t\t...has complex range -> proceeding to its restrictions immediately...");
 						dataPropRangeAxiom.getRange().accept(this);
 					} else {
