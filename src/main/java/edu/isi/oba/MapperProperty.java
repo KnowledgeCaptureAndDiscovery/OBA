@@ -83,11 +83,14 @@ public class MapperProperty {
 				final var itemsSchema = propertySchema.getItems();
 
 				if (itemsSchema != null) {
-					boolean shouldBeArray = !(functionalProperties != null && functionalProperties.contains(propertyName))
-                            && (Objects.requireNonNullElse(propertySchema.getMinItems(), -1) > 0
-                              || Objects.requireNonNullElse(propertySchema.getMaxItems(), -1) > 1)
-                            && !(Objects.requireNonNullElse(propertySchema.getMinItems(), -1) == 1
-                              && Objects.requireNonNullElse(propertySchema.getMaxItems(), -1) == 1);
+          // Initial indicator for whether the property should remain an array is if functional (should not be / false) or not functional (should be / true);
+					boolean shouldBeArray = !(functionalProperties != null && functionalProperties.contains(propertyName));
+
+          shouldBeArray &= (Objects.requireNonNullElse(propertySchema.getMinItems(), -1) > 0
+                            || Objects.requireNonNullElse(propertySchema.getMaxItems(), -1) > 1);
+          
+          shouldBeArray &= !(Objects.requireNonNullElse(propertySchema.getMinItems(), -1) == 1
+                            && Objects.requireNonNullElse(propertySchema.getMaxItems(), -1) == 1);
 					
 					// Keep as array (even if only one item exists), if there is a single reference or allOf/anyOf/oneOf/enum composed schemas are contained within the property's item.
 					shouldBeArray |= Objects.requireNonNullElse(propertySchema.getMinItems(), -1) < 1 // Weird edge case that someone may define minimum items as zero (or negative?), and should remain as array
