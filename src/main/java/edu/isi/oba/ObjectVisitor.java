@@ -41,7 +41,6 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	private OWLClass owlThing; // TODO: is this needed anymore??
 
 	private final Map<String, Schema> basePropertiesMap = new HashMap<>();
-	private final Map<IRI, Map<String, Schema>> inheritedPropertiesMap = new HashMap<>();
 
 	private final Set<String> propertyNames = new HashSet<>();
 	private final Set<String> requiredProperties = new HashSet<>();
