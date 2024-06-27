@@ -4,6 +4,10 @@ import static edu.isi.oba.ObaUtils.get_yaml_data;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
@@ -14,9 +18,26 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 public class ObaUtilsTest {
+    /**
+     * This method allows you to configure the logger variable that is required to print several 
+     * messages during the OBA execution.
+     */
+	public void initializeLogger() throws Exception {
+        final var stream = Oba.class.getClassLoader().getResourceAsStream("logging.properties");
+
+        try {
+            LogManager.getLogManager().readConfiguration(stream);
+            edu.isi.oba.Oba.logger = Logger.getLogger(Oba.class.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }	
+
+        edu.isi.oba.Oba.logger.setLevel(Level.FINE);
+        edu.isi.oba.Oba.logger.addHandler(new ConsoleHandler());
+	}
 
     @Test
-    public void read_json_file() throws IOException {
+    public void readJSONFile() throws IOException {
         final var actual = ObaUtils.read_json_file("json_one.json");
         Assertions.assertNotNull(actual.get("@context"));
     }
@@ -31,7 +52,7 @@ public class ObaUtilsTest {
     }
 
     @Test
-    public void concat_json_common_key() throws IOException {
+    public void concatJSONCommonKey() throws IOException {
         final var one = ObaUtils.read_json_file("json_one.json");
         final var two = ObaUtils.read_json_file("json_two.json");
         final var three = ObaUtils.read_json_file("json_three.json");
@@ -44,15 +65,17 @@ public class ObaUtilsTest {
     }
     
     @Test
-    public void getDescription () throws OWLOntologyCreationException{
+    public void getDescription() throws OWLOntologyCreationException {
         final var example_remote = "src/test/config/pplan.yaml";
         final var config_data = get_yaml_data(example_remote);
+
         try {
+            this.initializeLogger();
             final var mapper = new Mapper(config_data);
             OWLClass planClass = mapper.getManager().getOWLDataFactory().getOWLClass("http://purl.org/net/p-plan#Plan");
             String desc = ObaUtils.getDescription(planClass, mapper.getOntologies(), true);
-            Assertions.assertNotEquals(desc, "");
-        }catch(Exception e){
+            Assertions.assertNotEquals("", desc);
+        } catch (Exception e) {
             Assertions.fail("Failed to get description.", e);
         }
     }
@@ -63,13 +86,14 @@ public class ObaUtilsTest {
      * @throws OWLOntologyCreationException
      */
     @Test
-    public void missing_file () throws OWLOntologyCreationException{
+    public void missingFile() throws OWLOntologyCreationException {
         final var missing_file = "src/test/config/missing_file.yaml";
         final var config_data = get_yaml_data(missing_file);
+
         try {
             final var mapper = new Mapper(config_data);
             Assertions.fail("Missing file: If no exception is launched, fail test");
-        }catch(Exception e){
+        } catch (Exception e) {
             //pass test if there is an exception
         }
     }
@@ -84,6 +108,7 @@ public class ObaUtilsTest {
         ObaUtils.downloadOntology(ontology2, ont2.getPath());
         final var ontologies = new String[]{"ontology1", "ontology2"};
         JSONObject context = null;
+
         try {
             context = ObaUtils.generate_context_file(ontologies, false);
         } catch (Exception e) {
@@ -95,10 +120,12 @@ public class ObaUtilsTest {
         Assertions.assertEquals(o.get("type"), "@type");
         Assertions.assertNotNull(o.get("Entity"));
         Assertions.assertNotNull(o.get("Model"));
-        try{
+
+        try {
             java.nio.file.Files.delete(ont1.toPath());
             java.nio.file.Files.delete(ont2.toPath());
-        }catch(Exception e){
+        } catch (Exception e) {
+            // Files couldn't be deleted.  But not issue the test itself.
         }
     }
 
