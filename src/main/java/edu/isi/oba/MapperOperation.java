@@ -41,7 +41,7 @@ class MapperOperation {
     this.cardinality = cardinality;
     this.schemaName = schemaName;
     this.schemaURI = schemaURI;
-    String ref_text = "#/components/schemas/" + schemaName;
+    String ref_text = "#/components/schemas/" + this.schemaName;
     schema = new Schema().$ref(ref_text);
 
     switch (method) {
@@ -66,13 +66,13 @@ class MapperOperation {
 
     if (cardinality == Cardinality.SINGULAR){
       parameters.add(new PathParameter()
-              .description("The ID of the "+schemaName+" to be retrieved")
+              .description("The ID of the [" + this.schemaName + "](" + this.schemaURI + ") to be retrieved")
               .name("id")
               .required(true)
               .schema(new StringSchema()));
     }
 
-    if (auth && Set.of(Method.PATCH, Method.PUT, Method.POST, Method.DELETE).contains(method)) {
+    if (this.auth && Set.of(Method.PATCH, Method.PUT, Method.POST, Method.DELETE).contains(method)) {
       parameters.add(new QueryParameter()
               .description("Username")
               .name("user")
@@ -81,9 +81,9 @@ class MapperOperation {
     }
 
     operation = new Operation()
-          .description(description)
-          .summary(summary)
-          .addTagsItem(schemaName)
+          .description(this.description)
+          .summary(this.summary)
+          .addTagsItem(this.schemaName)
           .parameters(parameters)
           .responses(apiResponses);
 
@@ -112,9 +112,8 @@ class MapperOperation {
     switch (cardinality) {
       case PLURAL: {
         summary = "List all instances of " + this.schemaName;
-        description = "Gets a list of all instances of " + this.schemaName +
-                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
-        responseDescriptionOk = "Successful response - returns an array with the instances of " + schemaName + ".";
+        description = "Gets a list of all instances of [" + this.schemaName + "](" + this.schemaURI + ")";
+        responseDescriptionOk = "Successful response - returns an array with the instances of [" + this.schemaName + "](" + this.schemaURI + ").";
 
         //Set response
         ArraySchema schema = new ArraySchema();
@@ -162,9 +161,8 @@ class MapperOperation {
       }
       case SINGULAR: {
         summary = "Get a single " + this.schemaName + " by its id";
-        description = "Gets the details of a given " + this.schemaName +
-                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
-        responseDescriptionOk = "Gets the details of a given " + schemaName;
+        description = "Gets the details of a given [" + this.schemaName + "](" + this.schemaURI + ")";
+        responseDescriptionOk = "Gets the details of a given [" + this.schemaName + "](" + this.schemaURI + ")";
 
         //Set request
         var mediaType = new MediaType().schema(schema);
@@ -186,12 +184,11 @@ class MapperOperation {
   }
 
   private void setOperationPost() {
-    String requestDescription = "Information about the " + this.schemaName + " to be created";
+    String requestDescription = "Information about the [" + this.schemaName + "](" + this.schemaURI + ") to be created";
 
     //Edit global fields
     summary = "Create one " + this.schemaName;
-    description = "Create a new instance of " + this.schemaName+
-                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
+    description = "Create a new instance of [" + this.schemaName + "](" + this.schemaURI + ")";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
@@ -211,11 +208,10 @@ class MapperOperation {
   }
 
   private void setOperationPut() {
-    String requestDescription = "An old " + this.schemaName + " to be updated";
+    String requestDescription = "An old [" + this.schemaName + "](" + this.schemaURI + ") to be updated";
 
     summary = "Update an existing " + this.schemaName;
-    description = "Updates an existing " + this.schemaName +
-                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
+    description = "Updates an existing [" + this.schemaName + "](" + this.schemaURI + ")";
 
     //Set request
     MediaType mediaType = new MediaType().schema(schema);
@@ -240,8 +236,7 @@ class MapperOperation {
 
   private void setOperationDelete() {
     summary = "Delete an existing " + this.schemaName;
-    description = "Delete an existing " + this.schemaName +
-                " (more information at [" + this.schemaName + "](" + this.schemaURI + "))";
+    description = "Delete an existing [" + this.schemaName + "](" + this.schemaURI + ")";
 
     //Set the response
     apiResponses
