@@ -117,7 +117,6 @@ public class ObjectVisitor implements OWLObjectVisitor {
 	 * @return a {@link Schema} for the entire class
 	 */
 	public Schema getClassSchema() {
-
 		// There are cases where a property has ComplementOf set (i.e. "not: ...") but no items.
 		// Because the schema is an array, it will have problems.
 		// Need to either change it to "type: object" OR add empty items list (i.e. "items: {}").
@@ -715,9 +714,69 @@ public class ObjectVisitor implements OWLObjectVisitor {
 			}
 		});
 
-		// Loop through each expression in the equivalent classes axiom and accept visits from everything else.
+		// Loop through the class expressions in the defined / equivalent-to classes axiom and accept visits from everything else.
 		ax.classExpressions().filter((e) -> !this.baseClass.equals(e) && !(e instanceof OWLObjectOneOf)).forEach((e) -> {
-			e.accept(this);
+			// Correctly configured defined (equivalent to) classes (excluding enums, handled above) _should_ be an intersection of
+			// one or more classes plus (optional) properties.
+			if (e instanceof OWLObjectIntersectionOf) {
+				((OWLObjectIntersectionOf) e).operands().forEach((intersectionOperand) -> {
+					if (intersectionOperand instanceof OWLClass) {
+						// Handle classes normally, as though a superclass that we inherit from.
+						intersectionOperand.accept(this);
+					} else if (intersectionOperand instanceof OWLObjectRestriction) {
+						// For object restrictions, we need to set the object property name first.
+						final var objectPropertyExpression = ((OWLObjectRestriction) intersectionOperand).getProperty();
+						final var objectProperty = objectPropertyExpression.asOWLObjectProperty();
+						final var propertyName = objectProperty.getIRI().getShortForm();
+						this.propertyNames.add(propertyName);
+						this.currentlyProcessedPropertyName = propertyName;
+						intersectionOperand.accept(this);
+						this.currentlyProcessedPropertyName = null;
+					} else if (intersectionOperand instanceof OWLDataRestriction) {
+						// For data restrictions, we need to set the data property name first.
+						final var dataPropertyExpression = ((OWLDataRestriction) intersectionOperand).getProperty();
+						final var dataProperty = dataPropertyExpression.asOWLDataProperty();
+						final var propertyName = dataProperty.getIRI().getShortForm();
+						this.propertyNames.add(propertyName);
+						this.currentlyProcessedPropertyName = propertyName;
+						intersectionOperand.accept(this);
+						this.currentlyProcessedPropertyName = null;
+					} else {
+						// Not sure what would cause this, but lets spit out an error and figure it out if we encounter it.
+						logger.severe("################ Operand instanceof ???:  "+intersectionOperand);
+						logger.severe("################ Taking no action for now.  Need to figure out what use case this is.");
+					}
+				});
+			} else {
+				// Not sure this is a valid scenario??  This might happen for synonym classes?  Not sure if other scenarios are valid (e.g. only an object/data property)??
+
+				if (e instanceof OWLClass) {
+					// Handle classes normally, as though a superclass that we inherit from.
+					e.accept(this);
+				} else if (e instanceof OWLObjectRestriction) {
+					// For object restrictions, we need to set the object property name first.
+					final var objectPropertyExpression = ((OWLObjectRestriction) e).getProperty();
+					final var objectProperty = objectPropertyExpression.asOWLObjectProperty();
+					final var propertyName = objectProperty.getIRI().getShortForm();
+					this.propertyNames.add(propertyName);
+					this.currentlyProcessedPropertyName = propertyName;
+					e.accept(this);
+					this.currentlyProcessedPropertyName = null;
+				} else if (e instanceof OWLDataRestriction) {
+					// For data restrictions, we need to set the data property name first.
+					final var dataPropertyExpression = ((OWLDataRestriction) e).getProperty();
+					final var dataProperty = dataPropertyExpression.asOWLDataProperty();
+					final var propertyName = dataProperty.getIRI().getShortForm();
+					this.propertyNames.add(propertyName);
+					this.currentlyProcessedPropertyName = propertyName;
+					e.accept(this);
+					this.currentlyProcessedPropertyName = null;
+				} else {
+					// Not sure what would cause this, but lets spit out an error and figure it out if we encounter it.
+					logger.severe("################ Operand instanceof ???:  "+e);
+					logger.severe("################ Taking no action for now.  Need to figure out what use case this is.");
+				}
+			}
 		});
 	}
 
