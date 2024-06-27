@@ -40,7 +40,7 @@ class SerializerPython {
 
     //Create variable file
     FileWriter var_file_writer = new FileWriter(variables_file);
-    Iterator it = mapper.schemaNames.entrySet().iterator();
+    Iterator it = mapper.getSchemaNames().entrySet().iterator();
     add_variable_python(var_file_writer, it);
     var_file_writer.close();
 

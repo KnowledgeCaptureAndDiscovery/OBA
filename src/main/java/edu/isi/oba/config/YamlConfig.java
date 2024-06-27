@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class YamlConfig {
   private final Map<CONFIG_FLAG, Boolean> configFlags = new HashMap<>(){{
@@ -14,12 +15,15 @@ public class YamlConfig {
     put(CONFIG_FLAG.DEFAULT_DESCRIPTIONS, true);
     put(CONFIG_FLAG.DEFAULT_PROPERTIES, true);
     put(CONFIG_FLAG.FOLLOW_REFERENCES, true);
+    put(CONFIG_FLAG.GENERATE_JSON_FILE, false);
     put(CONFIG_FLAG.PATH_DELETE, false);
     put(CONFIG_FLAG.PATH_GET, true);
     put(CONFIG_FLAG.PATH_PATCH, false);
     put(CONFIG_FLAG.PATH_POST, false);
     put(CONFIG_FLAG.PATH_PUT, false);
     put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, false);
+    put(CONFIG_FLAG.USE_INHERITANCE_REFERENCES, false);
+    put(CONFIG_FLAG.USE_KEBAB_CASE_PATHS, false);
   }};
 
   String DEFAULT_OUTPUT_DIRECTORY = "outputs";
@@ -27,14 +31,14 @@ public class YamlConfig {
   public OpenAPI openapi;
   public String output_dir = DEFAULT_OUTPUT_DIRECTORY;
   public String name = DEFAULT_PROJECT_NAME;
-  public List<String> paths;
-  public List<String> ontologies;
+  public Set<String> paths;
+  public Set<String> ontologies;
   private EndpointConfig endpoint;
-  public AuthConfig auth;
+  private AuthConfig auth;
   public FirebaseConfig firebase;
   public Map<String, List<RelationConfig>> relations;
   private LinkedHashMap<String, PathItem> custom_paths = null;
-  public List<String> classes;
+  public Set<String> classes;
   public String custom_queries_directory;
 
   public Boolean getEnable_get_paths() {
@@ -78,7 +82,7 @@ public class YamlConfig {
   }
 
   public String getCustom_queries_directory() {
-    return custom_queries_directory;
+    return this.custom_queries_directory;
   }
 
   public void setCustom_queries_directory(String custom_queries_directory) {
@@ -86,7 +90,7 @@ public class YamlConfig {
   }
 
   public String getOutput_dir() {
-    return output_dir;
+    return this.output_dir;
   }
 
   public void setOutput_dir(String output_dir) {
@@ -94,31 +98,31 @@ public class YamlConfig {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(String name) {
     this.name = name;
   }
 
-  public List<String> getPaths() {
-    return paths;
+  public Set<String> getPaths() {
+    return this.paths;
   }
 
-  public void setPaths(List<String> paths) {
+  public void setPaths(Set<String> paths) {
     this.paths = paths;
   }
 
-  public List<String>  getOntologies() {
-    return ontologies;
+  public Set<String>  getOntologies() {
+    return this.ontologies;
   }
 
-  public void setOntologies(List<String> ontologies) {
+  public void setOntologies(Set<String> ontologies) {
     this.ontologies = ontologies;
   }
 
   public EndpointConfig getEndpoint() {
-    return endpoint;
+    return this.endpoint;
   }
 
   public void setEndpoint(EndpointConfig endpoint) {
@@ -126,7 +130,7 @@ public class YamlConfig {
   }
 
   public FirebaseConfig getFirebase() {
-    return firebase;
+    return this.firebase;
   }
 
   public void setFirebase(FirebaseConfig firebase) {
@@ -134,7 +138,7 @@ public class YamlConfig {
   }
 
   public Map<String, List<RelationConfig>> getRelations() {
-    return relations;
+    return this.relations;
   }
 
   public void setRelations(Map<String, List<RelationConfig>> relations) {
@@ -142,7 +146,7 @@ public class YamlConfig {
   }
 
   public LinkedHashMap<String, PathItem> getCustom_paths() {
-    return custom_paths;
+    return this.custom_paths;
   }
 
   public void setCustom_paths(LinkedHashMap<String, PathItem> custom_paths) {
@@ -150,18 +154,18 @@ public class YamlConfig {
   }
 
   public OpenAPI getOpenapi() {
-    return openapi;
+    return this.openapi;
   }
 
   public void setOpenapi(OpenAPI openapi) {
     this.openapi = openapi;
   }
 
-  public List<String> getClasses() {
+  public Set<String> getClasses() {
     return this.classes;
   }
 
-  public void setClasses(List<String> classes) {
+  public void setClasses(Set<String> classes) {
     this.classes = classes;
   }
 
@@ -179,6 +183,14 @@ public class YamlConfig {
 
   public void setFollow_references(Boolean follow_references) {
     this.configFlags.put(CONFIG_FLAG.FOLLOW_REFERENCES, follow_references);
+  }
+
+  public Boolean getUse_inheritance_references() {
+    return this.configFlags.get(CONFIG_FLAG.USE_INHERITANCE_REFERENCES);
+  }
+
+  public void setUse_inheritance_references(Boolean use_inheritance_references) {
+    this.configFlags.put(CONFIG_FLAG.USE_INHERITANCE_REFERENCES, use_inheritance_references);
   }
 
   public Boolean getDefault_descriptions() {
@@ -205,8 +217,24 @@ public class YamlConfig {
     this.configFlags.put(CONFIG_FLAG.REQUIRED_PROPERTIES_FROM_CARDINALITY, required_properties_from_cardinality);
   }
 
+  public Boolean getUse_kebab_case_paths() {
+    return this.configFlags.get(CONFIG_FLAG.USE_KEBAB_CASE_PATHS);
+  }
+
+  public void setUse_kebab_case_paths(Boolean use_kebab_case_paths) {
+    this.configFlags.put(CONFIG_FLAG.USE_KEBAB_CASE_PATHS, use_kebab_case_paths);
+  }
+
+  public Boolean getGenerate_json_file() {
+    return this.configFlags.get(CONFIG_FLAG.GENERATE_JSON_FILE);
+  }
+
+  public void setGenerate_json_file(Boolean generate_json_file) {
+    this.configFlags.put(CONFIG_FLAG.GENERATE_JSON_FILE, generate_json_file);
+  }
+
   public AuthConfig getAuth() {
-    return auth;
+    return this.auth;
   }
 
   public void setAuth(AuthConfig auth) {

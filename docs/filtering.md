@@ -38,12 +38,19 @@ enable_post_paths: false
 enable_delete_paths: false
 enable_put_paths: false
 
+## For endpoint path names, use "kebab-case" case (all lowercase and separate words with a dash/hyphen).  Synonyms for "kebab-case" include: caterpillar-case, param-case, dash-case, hyphen-case, lisp-case, spinal-case and css-case
+use_kebab_case_paths: false
+
 ## Select the classes to add in the API
 classes:
   - http://dbpedia.org/ontology/Genre
   - http://dbpedia.org/ontology/Band
 
+## REFERENCES
+### Enable/disable schema references.  This can be recursive and cause multiple depths/levels of reference.
 follow_references: false
+### Enable/disable use of references for class/schema inheritance.
+use_inheritance_references: false
 
 ## Enable/disable generation of a default description for each schema
 default_descriptions: true
@@ -76,17 +83,19 @@ components:
           type: array
 ```
 
-The option `follow_references` enables to follow the references.
-Let's enable the option for the previous example.
+The option `follow_references` enables OBA to follow the references when generating the OpenAPI spec.
 
-Now, you have the whole information:
+For comparison, let's enable the option for the previous example.
+
+Assume the following information is true for the ontology:
 
 - A city has 423 properties.
-- One property is the leaderName and a leaderName is Person.
-- A person has 285.
+- One property is `leaderName` and a `leaderName` is Person reference.
+- A person has 285 properties.
+- (this is **a lot** of properties to process)
 
 !!! warning
-For large ontologies, we don't recommend use the option because the result can be too heavy.
+For large ontologies, we don't recommend using the `follow_references` option because the result can be too heavy/large.
 
 ```yaml
 components:
@@ -151,7 +160,80 @@ components:
             type: string
           nullable: true
           type: array
+        ...
+        ...etc..
+        ...
+        finalProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
 ```
+
+#### Using inheritance references
+
+Enabling option `use_inheritance_references` only works if `follow_references` is also enabled (which it is by default - see above). Whereas `follow_references` allows `$ref` to be used to reference other schemas, `use_inheritance_references` allows references to parent/super classes to be used via the `allOf:` option for a class schema. This option can reduce the size of the OpenAPI spec at the cost of added OpenAPI parser/UI processing time.
+
+For example, lets say that a `Doctor` is a subclass of a `Person`. The `Doctor` has one property `licenseDetails` and inherits all other properties from `Person`. If `use_inheritance_references` is disabled, then its schema will look like:
+
+```yaml
+components:
+  schemas:
+    Doctor:
+      properties:
+        licenseDetails:
+          items:
+            type: object
+          nullable: true
+          type: array
+        firstPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+        ...
+        ...etc..
+        ...
+        finalPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+```
+
+Enabling option `use_inheritance_references` allows the `Person` schema to be referenced completely, so that the `Person`-specific properties only appear on the `Person` schema. The result looks like:
+
+```yaml
+components:
+  schemas:
+    Doctor:
+      allOf:
+        - type: object
+        - $ref: "#components/schemas/Person"
+      properties:
+        licenseDetails:
+          items:
+            type: object
+          nullable: true
+          type: array
+    Person:
+      properties:
+        firstPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+        ...
+        ...etc..
+        ...
+        finalPersonProperty:
+          items:
+            type: string
+          nullable: true
+          type: array
+```
+
+In some cases, the subclass inherits a property and then has additional restrictions for the inherited property that do not exist on the parent/super class. In these situations, the entire property _will_ be copied to the subclass with all of the parent/super class property information _and_ the subclass's restrictions.
 
 ### Including default schema descriptions
 

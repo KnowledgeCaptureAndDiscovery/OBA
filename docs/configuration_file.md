@@ -45,12 +45,19 @@ enable_post_paths: false
 enable_delete_paths: false
 enable_put_paths: false
 
+## For endpoint path names, use "kebab-case" case (all lowercase and separate words with a dash/hyphen).  Synonyms for "kebab-case" include: caterpillar-case, param-case, dash-case, hyphen-case, lisp-case, spinal-case and css-case
+use_kebab_case_paths: false
+
 ## Select the classes to add in the API
 classes:
   - http://dbpedia.org/ontology/Genre
   - http://dbpedia.org/ontology/Band
 
+## REFERENCES
+### Enable/disable schema references.  This can be recursive and cause multiple depths/levels of reference.
 follow_references: false
+### Enable/disable use of references for class/schema inheritance.
+use_inheritance_references: false
 
 ## Enable/disable generation of a default description for each schema
 default_descriptions: true
@@ -94,6 +101,18 @@ Example:
 
 ```yaml
 output_dir: outputs
+```
+
+Te generate the OpenAPI spec files as JSON, use the `generate_json_file` flag set to `true`.
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `False`   |
+
+```yaml
+generate_json_file: true
 ```
 
 ### OpenAPI
@@ -162,6 +181,22 @@ Enable the PUT method for the paths
 | **Required:** | `false`   |
 | **Type:**     | `boolean` |
 | **Default:**  | `false`   |
+
+### use_kebab_case_paths
+
+For endpoint path names, use "kebab-case" case (all lowercase and separate words with a dash/hyphen). Synonyms for "kebab-case" include: caterpillar-case, param-case, dash-case, hyphen-case, lisp-case, spinal-case and css-case.
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `False`   |
+
+For more information, go to [filtering classes](filtering.md#use_kebab_case_paths)
+
+```yaml
+use_kebab_case_paths: true
+```
 
 ### endpoint
 
@@ -275,6 +310,20 @@ For more information, go to [filtering classes](filtering.md#following-reference
 
 ```yaml
 follow_references: false
+```
+
+### use_inheritance_references
+
+| Field         | Value     |
+| ------------- | --------- |
+| **Required:** | `false`   |
+| **Type:**     | `Boolean` |
+| **Default:**  | `False`   |
+
+For more information, go to [filtering classes](filtering.md#use_inheritance_references)
+
+```yaml
+use_inheritance_references: false
 ```
 
 ### default_descriptions
