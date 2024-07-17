@@ -205,7 +205,6 @@
     <!-- https://w3id.org/example#hasRector -->
 
     <owl:ObjectProperty rdf:about="https://w3id.org/example#hasRector">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://w3id.org/example#University"/>
         <rdfs:range rdf:resource="https://w3id.org/example#Professor"/>
         <rdfs:label xml:lang="en">has rector</rdfs:label>
@@ -881,6 +880,13 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="https://w3id.org/example#hasProfessor"/>
                 <owl:someValuesFrom rdf:resource="https://w3id.org/example#Professor"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://w3id.org/example#hasRector"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="https://w3id.org/example#Professor"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
